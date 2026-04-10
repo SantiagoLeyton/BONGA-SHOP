@@ -1,0 +1,20 @@
+# Backend
+/target/
+*.class
+
+# Frontend
+/node_modules/
+/dist/
+/.angular/
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Env
+.env
+.env.*
+
+# Logs
+*.log

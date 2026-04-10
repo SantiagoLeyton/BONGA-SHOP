@@ -1,0 +1,1 @@
+-- Consolidated database SQL placeholder
