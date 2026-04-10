@@ -1,0 +1,26 @@
+<app-modal-shell
+  [isOpen]="isOpen()"
+  title="Crear cuenta"
+  (closed)="close()"
+>
+  <form class="auth-form" (submit)="$event.preventDefault()">
+    <label class="field">
+      <span>Nombre</span>
+      <input type="text" name="name" autocomplete="name" placeholder="Tu nombre" />
+    </label>
+    <label class="field">
+      <span>Correo</span>
+      <input type="email" name="email" autocomplete="email" placeholder="tu@correo.com" />
+    </label>
+    <label class="field">
+      <span>Contraseña</span>
+      <input type="password" name="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres" />
+    </label>
+    <button type="button" class="btn btn-primary" disabled>Registrarme</button>
+    <p class="hint">El registro real se conectará al API de Spring Boot.</p>
+    <p class="switch">
+      ¿Ya tienes cuenta?
+      <button type="button" class="linkish" (click)="openLogin()">Iniciar sesión</button>
+    </p>
+  </form>
+</app-modal-shell>

@@ -1,0 +1,53 @@
+<section class="hero">
+  <div class="container hero-grid">
+    <div class="hero-copy reveal">
+      <p class="kicker">BONGA SHOP · vapes desechables</p>
+      <h1 class="title">Urbano, limpio y listo para integrarse con tu backend.</h1>
+      <p class="lead">
+        Una base visual premium para catálogo y administración: mock data hoy, Spring Boot mañana.
+      </p>
+      <div class="cta">
+        <a class="btn btn-primary" routerLink="/products">Ver productos</a>
+        <a class="btn btn-secondary" routerLink="/admin">Vista admin</a>
+      </div>
+      <p class="fineprint">Solo +18. Consume con responsabilidad.</p>
+    </div>
+    <div class="hero-art reveal reveal--delay">
+      <img src="/assets/hero-vapor.svg" width="900" height="520" alt="" loading="eager" />
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-head reveal">
+      <h2>Destacados</h2>
+      <p class="muted">Selección curada para mostrar cards, badges y precios desde mock data.</p>
+    </div>
+
+    <div class="grid">
+      @for (p of featured(); track p.id) {
+        <div class="reveal">
+          <app-product-card [product]="p" />
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<section class="section section--brand">
+  <div class="container split reveal">
+    <div>
+      <h2>Marca con actitud, sin ruido</h2>
+      <p class="muted">
+        Oscuros elegantes, acentos fríos y tipografía moderna. Pensado para un público joven que valora claridad y
+        estética urbana.
+      </p>
+    </div>
+    <ul class="ticks">
+      <li>Componentes reutilizables y rutas lazy-loaded</li>
+      <li>Modales listos para JWT y formularios reales</li>
+      <li>Grid responsive y filtros preparados para API</li>
+    </ul>
+  </div>
+</section>

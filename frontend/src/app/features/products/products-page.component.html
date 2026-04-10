@@ -1,0 +1,38 @@
+<div class="page-head container reveal">
+  <div>
+    <h1 class="title">Catálogo</h1>
+    <p class="muted">Mock data local — sustituye por HTTP cuando el API esté listo.</p>
+  </div>
+</div>
+
+<div class="container layout">
+  <aside class="aside" aria-label="Filtros">
+    <app-filter-panel
+      [brands]="brands()"
+      [flavors]="flavors()"
+      [value]="filters()"
+      (valueChange)="onFiltersChange($event)"
+    />
+  </aside>
+
+  <section class="catalog" aria-label="Resultados">
+    <div class="toolbar">
+      <p class="count">
+        <strong>{{ filtered().length }}</strong>
+        <span class="muted">resultados</span>
+      </p>
+    </div>
+
+    <div class="grid">
+      @for (p of filtered(); track p.id) {
+        <div class="reveal">
+          <app-product-card [product]="p" />
+        </div>
+      } @empty {
+        <div class="empty">
+          <p class="muted">No hay productos con estos filtros.</p>
+        </div>
+      }
+    </div>
+  </section>
+</div>

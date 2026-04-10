@@ -1,0 +1,50 @@
+.auth-form {
+  display: grid;
+  gap: 0.875rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  color: var(--color-muted);
+
+  input {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: rgba(15, 23, 42, 0.55);
+    color: var(--color-text);
+    padding: 0.65rem 0.75rem;
+    outline: none;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+
+    &:focus {
+      border-color: rgba(94, 234, 212, 0.55);
+      box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.12);
+    }
+  }
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+  line-height: 1.45;
+}
+
+.switch {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+.linkish {
+  border: 0;
+  background: transparent;
+  color: var(--color-accent);
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

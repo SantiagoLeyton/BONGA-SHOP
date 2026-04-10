@@ -1,0 +1,29 @@
+<footer class="footer">
+  <div class="container footer-grid">
+    <div>
+      <p class="eyebrow">BONGA SHOP</p>
+      <p class="muted">
+        Vapes desechables con estética urbana. Catálogo visual preparado para integración con backend y carrito.
+      </p>
+    </div>
+    <div>
+      <p class="eyebrow">Explorar</p>
+      <ul class="list">
+        <li><a routerLink="/">Inicio</a></li>
+        <li><a routerLink="/products">Productos</a></li>
+        <li><a routerLink="/admin">Panel admin</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="eyebrow">Equipo</p>
+      <p class="muted small">UI/UX base por Esteban Bonilla — listo para JWT, carrito y API.</p>
+    </div>
+  </div>
+  <div class="container bottom">
+    <span>© {{ year }} BONGA SHOP</span>
+    <span class="muted small"
+      >Proyecto académico / profesional ·
+      <button type="button" class="linkish" (click)="openInfo()">Modal informativo</button></span
+    >
+  </div>
+</footer>

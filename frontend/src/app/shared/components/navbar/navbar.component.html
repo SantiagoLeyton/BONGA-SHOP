@@ -1,0 +1,44 @@
+<header class="nav" [class.nav--open]="menuOpen()">
+  <div class="container nav-inner">
+    <a class="brand" routerLink="/" (click)="closeMenu()" aria-label="BONGA SHOP inicio">
+      <img src="/assets/logo-bonga.svg" width="168" height="36" alt="" />
+    </a>
+
+    <button
+      type="button"
+      class="burger"
+      (click)="toggleMenu()"
+      [attr.aria-expanded]="menuOpen()"
+      aria-controls="primary-nav"
+      aria-label="Abrir menú"
+    >
+      <span></span><span></span><span></span>
+    </button>
+
+    <div class="panel">
+      <nav id="primary-nav" class="links" aria-label="Principal">
+        <a
+          routerLink="/"
+          routerLinkActive="is-active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeMenu()"
+          >Inicio</a
+        >
+        <a routerLink="/products" routerLinkActive="is-active" (click)="closeMenu()">Productos</a>
+        <a routerLink="/admin" routerLinkActive="is-active" (click)="closeMenu()">Admin</a>
+      </nav>
+
+      <div class="actions">
+        <button type="button" class="btn btn-ghost btn-sm cart" disabled title="Carrito (próximamente)">
+          Carrito
+          <span class="dot" aria-hidden="true">0</span>
+        </button>
+        <button type="button" class="btn btn-ghost btn-sm" (click)="openLogin()">Entrar</button>
+        <button type="button" class="btn btn-primary btn-sm" (click)="openRegister()">Registro</button>
+      </div>
+    </div>
+  </div>
+  @if (menuOpen()) {
+    <button type="button" class="scrim" (click)="closeMenu()" tabindex="-1" aria-hidden="true"></button>
+  }
+</header>
