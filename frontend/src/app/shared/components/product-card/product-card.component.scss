@@ -43,6 +43,40 @@
   left: 0.75rem;
 }
 
+.wish {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(2, 6, 23, 0.45);
+  backdrop-filter: blur(10px);
+  color: rgba(226, 232, 240, 0.9);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, color 160ms ease;
+
+  span {
+    font-size: 1.05rem;
+    line-height: 1;
+    transform: translateY(-0.5px);
+  }
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: rgba(94, 234, 212, 0.22);
+  }
+}
+
+.wish--on {
+  background: rgba(251, 113, 133, 0.18);
+  border-color: rgba(251, 113, 133, 0.28);
+  color: rgba(251, 113, 133, 0.95);
+}
+
 .body {
   display: grid;
   gap: 0.55rem;

@@ -38,6 +38,7 @@
   gap: 1rem;
 
   a {
+    position: relative;
     color: var(--color-muted);
     text-decoration: none;
     font-weight: 600;
@@ -59,6 +60,20 @@
   }
 }
 
+.badge {
+  display: inline-grid;
+  place-items: center;
+  margin-left: 0.35rem;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 800;
+  color: rgba(2, 6, 23, 0.92);
+  background: rgba(94, 234, 212, 0.9);
+}
+
 .actions {
   grid-column: 3 / 4;
   display: flex;
@@ -67,12 +82,16 @@
   gap: 0.5rem;
 }
 
+.prefs {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+}
+
 .cart {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  opacity: 0.65;
-  cursor: not-allowed;
 }
 
 .dot {

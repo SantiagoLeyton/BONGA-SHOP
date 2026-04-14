@@ -1,6 +1,17 @@
 <article class="card">
   <a class="media" [routerLink]="['/products', product.slug]">
     <img [src]="product.imageUrl" [alt]="'Ilustración de ' + product.name" loading="lazy" />
+    <button
+      type="button"
+      class="wish"
+      [class.wish--on]="wished()"
+      (click)="toggleWish($event)"
+      [attr.aria-pressed]="wished()"
+      aria-label="Guardar en favoritos"
+      title="Favoritos"
+    >
+      <span aria-hidden="true">♥</span>
+    </button>
     @if (product.badge) {
       <div class="badge-wrap">
         <app-product-badge [badge]="product.badge" />

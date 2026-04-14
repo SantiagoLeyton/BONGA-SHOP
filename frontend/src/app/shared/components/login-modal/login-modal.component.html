@@ -3,17 +3,60 @@
   title="Iniciar sesión"
   (closed)="close()"
 >
-  <form class="auth-form" (submit)="$event.preventDefault()">
+  <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
     <label class="field">
       <span>Correo</span>
-      <input type="email" name="email" autocomplete="username" placeholder="tu@correo.com" />
+      <input
+        type="email"
+        formControlName="email"
+        autocomplete="username"
+        placeholder="tu@correo.com"
+        [attr.aria-invalid]="form.controls.email.invalid && (form.controls.email.touched || form.controls.email.dirty)"
+      />
+      @if (form.controls.email.invalid && (form.controls.email.touched || form.controls.email.dirty)) {
+        <span class="err">Ingresa un correo válido.</span>
+      }
     </label>
     <label class="field">
       <span>Contraseña</span>
-      <input type="password" name="password" autocomplete="current-password" placeholder="••••••••" />
+      <div class="pw">
+        <input
+          [type]="showPassword() ? 'text' : 'password'"
+          formControlName="password"
+          autocomplete="current-password"
+          placeholder="••••••••"
+          [attr.aria-invalid]="
+            form.controls.password.invalid && (form.controls.password.touched || form.controls.password.dirty)
+          "
+        />
+        <button type="button" class="pw-btn" (click)="togglePassword()">
+          {{ showPassword() ? 'Ocultar' : 'Ver' }}
+        </button>
+      </div>
+      @if (form.controls.password.invalid && (form.controls.password.touched || form.controls.password.dirty)) {
+        <span class="err">Mínimo 8 caracteres.</span>
+      }
     </label>
-    <button type="button" class="btn btn-primary" disabled>Continuar</button>
-    <p class="hint">La autenticación real se integrará con el backend (JWT).</p>
+    <div class="row">
+      <label class="check">
+        <input type="checkbox" formControlName="remember" />
+        <span>Recordarme</span>
+      </label>
+      <button type="button" class="linkish" (click)="forgotPassword()">¿Olvidaste tu contraseña?</button>
+    </div>
+
+    @if (error()) {
+      <p class="alert" role="alert">{{ error() }}</p>
+    }
+
+    <button type="submit" class="btn btn-primary" [disabled]="!canSubmit()">
+      @if (loading()) {
+        Continuando…
+      } @else {
+        Continuar
+      }
+    </button>
+    <p class="hint">Mock auth por ahora. Con JWT y backend se validará el login real.</p>
     <p class="switch">
       ¿No tienes cuenta?
       <button type="button" class="linkish" (click)="openRegister()">Crear cuenta</button>

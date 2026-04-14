@@ -7,6 +7,7 @@ import { LoginModalComponent } from '../../shared/components/login-modal/login-m
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { RegisterModalComponent } from '../../shared/components/register-modal/register-modal.component';
 import { ToastContainerComponent } from '../../shared/components/toast-container/toast-container.component';
+import { CartDrawerComponent } from '../../shared/components/cart-drawer/cart-drawer.component';
 import { filter } from 'rxjs';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { registerGsap } from '../../shared/animation/register-gsap';
@@ -24,6 +25,7 @@ import { routeAnimations } from '../../shared/animations/route.animations';
     RegisterModalComponent,
     InfoModalComponent,
     ToastContainerComponent,
+    CartDrawerComponent,
   ],
   templateUrl: './main-layout.component.html',
   styleUrl: './main-layout.component.scss',

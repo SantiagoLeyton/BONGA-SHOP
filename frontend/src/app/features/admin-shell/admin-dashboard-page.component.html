@@ -45,8 +45,16 @@
             <p class="muted small">Mock table · lista para conectar al API</p>
           </div>
           <div class="table-actions">
-            <button type="button" class="btn btn-secondary btn-sm" disabled>Nuevo producto</button>
-            <button type="button" class="btn btn-ghost btn-sm" disabled>Exportar</button>
+            <label class="search">
+              <span class="sr-only">Buscar</span>
+              <input
+                type="search"
+                placeholder="Buscar…"
+                [value]="query()"
+                (input)="setQuery($any($event.target).value)"
+              />
+            </label>
+            <button type="button" class="btn btn-secondary btn-sm" (click)="openCreate()">Nuevo producto</button>
           </div>
         </div>
 
@@ -60,52 +68,63 @@
                 <th>Stock</th>
                 <th class="right">Precio desde</th>
                 <th class="right">Estado</th>
+                <th class="right">Acciones</th>
               </tr>
             </thead>
             <tbody>
-              <tr>
-                <td>
-                  <div class="cell-title">
-                    <span class="dot dot--a" aria-hidden="true"></span>
-                    Breeze Ice Duo
-                  </div>
-                </td>
-                <td>Urban Mist</td>
-                <td>3</td>
-                <td>48</td>
-                <td class="right">12.99 €</td>
-                <td class="right"><span class="pill ok">Activo</span></td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="cell-title">
-                    <span class="dot dot--b" aria-hidden="true"></span>
-                    Neon Citrus
-                  </div>
-                </td>
-                <td>Neon Labs</td>
-                <td>2</td>
-                <td>60</td>
-                <td class="right">11.50 €</td>
-                <td class="right"><span class="pill warn">Nuevo</span></td>
-              </tr>
-              <tr>
-                <td>
-                  <div class="cell-title">
-                    <span class="dot dot--c" aria-hidden="true"></span>
-                    Shadow Grape
-                  </div>
-                </td>
-                <td>Nocturne</td>
-                <td>2</td>
-                <td>5</td>
-                <td class="right">13.25 €</td>
-                <td class="right"><span class="pill bad">Stock bajo</span></td>
-              </tr>
+              @for (p of view(); track p.id) {
+                <tr>
+                  <td>
+                    <div class="cell-title">
+                      <span class="dot dot--a" aria-hidden="true"></span>
+                      {{ p.name }}
+                    </div>
+                    <p class="muted small">{{ p.slug }}</p>
+                  </td>
+                  <td>{{ p.brand.name }}</td>
+                  <td>{{ p.variants.length }}</td>
+                  <td>{{ stockTotal(p) }}</td>
+                  <td class="right">
+                    {{ minPrice(p) | number : '1.2-2' }} €
+                  </td>
+                  <td class="right">
+                    @if (stockTotal(p) <= 5) {
+                      <span class="pill bad">Stock bajo</span>
+                    } @else {
+                      <span class="pill ok">Activo</span>
+                    }
+                  </td>
+                  <td class="right">
+                    <div class="row-actions">
+                      <button type="button" class="btn btn-ghost btn-sm" (click)="openEdit(p)">Editar</button>
+                      <button type="button" class="btn btn-text btn-sm" (click)="deleteProduct(p)">Eliminar</button>
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="7">
+                    <p class="muted">No hay resultados.</p>
+                  </td>
+                </tr>
+              }
             </tbody>
           </table>
+        </div>
+
+        <div class="pager">
+          <button type="button" class="btn btn-ghost btn-sm" (click)="prev()">Anterior</button>
+          <p class="muted small">Página {{ page() }} / {{ totalPages() }}</p>
+          <button type="button" class="btn btn-ghost btn-sm" (click)="next()">Siguiente</button>
         </div>
       </div>
     </section>
   </div>
 </div>
+
+<app-admin-product-modal
+  [isOpen]="modalOpen()"
+  [product]="editing()"
+  (closed)="closeModal()"
+  (saved)="saveProduct($event)"
+/>

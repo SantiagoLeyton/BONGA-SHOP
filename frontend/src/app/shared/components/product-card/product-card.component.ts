@@ -1,7 +1,9 @@
 import { DecimalPipe } from '@angular/common';
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import type { Product } from '../../../core/models/product.model';
+import { ToastService } from '../../../core/services/toast.service';
+import { WishlistService } from '../../../core/services/wishlist.service';
 import { ProductBadgeComponent } from '../product-badge/product-badge.component';
 
 @Component({
@@ -12,9 +14,14 @@ import { ProductBadgeComponent } from '../product-badge/product-badge.component'
   styleUrl: './product-card.component.scss',
 })
 export class ProductCardComponent {
+  private readonly wishlist = inject(WishlistService);
+  private readonly toasts = inject(ToastService);
+
   @Input({ required: true }) product!: Product;
   @Input() showQuickView = false;
   @Output() quickView = new EventEmitter<Product>();
+
+  readonly wished = computed(() => this.wishlist.has(this.product?.id));
 
   minPrice(): number {
     return Math.min(...this.product.variants.map((v) => v.price));
@@ -35,5 +42,16 @@ export class ProductCardComponent {
     event.preventDefault();
     event.stopPropagation();
     this.quickView.emit(this.product);
+  }
+
+  toggleWish(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    const isOn = this.wishlist.toggle(this.product.id);
+    this.toasts.show(
+      isOn ? 'Guardado en favoritos' : 'Quitado de favoritos',
+      isOn ? 'success' : 'info',
+      'Favoritos',
+    );
   }
 }

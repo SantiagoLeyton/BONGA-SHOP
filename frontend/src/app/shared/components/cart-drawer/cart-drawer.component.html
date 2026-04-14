@@ -1,0 +1,70 @@
+@if (isOpen()) {
+  <div class="root">
+    <button type="button" class="backdrop" (click)="close()" aria-label="Cerrar carrito"></button>
+    <aside class="panel" role="dialog" aria-modal="true" aria-label="Carrito">
+      <header class="head">
+        <div>
+          <p class="kicker">Carrito</p>
+          <p class="count">{{ count() }} items</p>
+        </div>
+        <button type="button" class="icon" (click)="close()" aria-label="Cerrar">×</button>
+      </header>
+
+      <div class="body">
+        @if (!viewLines().length) {
+          <div class="empty">
+            <h3>Tu carrito está vacío</h3>
+            <p class="muted">Agrega un producto para comenzar.</p>
+            <a class="btn btn-primary" routerLink="/products" (click)="close()">Explorar</a>
+          </div>
+        } @else {
+          <ul class="lines" aria-label="Items del carrito">
+            @for (l of viewLines(); track l.key) {
+              <li class="line">
+                <img class="thumb" [src]="l.product.imageUrl" [alt]="l.product.name" loading="lazy" />
+                <div class="info">
+                  <p class="name">{{ l.product.name }}</p>
+                  <p class="meta">{{ l.flavor }} · {{ l.nicotineMg }} mg</p>
+                  <label class="sel">
+                    <span class="sr-only">Variante</span>
+                    <select [value]="l.variantId" (change)="changeVariant(l, $any($event.target).value)">
+                      @for (v of l.product.variants; track v.id) {
+                        <option [value]="v.id">{{ v.flavor }} · {{ v.nicotineMg }} mg</option>
+                      }
+                    </select>
+                  </label>
+                  <div class="qty">
+                    <button type="button" class="qbtn" (click)="dec(l)" [disabled]="l.qty <= 1">−</button>
+                    <span class="q">{{ l.qty }}</span>
+                    <button type="button" class="qbtn" (click)="inc(l)">+</button>
+                  </div>
+                </div>
+                <div class="price">
+                  <p class="p">{{ l.lineTotal | appCurrency }}</p>
+                  <div class="acts">
+                    <button type="button" class="rm" (click)="saveForLater(l)">Guardar</button>
+                    <button type="button" class="rm" (click)="remove(l)">Quitar</button>
+                  </div>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      <footer class="foot">
+        <div class="sum">
+          <span>Subtotal</span>
+          <strong>{{ subtotal() | appCurrency }}</strong>
+        </div>
+        <div class="actions">
+          <button type="button" class="btn btn-ghost" (click)="clear()" [disabled]="!viewLines().length">Vaciar</button>
+          <a class="btn btn-primary" routerLink="/cart" (click)="close()" [class.is-disabled]="!viewLines().length"
+            >Ver carrito</a
+          >
+        </div>
+      </footer>
+    </aside>
+  </div>
+}
+

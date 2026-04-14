@@ -22,19 +22,45 @@
           routerLinkActive="is-active"
           [routerLinkActiveOptions]="{ exact: true }"
           (click)="closeMenu()"
-          >Inicio</a
+          >{{ 'home' | t }}</a
         >
-        <a routerLink="/products" routerLinkActive="is-active" (click)="closeMenu()">Productos</a>
-        <a routerLink="/admin" routerLinkActive="is-active" (click)="closeMenu()">Admin</a>
+        <a routerLink="/products" routerLinkActive="is-active" (click)="closeMenu()">{{ 'products' | t }}</a>
+        <a routerLink="/wishlist" routerLinkActive="is-active" (click)="closeMenu()">
+          {{ 'wishlist' | t }}
+          @if (wishlistCount()) {
+            <span class="badge" aria-hidden="true">{{ wishlistCount() }}</span>
+          }
+        </a>
+        <a routerLink="/admin" routerLinkActive="is-active" (click)="closeMenu()">{{ 'admin' | t }}</a>
       </nav>
 
       <div class="actions">
-        <button type="button" class="btn btn-ghost btn-sm cart" disabled title="Carrito (próximamente)">
-          Carrito
-          <span class="dot" aria-hidden="true">0</span>
+        <button
+          type="button"
+          id="cart-btn"
+          class="btn btn-ghost btn-sm cart"
+          (click)="openCart()"
+          title="Carrito"
+        >
+          {{ 'cart' | t }}
+          <span class="dot" aria-hidden="true">{{ cartCount() }}</span>
         </button>
-        <button type="button" class="btn btn-ghost btn-sm" (click)="openLogin()">Entrar</button>
-        <button type="button" class="btn btn-primary btn-sm" (click)="openRegister()">Registro</button>
+        <div class="prefs" aria-label="Preferencias">
+          <button type="button" class="btn btn-text btn-sm" (click)="setLang(lang() === 'es' ? 'en' : 'es')">
+            {{ lang() === 'es' ? 'ES' : 'EN' }}
+          </button>
+          <button type="button" class="btn btn-text btn-sm" (click)="setCurrency(currency() === 'EUR' ? 'COP' : 'EUR')">
+            {{ currency() }}
+          </button>
+        </div>
+        @if (user(); as u) {
+          <a class="btn btn-ghost btn-sm" routerLink="/orders" (click)="closeMenu()">{{ 'orders' | t }}</a>
+          <a class="btn btn-ghost btn-sm" routerLink="/wishlist" (click)="closeMenu()">Hola, {{ u.name }}</a>
+          <button type="button" class="btn btn-secondary btn-sm" (click)="logout()">{{ 'logout' | t }}</button>
+        } @else {
+          <button type="button" class="btn btn-ghost btn-sm" (click)="openLogin()">{{ 'login' | t }}</button>
+          <button type="button" class="btn btn-primary btn-sm" (click)="openRegister()">{{ 'register' | t }}</button>
+        }
       </div>
     </div>
   </div>
