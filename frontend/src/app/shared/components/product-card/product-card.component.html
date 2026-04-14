@@ -18,7 +18,14 @@
     </div>
     <div class="row">
       <p class="price">Desde <strong>{{ minPrice() | number : '1.2-2' }} €</strong></p>
-      <a class="btn btn-ghost btn-sm" [routerLink]="['/products', product.slug]">Ver detalle</a>
+      <div class="row-actions">
+        @if (showQuickView) {
+          <button type="button" class="btn btn-secondary btn-sm" (click)="openQuickView($event)">
+            Vista rápida
+          </button>
+        }
+        <a class="btn btn-ghost btn-sm" [routerLink]="['/products', product.slug]">Ver detalle</a>
+      </div>
     </div>
   </div>
 </article>

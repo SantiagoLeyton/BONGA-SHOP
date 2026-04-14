@@ -36,22 +36,21 @@
         }
       </div>
 
-      <div class="toolbar-right" aria-label="Preferencias de vista">
-        <button
-          type="button"
-          class="seg"
-          [class.is-active]="density() === 'comfortable'"
-          (click)="setDensity('comfortable')"
-        >
-          Cómodo
-        </button>
-        <button type="button" class="seg" [class.is-active]="density() === 'compact'" (click)="setDensity('compact')">
-          Compacto
-        </button>
+      <div class="toolbar-right" aria-label="Buscar en catálogo">
+        <label class="search">
+          <span class="sr-only">Buscar</span>
+          <input
+            type="search"
+            class="search-input"
+            placeholder="Buscar por nombre, marca o sabor…"
+            [value]="query()"
+            (input)="setQuery($any($event.target).value)"
+          />
+        </label>
       </div>
     </div>
 
-    <div class="grid" [class.grid--compact]="density() === 'compact'">
+    <div class="grid">
       @if (initialLoading()) {
         @for (x of [1, 2, 3, 4, 5, 6]; track x) {
           <app-product-card-skeleton />
@@ -59,7 +58,7 @@
       } @else {
         @for (p of filtered(); track p.id; let i = $index) {
           <div appRevealScroll [appRevealDelay]="0.03 * i">
-            <app-product-card [product]="p" />
+            <app-product-card [product]="p" [showQuickView]="true" (quickView)="openQuickView($event)" />
           </div>
         } @empty {
           <div class="empty">
@@ -70,3 +69,9 @@
     </div>
   </section>
 </div>
+
+<app-product-quick-view
+  [isOpen]="quickViewOpen()"
+  [product]="quickViewProduct()"
+  (closed)="closeQuickView()"
+/>

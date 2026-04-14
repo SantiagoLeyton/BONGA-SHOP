@@ -4,6 +4,7 @@ import { BrandService } from '../../core/services/brand.service';
 import { ProductService } from '../../core/services/product.service';
 import { FilterPanelComponent } from '../../shared/components/filter-panel/filter-panel.component';
 import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
+import { ProductQuickViewComponent } from '../../shared/components/product-quick-view/product-quick-view.component';
 import { ProductCardSkeletonComponent } from '../../shared/components/skeleton/product-card-skeleton.component';
 import { RevealScrollDirective } from '../../shared/directives/reveal-scroll.directive';
 import {
@@ -12,11 +13,18 @@ import {
   uniqueFlavors,
   type ProductFilterState,
 } from '../../shared/utils/product-filter.util';
+import type { Product } from '../../core/models/product.model';
 
 @Component({
   selector: 'app-products-page',
   standalone: true,
-  imports: [FilterPanelComponent, ProductCardComponent, ProductCardSkeletonComponent, RevealScrollDirective],
+  imports: [
+    FilterPanelComponent,
+    ProductCardComponent,
+    ProductQuickViewComponent,
+    ProductCardSkeletonComponent,
+    RevealScrollDirective,
+  ],
   templateUrl: './products-page.component.html',
   styleUrl: './products-page.component.scss',
 })
@@ -28,14 +36,33 @@ export class ProductsPageComponent {
   readonly brands = toSignal(this.brandService.getBrands(), { initialValue: [] });
 
   readonly filters = signal<ProductFilterState>(defaultFilterState());
+  readonly query = signal('');
 
   readonly flavors = computed(() => uniqueFlavors(this.allProducts()));
 
-  readonly filtered = computed(() => applyProductFilters(this.allProducts(), this.filters()));
+  readonly filtered = computed(() => {
+    const base = applyProductFilters(this.allProducts(), this.filters());
+    const q = this.query().trim().toLowerCase();
+    if (!q) {
+      return base;
+    }
+    return base.filter((p) => {
+      const hay = [
+        p.name,
+        p.brand?.name,
+        ...p.variants.map((v) => v.flavor),
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+      return hay.includes(q);
+    });
+  });
 
   readonly initialLoading = computed(() => this.allProducts().length === 0);
 
-  readonly density = signal<'comfortable' | 'compact'>('comfortable');
+  readonly quickViewOpen = signal(false);
+  readonly quickViewProduct = signal<Product | undefined>(undefined);
 
   readonly activeChips = computed(() => {
     const f = this.filters();
@@ -57,6 +84,10 @@ export class ProductsPageComponent {
 
   onFiltersChange(next: ProductFilterState): void {
     this.filters.set(next);
+  }
+
+  setQuery(next: string): void {
+    this.query.set(next);
   }
 
   clearAll(): void {
@@ -89,7 +120,12 @@ export class ProductsPageComponent {
     }
   }
 
-  setDensity(next: 'comfortable' | 'compact'): void {
-    this.density.set(next);
+  openQuickView(p: Product): void {
+    this.quickViewProduct.set(p);
+    this.quickViewOpen.set(true);
+  }
+
+  closeQuickView(): void {
+    this.quickViewOpen.set(false);
   }
 }

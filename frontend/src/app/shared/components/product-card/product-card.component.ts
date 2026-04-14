@@ -1,5 +1,5 @@
 import { DecimalPipe } from '@angular/common';
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import type { Product } from '../../../core/models/product.model';
 import { ProductBadgeComponent } from '../product-badge/product-badge.component';
@@ -13,6 +13,8 @@ import { ProductBadgeComponent } from '../product-badge/product-badge.component'
 })
 export class ProductCardComponent {
   @Input({ required: true }) product!: Product;
+  @Input() showQuickView = false;
+  @Output() quickView = new EventEmitter<Product>();
 
   minPrice(): number {
     return Math.min(...this.product.variants.map((v) => v.price));
@@ -27,5 +29,11 @@ export class ProductCardComponent {
     const min = Math.min(...values);
     const max = Math.max(...values);
     return min === max ? `${min} mg` : `${min}–${max} mg`;
+  }
+
+  openQuickView(event: MouseEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.quickView.emit(this.product);
   }
 }

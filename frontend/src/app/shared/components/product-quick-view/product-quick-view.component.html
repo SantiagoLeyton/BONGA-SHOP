@@ -1,0 +1,33 @@
+<app-modal-shell [isOpen]="isOpen" title="Vista rápida" (closed)="close()">
+  @if (product; as p) {
+    <div class="qv">
+      <div class="media">
+        <img [src]="p.imageUrl" [alt]="'Ilustración de ' + p.name" loading="lazy" />
+        @if (p.badge) {
+          <div class="badge">
+            <app-product-badge [badge]="p.badge" />
+          </div>
+        }
+      </div>
+
+      <div class="copy">
+        <p class="brand">{{ p.brand.name }}</p>
+        <h3 class="name">{{ p.name }}</h3>
+        <p class="desc">{{ p.description }}</p>
+
+        <div class="meta">
+          <span class="pill">Desde {{ minPrice() | number : '1.2-2' }} €</span>
+          <span class="pill muted">{{ p.variants.length }} variantes</span>
+        </div>
+
+        <div class="actions">
+          <button type="button" class="btn btn-primary" (click)="addToCart()">Añadir al carrito</button>
+          <button type="button" class="btn btn-secondary" (click)="close()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <p class="muted">Sin datos.</p>
+  }
+</app-modal-shell>
+
