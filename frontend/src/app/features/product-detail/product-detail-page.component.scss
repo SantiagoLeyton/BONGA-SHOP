@@ -41,11 +41,9 @@
     radial-gradient(circle at 80% 60%, rgba(124, 58, 237, 0.12), transparent 55%), #0b1220;
   box-shadow: var(--shadow-lg);
 
-  img {
-    display: block;
-    width: 100%;
-    height: auto;
-  }
+  padding: 1rem;
+  display: grid;
+  place-items: center;
 }
 
 .badge-float {

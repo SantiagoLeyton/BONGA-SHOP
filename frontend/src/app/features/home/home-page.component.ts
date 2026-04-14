@@ -13,12 +13,11 @@ import { ProductService } from '../../core/services/product.service';
 import { prefersReducedMotion, registerGsap } from '../../shared/animation/register-gsap';
 import { RevealScrollDirective } from '../../shared/directives/reveal-scroll.directive';
 import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
-import { VaporFrameScrubComponent } from '../../shared/components/vapor-frame-scrub/vapor-frame-scrub.component';
 
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [RouterLink, ProductCardComponent, RevealScrollDirective, VaporFrameScrubComponent],
+  imports: [RouterLink, ProductCardComponent, RevealScrollDirective],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss',
 })

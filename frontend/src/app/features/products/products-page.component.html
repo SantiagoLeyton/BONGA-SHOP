@@ -17,21 +17,55 @@
 
   <section class="catalog" aria-label="Resultados">
     <div class="toolbar" appRevealScroll [appRevealDelay]="0.06">
-      <p class="count">
-        <strong>{{ filtered().length }}</strong>
-        <span class="muted">resultados</span>
-      </p>
+      <div class="toolbar-left">
+        <p class="count">
+          <strong>{{ filtered().length }}</strong>
+          <span class="muted">resultados</span>
+        </p>
+
+        @if (activeChips().length) {
+          <div class="chips" aria-label="Filtros activos">
+            @for (c of activeChips(); track c.key) {
+              <button type="button" class="chip" (click)="removeChip(c.type, c.value)" [title]="'Quitar: ' + c.label">
+                <span class="chip-label">{{ c.label }}</span>
+                <span class="chip-x" aria-hidden="true">×</span>
+              </button>
+            }
+            <button type="button" class="btn btn-text btn-sm" (click)="clearAll()">Limpiar todo</button>
+          </div>
+        }
+      </div>
+
+      <div class="toolbar-right" aria-label="Preferencias de vista">
+        <button
+          type="button"
+          class="seg"
+          [class.is-active]="density() === 'comfortable'"
+          (click)="setDensity('comfortable')"
+        >
+          Cómodo
+        </button>
+        <button type="button" class="seg" [class.is-active]="density() === 'compact'" (click)="setDensity('compact')">
+          Compacto
+        </button>
+      </div>
     </div>
 
-    <div class="grid">
-      @for (p of filtered(); track p.id; let i = $index) {
-        <div appRevealScroll [appRevealDelay]="0.03 * i">
-          <app-product-card [product]="p" />
-        </div>
-      } @empty {
-        <div class="empty">
-          <p class="muted">No hay productos con estos filtros.</p>
-        </div>
+    <div class="grid" [class.grid--compact]="density() === 'compact'">
+      @if (initialLoading()) {
+        @for (x of [1, 2, 3, 4, 5, 6]; track x) {
+          <app-product-card-skeleton />
+        }
+      } @else {
+        @for (p of filtered(); track p.id; let i = $index) {
+          <div appRevealScroll [appRevealDelay]="0.03 * i">
+            <app-product-card [product]="p" />
+          </div>
+        } @empty {
+          <div class="empty">
+            <p class="muted">No hay productos con estos filtros.</p>
+          </div>
+        }
       }
     </div>
   </section>

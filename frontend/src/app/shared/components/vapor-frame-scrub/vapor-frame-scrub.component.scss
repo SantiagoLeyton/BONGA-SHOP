@@ -3,6 +3,13 @@
   width: 100%;
 }
 
+.vapor-viewer {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
 .vapor-scrub--static {
   height: auto;
 }
@@ -53,6 +60,22 @@
     user-select: none;
     pointer-events: none;
   }
+}
+
+.vapor-canvas {
+  display: block;
+  width: min(560px, 88vw);
+  height: auto;
+  max-height: min(68vh, 640px);
+}
+
+.vapor-scrub__device--drag {
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.vapor-scrub__device--drag.is-dragging {
+  cursor: grabbing;
 }
 
 .vapor-scrub__rail {

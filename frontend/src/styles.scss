@@ -1,5 +1,23 @@
 :root {
   color-scheme: dark;
+  /* Spacing scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+
+  /* Type scale */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+
+  --leading-tight: 1.1;
+  --leading-normal: 1.55;
+
   --color-bg: #070a12;
   --color-surface: rgba(15, 23, 42, 0.72);
   --color-surface-elevated: #0f172a;
@@ -32,11 +50,54 @@ body {
 body {
   margin: 0;
   font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  background: radial-gradient(1200px 700px at 20% 0%, rgba(124, 58, 237, 0.18), transparent 55%),
-    radial-gradient(900px 600px at 90% 10%, rgba(94, 234, 212, 0.12), transparent 55%),
-    var(--color-bg);
+  /* Keep background ultra-clean to avoid visible seams */
+  background: linear-gradient(180deg, #070a12 0%, #060812 100%);
   color: var(--color-text);
   text-rendering: optimizeLegibility;
+}
+
+/* Better default focus ring (accessibility + premium feel) */
+:focus {
+  outline: none;
+}
+
+:focus-visible {
+  outline: 2px solid rgba(94, 234, 212, 0.65);
+  outline-offset: 2px;
+}
+
+button,
+input,
+select,
+textarea,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Subtle noise to avoid visible gradient seams/banding */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.08;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
+  background-size: 420px 420px;
+  mix-blend-mode: overlay;
+  filter: blur(0.8px);
+  transform: translateZ(0);
+}
+
+app-root {
+  position: relative;
+  z-index: 1;
+}
+
+/* Selection */
+::selection {
+  background: rgba(94, 234, 212, 0.22);
+  color: var(--color-text);
 }
 
 h1,

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, Output, signal } from '@angular/core';
 import type { Brand } from '../../../core/models/brand.model';
 import type { ProductFilterState, ProductSort } from '../../utils/product-filter.util';
 
@@ -14,6 +14,8 @@ export class FilterPanelComponent {
   @Input({ required: true }) value!: ProductFilterState;
 
   @Output() valueChange = new EventEmitter<ProductFilterState>();
+
+  readonly sortOpen = signal(false);
 
   toggleBrand(slug: string, checked: boolean): void {
     const set = new Set(this.value.brandSlugs);
@@ -57,6 +59,46 @@ export class FilterPanelComponent {
 
   updateSort(value: string): void {
     this.emit({ ...this.value, sort: value as ProductSort });
+    this.sortOpen.set(false);
+  }
+
+  sortLabel(): string {
+    switch (this.value.sort) {
+      case 'price-asc':
+        return 'Precio: menor a mayor';
+      case 'price-desc':
+        return 'Precio: mayor a menor';
+      case 'name':
+        return 'Nombre (A–Z)';
+      case 'featured':
+      default:
+        return 'Destacados';
+    }
+  }
+
+  toggleSortMenu(): void {
+    this.sortOpen.update((v) => !v);
+  }
+
+  closeSortMenu(): void {
+    this.sortOpen.set(false);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement | null;
+    if (!target) {
+      return;
+    }
+    if (target.closest('[data-sort-root]')) {
+      return;
+    }
+    this.sortOpen.set(false);
+  }
+
+  @HostListener('document:keydown.escape')
+  onEsc(): void {
+    this.sortOpen.set(false);
   }
 
   reset(): void {

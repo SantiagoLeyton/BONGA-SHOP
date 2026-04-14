@@ -38,12 +38,73 @@
         </article>
       </div>
 
-      <div class="placeholder">
-        <h2>Área de trabajo</h2>
-        <p class="muted">
-          Aquí podrás montar tablas, filtros y formularios de administración reutilizando los mismos tokens visuales
-          de la tienda.
-        </p>
+      <div class="table-card" aria-label="Tabla mock de productos">
+        <div class="table-head">
+          <div>
+            <h2>Productos</h2>
+            <p class="muted small">Mock table · lista para conectar al API</p>
+          </div>
+          <div class="table-actions">
+            <button type="button" class="btn btn-secondary btn-sm" disabled>Nuevo producto</button>
+            <button type="button" class="btn btn-ghost btn-sm" disabled>Exportar</button>
+          </div>
+        </div>
+
+        <div class="table-wrap" role="region" aria-label="Tabla de productos" tabindex="0">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Marca</th>
+                <th>Variantes</th>
+                <th>Stock</th>
+                <th class="right">Precio desde</th>
+                <th class="right">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="cell-title">
+                    <span class="dot dot--a" aria-hidden="true"></span>
+                    Breeze Ice Duo
+                  </div>
+                </td>
+                <td>Urban Mist</td>
+                <td>3</td>
+                <td>48</td>
+                <td class="right">12.99 €</td>
+                <td class="right"><span class="pill ok">Activo</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="cell-title">
+                    <span class="dot dot--b" aria-hidden="true"></span>
+                    Neon Citrus
+                  </div>
+                </td>
+                <td>Neon Labs</td>
+                <td>2</td>
+                <td>60</td>
+                <td class="right">11.50 €</td>
+                <td class="right"><span class="pill warn">Nuevo</span></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="cell-title">
+                    <span class="dot dot--c" aria-hidden="true"></span>
+                    Shadow Grape
+                  </div>
+                </td>
+                <td>Nocturne</td>
+                <td>2</td>
+                <td>5</td>
+                <td class="right">13.25 €</td>
+                <td class="right"><span class="pill bad">Stock bajo</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   </div>

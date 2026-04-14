@@ -6,19 +6,35 @@
 
   <section class="block">
     <h3 class="sub">Orden</h3>
-    <label class="select-wrap">
-      <span class="sr-only">Ordenar por</span>
-      <select
-        class="select"
-        [value]="value.sort"
-        (change)="updateSort($any($event.target).value)"
+    <div class="sort" data-sort-root>
+      <button
+        type="button"
+        class="sort-btn"
+        (click)="toggleSortMenu()"
+        [attr.aria-expanded]="sortOpen()"
+        aria-haspopup="listbox"
       >
-        <option value="featured">Destacados</option>
-        <option value="price-asc">Precio: menor a mayor</option>
-        <option value="price-desc">Precio: mayor a menor</option>
-        <option value="name">Nombre (A–Z)</option>
-      </select>
-    </label>
+        <span class="sort-btn__label">{{ sortLabel() }}</span>
+        <span class="sort-btn__chev" aria-hidden="true"></span>
+      </button>
+
+      @if (sortOpen()) {
+        <ul class="sort-menu" role="listbox" aria-label="Ordenar por">
+          <li>
+            <button type="button" class="sort-item" (click)="updateSort('featured')">Destacados</button>
+          </li>
+          <li>
+            <button type="button" class="sort-item" (click)="updateSort('price-asc')">Precio: menor a mayor</button>
+          </li>
+          <li>
+            <button type="button" class="sort-item" (click)="updateSort('price-desc')">Precio: mayor a menor</button>
+          </li>
+          <li>
+            <button type="button" class="sort-item" (click)="updateSort('name')">Nombre (A–Z)</button>
+          </li>
+        </ul>
+      }
+    </div>
   </section>
 
   <section class="block">

@@ -1,63 +1,91 @@
-@if (product(); as p) {
+@if (loading()) {
   <div class="container detail">
     <nav class="crumbs" aria-label="Migas de pan">
       <a routerLink="/">Inicio</a>
       <span aria-hidden="true">/</span>
       <a routerLink="/products">Productos</a>
       <span aria-hidden="true">/</span>
-      <span class="current">{{ p.name }}</span>
+      <span class="current">Cargando…</span>
     </nav>
 
     <div class="grid">
       <div class="media" appRevealScroll>
-        <img [src]="p.imageUrl" [alt]="'Ilustración de ' + p.name" loading="eager" />
-        @if (p.badge) {
-          <div class="badge-float">
-            <app-product-badge [badge]="p.badge" />
-          </div>
-        }
+        <app-vapor-frame-scrub interaction="drag" [pxPerFrame]="12" [loop]="true" />
       </div>
 
       <div class="copy" appRevealScroll [appRevealDelay]="0.1">
-        <p class="brand">{{ p.brand.name }}</p>
-        <h1 class="title">{{ p.name }}</h1>
-        <p class="desc">{{ p.description }}</p>
-
-        <div class="variants" role="radiogroup" aria-label="Variantes">
-          @for (v of p.variants; track v.id) {
-            <button
-              type="button"
-              class="chip"
-              [class.chip--active]="selectedVariant()?.id === v.id"
-              (click)="pickVariant(v.id)"
-            >
-              <span class="chip-title">{{ v.flavor }}</span>
-              <span class="chip-meta">{{ v.nicotineMg }} mg · {{ v.price | number : '1.2-2' }} €</span>
-            </button>
-          }
-        </div>
-
-        @if (selectedVariant(); as v) {
-          <div class="buy">
-            <div class="price-row">
-              <p class="price">{{ v.price | number : '1.2-2' }} €</p>
-              <p class="stock" [class.stock--bad]="v.stock === 0" [class.stock--warn]="v.stock > 0 && v.stock <= 5">
-                {{ stockLabel(v.stock) }}
-              </p>
-            </div>
-            <button type="button" class="btn btn-primary btn-lg" disabled title="Integración de carrito pendiente">
-              Añadir al carrito
-            </button>
-            <p class="hint">El botón quedará habilitado cuando el carrito se conecte al backend.</p>
-          </div>
-        }
+        <p class="brand">—</p>
+        <h1 class="title">Cargando producto…</h1>
+        <p class="desc">Preparando detalle visual.</p>
       </div>
     </div>
   </div>
 } @else {
-  <div class="container empty">
-    <h1>Producto no encontrado</h1>
-    <p class="muted">Revisa la URL o vuelve al catálogo.</p>
-    <a class="btn btn-secondary" routerLink="/products">Volver a productos</a>
-  </div>
+  @if (product(); as p) {
+    <div class="container detail">
+      <nav class="crumbs" aria-label="Migas de pan">
+        <a routerLink="/">Inicio</a>
+        <span aria-hidden="true">/</span>
+        <a routerLink="/products">Productos</a>
+        <span aria-hidden="true">/</span>
+        <span class="current">{{ p.name }}</span>
+      </nav>
+
+      <div class="grid">
+        <div class="media" appRevealScroll>
+          <app-vapor-frame-scrub interaction="drag" [pxPerFrame]="10" [loop]="true" />
+          @if (p.badge) {
+            <div class="badge-float">
+              <app-product-badge [badge]="p.badge" />
+            </div>
+          }
+        </div>
+
+        <div class="copy" appRevealScroll [appRevealDelay]="0.1">
+          <p class="brand">{{ p.brand.name }}</p>
+          <h1 class="title">{{ p.name }}</h1>
+          <p class="desc">{{ p.description }}</p>
+
+          <div class="variants" role="radiogroup" aria-label="Variantes">
+            @for (v of p.variants; track v.id) {
+              <button
+                type="button"
+                class="chip"
+                [class.chip--active]="selectedVariant()?.id === v.id"
+                (click)="pickVariant(v.id)"
+              >
+                <span class="chip-title">{{ v.flavor }}</span>
+                <span class="chip-meta">{{ v.nicotineMg }} mg · {{ v.price | number : '1.2-2' }} €</span>
+              </button>
+            }
+          </div>
+
+          @if (selectedVariant(); as v) {
+            <div class="buy">
+              <div class="price-row">
+                <p class="price">{{ v.price | number : '1.2-2' }} €</p>
+                <p
+                  class="stock"
+                  [class.stock--bad]="v.stock === 0"
+                  [class.stock--warn]="v.stock > 0 && v.stock <= 5"
+                >
+                  {{ stockLabel(v.stock) }}
+                </p>
+              </div>
+              <button type="button" class="btn btn-primary btn-lg" disabled title="Integración de carrito pendiente">
+                Añadir al carrito
+              </button>
+              <p class="hint">El botón quedará habilitado cuando el carrito se conecte al backend.</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="container empty">
+      <h1>Producto no encontrado</h1>
+      <p class="muted">Revisa la URL o vuelve al catálogo.</p>
+      <a class="btn btn-secondary" routerLink="/products">Volver a productos</a>
+    </div>
+  }
 }

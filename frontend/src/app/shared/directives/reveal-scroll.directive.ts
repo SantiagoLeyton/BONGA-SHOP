@@ -25,6 +25,7 @@ export class RevealScrollDirective implements AfterViewInit, OnDestroy {
   readonly appRevealDelay = input(0);
 
   private trigger?: ScrollTrigger;
+  private revealed = false;
 
   ngAfterViewInit(): void {
     const node = this.el.nativeElement;
@@ -38,6 +39,7 @@ export class RevealScrollDirective implements AfterViewInit, OnDestroy {
       start: 'top 90%',
       once: true,
       onEnter: () => {
+        this.revealed = true;
         gsap.to(node, {
           opacity: 1,
           y: 0,
@@ -47,6 +49,29 @@ export class RevealScrollDirective implements AfterViewInit, OnDestroy {
           ease: 'power3.out',
         });
       },
+    });
+
+    // Critical for SPA route changes: ensure ScrollTrigger evaluates immediately
+    // so above-the-fold elements don't stay invisible until the first scroll.
+    requestAnimationFrame(() => {
+      ScrollTrigger.refresh();
+
+      if (!this.revealed) {
+        const rect = node.getBoundingClientRect();
+        const vh = window.innerHeight || 0;
+        const isInView = rect.top < vh * 0.95 && rect.bottom > 0;
+        if (isInView) {
+          this.revealed = true;
+          gsap.to(node, {
+            opacity: 1,
+            y: 0,
+            filter: 'blur(0px)',
+            duration: 0.62,
+            delay: this.appRevealDelay(),
+            ease: 'power3.out',
+          });
+        }
+      }
     });
   }
 
