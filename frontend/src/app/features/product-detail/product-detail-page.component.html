@@ -9,7 +9,7 @@
     </nav>
 
     <div class="grid">
-      <div class="media reveal">
+      <div class="media" appRevealScroll>
         <img [src]="p.imageUrl" [alt]="'Ilustración de ' + p.name" loading="eager" />
         @if (p.badge) {
           <div class="badge-float">
@@ -18,7 +18,7 @@
         }
       </div>
 
-      <div class="copy reveal reveal--delay">
+      <div class="copy" appRevealScroll [appRevealDelay]="0.1">
         <p class="brand">{{ p.brand.name }}</p>
         <h1 class="title">{{ p.name }}</h1>
         <p class="desc">{{ p.description }}</p>

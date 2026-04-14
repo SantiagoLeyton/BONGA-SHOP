@@ -4,6 +4,7 @@ import { BrandService } from '../../core/services/brand.service';
 import { ProductService } from '../../core/services/product.service';
 import { FilterPanelComponent } from '../../shared/components/filter-panel/filter-panel.component';
 import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
+import { RevealScrollDirective } from '../../shared/directives/reveal-scroll.directive';
 import {
   applyProductFilters,
   defaultFilterState,
@@ -14,7 +15,7 @@ import {
 @Component({
   selector: 'app-products-page',
   standalone: true,
-  imports: [FilterPanelComponent, ProductCardComponent],
+  imports: [FilterPanelComponent, ProductCardComponent, RevealScrollDirective],
   templateUrl: './products-page.component.html',
   styleUrl: './products-page.component.scss',
 })

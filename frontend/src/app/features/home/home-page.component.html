@@ -1,33 +1,44 @@
-<section class="hero">
+<app-vapor-frame-scrub [scrollVh]="400" [scrub]="0.5" />
+
+<section class="hero hero--mist" #heroSection>
   <div class="container hero-grid">
-    <div class="hero-copy reveal">
-      <p class="kicker">BONGA SHOP · vapes desechables</p>
-      <h1 class="title">Urbano, limpio y listo para integrarse con tu backend.</h1>
-      <p class="lead">
+    <div class="hero-copy">
+      <p class="kicker hero-kicker">BONGA SHOP · vapes desechables</p>
+      <h1 class="title">
+        @for (w of heroWords; track $index) {
+          <span class="title-word">{{ w }}</span>
+          @if ($index < heroWords.length - 1) {
+            <span class="title-space">&nbsp;</span>
+          }
+        }
+      </h1>
+      <p class="lead hero-lead">
         Una base visual premium para catálogo y administración: mock data hoy, Spring Boot mañana.
       </p>
-      <div class="cta">
+      <div class="cta hero-cta">
         <a class="btn btn-primary" routerLink="/products">Ver productos</a>
         <a class="btn btn-secondary" routerLink="/admin">Vista admin</a>
       </div>
-      <p class="fineprint">Solo +18. Consume con responsabilidad.</p>
+      <p class="fineprint hero-fine">Solo +18. Consume con responsabilidad.</p>
     </div>
-    <div class="hero-art reveal reveal--delay">
-      <img src="/assets/hero-vapor.svg" width="900" height="520" alt="" loading="eager" />
+    <div class="hero-art">
+      <div class="hero-art-inner">
+        <img src="/assets/hero-vapor.svg" width="900" height="520" alt="" loading="eager" />
+      </div>
     </div>
   </div>
 </section>
 
 <section class="section">
   <div class="container">
-    <div class="section-head reveal">
+    <div class="section-head" appRevealScroll>
       <h2>Destacados</h2>
       <p class="muted">Selección curada para mostrar cards, badges y precios desde mock data.</p>
     </div>
 
     <div class="grid">
-      @for (p of featured(); track p.id) {
-        <div class="reveal">
+      @for (p of featured(); track p.id; let i = $index) {
+        <div appRevealScroll [appRevealDelay]="i * 0.04">
           <app-product-card [product]="p" />
         </div>
       }
@@ -36,7 +47,7 @@
 </section>
 
 <section class="section section--brand">
-  <div class="container split reveal">
+  <div class="container split" appRevealScroll>
     <div>
       <h2>Marca con actitud, sin ruido</h2>
       <p class="muted">

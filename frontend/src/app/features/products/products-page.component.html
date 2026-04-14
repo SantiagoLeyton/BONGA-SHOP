@@ -1,4 +1,4 @@
-<div class="page-head container reveal">
+<div class="page-head container" appRevealScroll>
   <div>
     <h1 class="title">Catálogo</h1>
     <p class="muted">Mock data local — sustituye por HTTP cuando el API esté listo.</p>
@@ -6,7 +6,7 @@
 </div>
 
 <div class="container layout">
-  <aside class="aside" aria-label="Filtros">
+  <aside class="aside" aria-label="Filtros" appRevealScroll [appRevealDelay]="0.05">
     <app-filter-panel
       [brands]="brands()"
       [flavors]="flavors()"
@@ -16,7 +16,7 @@
   </aside>
 
   <section class="catalog" aria-label="Resultados">
-    <div class="toolbar">
+    <div class="toolbar" appRevealScroll [appRevealDelay]="0.06">
       <p class="count">
         <strong>{{ filtered().length }}</strong>
         <span class="muted">resultados</span>
@@ -24,8 +24,8 @@
     </div>
 
     <div class="grid">
-      @for (p of filtered(); track p.id) {
-        <div class="reveal">
+      @for (p of filtered(); track p.id; let i = $index) {
+        <div appRevealScroll [appRevealDelay]="0.03 * i">
           <app-product-card [product]="p" />
         </div>
       } @empty {

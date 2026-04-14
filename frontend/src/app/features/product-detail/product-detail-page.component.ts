@@ -5,12 +5,13 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { map, switchMap } from 'rxjs';
 import { ProductService } from '../../core/services/product.service';
 import { ProductBadgeComponent } from '../../shared/components/product-badge/product-badge.component';
+import { RevealScrollDirective } from '../../shared/directives/reveal-scroll.directive';
 import type { ProductVariant } from '../../core/models/product-variant.model';
 
 @Component({
   selector: 'app-product-detail-page',
   standalone: true,
-  imports: [RouterLink, DecimalPipe, ProductBadgeComponent],
+  imports: [RouterLink, DecimalPipe, ProductBadgeComponent, RevealScrollDirective],
   templateUrl: './product-detail-page.component.html',
   styleUrl: './product-detail-page.component.scss',
 })
