@@ -1,5 +1,6 @@
 # Backend
 /target/
+backend/.gradle/
 *.class
 
 # Frontend
