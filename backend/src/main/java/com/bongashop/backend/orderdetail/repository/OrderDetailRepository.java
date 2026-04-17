@@ -1,4 +1,7 @@
 package com.bongashop.backend.orderdetail.repository;
 
-public class OrderDetailRepository {
+import com.bongashop.backend.orderdetail.entity.OrderDetail;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface OrderDetailRepository extends JpaRepository<OrderDetail, Long> {
 }

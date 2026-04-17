@@ -1,4 +1,9 @@
 package com.bongashop.backend.shared.enums;
 
-public class OrderStatus {
+public enum OrderStatus {
+    CREATED,
+    PROCESSING,
+    SHIPPED,
+    DELIVERED,
+    CANCELLED
 }

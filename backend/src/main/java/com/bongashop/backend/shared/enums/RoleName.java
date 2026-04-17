@@ -1,4 +1,6 @@
 package com.bongashop.backend.shared.enums;
 
-public class RoleName {
+public enum RoleName {
+    ROLE_ADMIN,
+    ROLE_CLIENT
 }
