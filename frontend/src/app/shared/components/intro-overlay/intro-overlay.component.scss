@@ -1,0 +1,55 @@
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  background: rgba(2, 6, 23, 0.78);
+  backdrop-filter: blur(12px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro__glow {
+  position: absolute;
+  width: min(760px, 92vw);
+  height: min(760px, 92vw);
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 30%, rgba(94, 234, 212, 0.22), transparent 55%),
+    radial-gradient(circle at 70% 60%, rgba(124, 58, 237, 0.18), transparent 55%);
+  filter: blur(6px);
+  opacity: 0;
+}
+
+.intro__card {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 0.85rem;
+  padding: 1.25rem 1.25rem 1.1rem;
+  border-radius: var(--radius-xl);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.72);
+  box-shadow: var(--shadow-lg);
+}
+
+.intro__logo {
+  display: block;
+  width: min(280px, 72vw);
+  height: auto;
+}
+
+.intro__tag {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(148, 163, 184, 0.9);
+  font-weight: 800;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro {
+    backdrop-filter: none;
+  }
+}

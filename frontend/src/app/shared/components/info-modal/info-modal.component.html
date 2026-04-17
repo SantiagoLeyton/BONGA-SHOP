@@ -1,0 +1,9 @@
+<app-modal-shell [isOpen]="isOpen()" title="Información" (closed)="close()">
+  <div class="info-body">
+    <p>
+      Este modal reutilizable servirá para avisos y confirmaciones cuando el equipo conecte flujos con el
+      backend.
+    </p>
+    <button type="button" class="btn btn-secondary" (click)="close()">Entendido</button>
+  </div>
+</app-modal-shell>

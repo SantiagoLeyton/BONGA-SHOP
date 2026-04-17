@@ -1,0 +1,53 @@
+<app-modal-shell [isOpen]="isOpen" title="Producto" (closed)="close()">
+  <form class="form" [formGroup]="form" (ngSubmit)="save()">
+    <div class="grid">
+      <label class="field">
+        <span>Nombre</span>
+        <input formControlName="name" placeholder="Nombre del producto" (input)="autofillSlug()" />
+      </label>
+      <label class="field">
+        <span>Slug</span>
+        <input formControlName="slug" placeholder="slug-del-producto" />
+      </label>
+      <label class="field">
+        <span>Marca</span>
+        <input formControlName="brandName" placeholder="Marca" (input)="autofillBrandSlug()" />
+      </label>
+      <label class="field">
+        <span>Marca slug</span>
+        <input formControlName="brandSlug" placeholder="marca" />
+      </label>
+      <label class="field field--wide">
+        <span>Descripción</span>
+        <textarea formControlName="description" rows="3" placeholder="Descripción del producto…"></textarea>
+      </label>
+      <label class="field">
+        <span>Imagen URL</span>
+        <input formControlName="imageUrl" placeholder="/assets/products/x.svg" />
+      </label>
+      <label class="field">
+        <span>Subir imagen (mock)</span>
+        <input type="file" accept="image/*" (change)="onFilePicked($any($event.target).files?.[0] ?? null)" />
+      </label>
+      <label class="check field--wide">
+        <input type="checkbox" formControlName="featured" />
+        <span>Destacado</span>
+      </label>
+      <label class="field field--wide">
+        <span>Variantes (una por línea: sabor | nicotina | precio | stock)</span>
+        <textarea [formControl]="variantsText" rows="5" placeholder="Menta | 20 | 12.99 | 48"></textarea>
+      </label>
+    </div>
+
+    <div class="preview">
+      <p class="muted small">Preview</p>
+      <img [src]="filePreview() || form.controls.imageUrl.value" alt="" />
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn btn-ghost" (click)="close()">Cancelar</button>
+      <button type="submit" class="btn btn-primary" [disabled]="!canSave()">Guardar</button>
+    </div>
+  </form>
+</app-modal-shell>
+

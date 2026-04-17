@@ -1,0 +1,71 @@
+@if (interaction() === 'scroll') {
+  <section
+    class="vapor-scrub"
+    [class.vapor-scrub--static]="useStaticReduced()"
+    [ngStyle]="
+      useStaticReduced()
+        ? { minHeight: '58vh' }
+        : { height: scrollVh() + 'vh' }
+    "
+    aria-label="Animación de producto controlada por scroll"
+  >
+    <div class="vapor-scrub__sticky">
+      <p class="vapor-scrub__hint">
+        @if (useStaticReduced()) {
+          Vista estática (movimiento reducido activado)
+        } @else {
+          Desplaza hacia abajo · secuencia 3D
+        }
+      </p>
+
+      <div class="vapor-scrub__stage">
+        <div class="vapor-scrub__device">
+          <img
+            [src]="broken() ? fallbackSrc() : imageUrl()"
+            width="640"
+            height="640"
+            alt=""
+            draggable="false"
+            decoding="async"
+            (error)="onImgError()"
+          />
+        </div>
+      </div>
+
+      @if (!useStaticReduced()) {
+        <div class="vapor-scrub__rail" aria-hidden="true">
+          <span class="vapor-scrub__rail-fill" [style.transform]="'scaleX(' + progress() + ')'"></span>
+        </div>
+      }
+    </div>
+  </section>
+} @else {
+  <div class="vapor-viewer" aria-label="Visor 3D interactivo (drag)">
+    <p class="vapor-scrub__hint">
+      @if (useStaticReduced()) {
+        Vista estática (movimiento reducido activado)
+      } @else {
+        Arrastra para girar
+      }
+    </p>
+
+    <div class="vapor-scrub__stage">
+      <div
+        class="vapor-scrub__device vapor-scrub__device--drag"
+        data-drag-target
+        [class.is-dragging]="isDragging()"
+      >
+        <canvas class="vapor-canvas" #c></canvas>
+        <img
+          *ngIf="broken()"
+          [src]="fallbackSrc()"
+          width="640"
+          height="640"
+          alt=""
+          draggable="false"
+          decoding="async"
+        />
+      </div>
+    </div>
+  </div>
+}

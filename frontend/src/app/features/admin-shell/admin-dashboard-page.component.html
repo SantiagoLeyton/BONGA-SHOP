@@ -1,0 +1,130 @@
+<div class="container page">
+  <header class="head">
+    <p class="kicker">Admin · UI shell</p>
+    <h1>Panel visual</h1>
+    <p class="muted">
+      Esta vista reserva espacio para métricas, inventario y pedidos cuando el backend esté conectado.
+    </p>
+  </header>
+
+  <div class="grid">
+    <aside class="side" aria-label="Navegación admin">
+      <p class="side-title">Secciones</p>
+      <ul class="list">
+        <li><span class="pill">Resumen</span> <span class="tag">próximo</span></li>
+        <li><span class="pill">Productos</span> <span class="tag">próximo</span></li>
+        <li><span class="pill">Pedidos</span> <span class="tag">próximo</span></li>
+        <li><span class="pill">Usuarios</span> <span class="tag">próximo</span></li>
+      </ul>
+      <a class="btn btn-secondary" routerLink="/products">Volver a tienda</a>
+    </aside>
+
+    <section class="panel" aria-label="Contenido">
+      <div class="cards">
+        <article class="card">
+          <p class="label">Ingresos</p>
+          <p class="value">—</p>
+          <p class="sub">Mock</p>
+        </article>
+        <article class="card">
+          <p class="label">Pedidos</p>
+          <p class="value">—</p>
+          <p class="sub">Mock</p>
+        </article>
+        <article class="card">
+          <p class="label">Stock bajo</p>
+          <p class="value">—</p>
+          <p class="sub">Mock</p>
+        </article>
+      </div>
+
+      <div class="table-card" aria-label="Tabla mock de productos">
+        <div class="table-head">
+          <div>
+            <h2>Productos</h2>
+            <p class="muted small">Mock table · lista para conectar al API</p>
+          </div>
+          <div class="table-actions">
+            <label class="search">
+              <span class="sr-only">Buscar</span>
+              <input
+                type="search"
+                placeholder="Buscar…"
+                [value]="query()"
+                (input)="setQuery($any($event.target).value)"
+              />
+            </label>
+            <button type="button" class="btn btn-secondary btn-sm" (click)="openCreate()">Nuevo producto</button>
+          </div>
+        </div>
+
+        <div class="table-wrap" role="region" aria-label="Tabla de productos" tabindex="0">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Marca</th>
+                <th>Variantes</th>
+                <th>Stock</th>
+                <th class="right">Precio desde</th>
+                <th class="right">Estado</th>
+                <th class="right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (p of view(); track p.id) {
+                <tr>
+                  <td>
+                    <div class="cell-title">
+                      <span class="dot dot--a" aria-hidden="true"></span>
+                      {{ p.name }}
+                    </div>
+                    <p class="muted small">{{ p.slug }}</p>
+                  </td>
+                  <td>{{ p.brand.name }}</td>
+                  <td>{{ p.variants.length }}</td>
+                  <td>{{ stockTotal(p) }}</td>
+                  <td class="right">
+                    {{ minPrice(p) | number : '1.2-2' }} €
+                  </td>
+                  <td class="right">
+                    @if (stockTotal(p) <= 5) {
+                      <span class="pill bad">Stock bajo</span>
+                    } @else {
+                      <span class="pill ok">Activo</span>
+                    }
+                  </td>
+                  <td class="right">
+                    <div class="row-actions">
+                      <button type="button" class="btn btn-ghost btn-sm" (click)="openEdit(p)">Editar</button>
+                      <button type="button" class="btn btn-text btn-sm" (click)="deleteProduct(p)">Eliminar</button>
+                    </div>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="7">
+                    <p class="muted">No hay resultados.</p>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="pager">
+          <button type="button" class="btn btn-ghost btn-sm" (click)="prev()">Anterior</button>
+          <p class="muted small">Página {{ page() }} / {{ totalPages() }}</p>
+          <button type="button" class="btn btn-ghost btn-sm" (click)="next()">Siguiente</button>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<app-admin-product-modal
+  [isOpen]="modalOpen()"
+  [product]="editing()"
+  (closed)="closeModal()"
+  (saved)="saveProduct($event)"
+/>

@@ -1,0 +1,14 @@
+.shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.main {
+  flex: 1;
+  outline: none;
+}
+
+.route-wrap {
+  min-height: 1px;
+}

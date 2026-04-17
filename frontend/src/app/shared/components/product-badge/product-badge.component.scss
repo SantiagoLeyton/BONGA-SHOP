@@ -1,0 +1,29 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+}
+
+.badge--new {
+  background: rgba(94, 234, 212, 0.12);
+  border-color: rgba(94, 234, 212, 0.35);
+  color: #5eead4;
+}
+
+.badge--popular {
+  background: rgba(124, 58, 237, 0.14);
+  border-color: rgba(124, 58, 237, 0.35);
+  color: #c4b5fd;
+}
+
+.badge--low-stock {
+  background: rgba(251, 113, 133, 0.12);
+  border-color: rgba(251, 113, 133, 0.35);
+  color: #fecdd3;
+}

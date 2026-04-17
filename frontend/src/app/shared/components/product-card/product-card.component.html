@@ -1,0 +1,42 @@
+<article class="card">
+  <a class="media" [routerLink]="['/products', product.slug]">
+    <img [src]="product.imageUrl" [alt]="'Ilustración de ' + product.name" loading="lazy" />
+    <button
+      type="button"
+      class="wish"
+      [class.wish--on]="wished()"
+      (click)="toggleWish($event)"
+      [attr.aria-pressed]="wished()"
+      aria-label="Guardar en favoritos"
+      title="Favoritos"
+    >
+      <span aria-hidden="true">♥</span>
+    </button>
+    @if (product.badge) {
+      <div class="badge-wrap">
+        <app-product-badge [badge]="product.badge" />
+      </div>
+    }
+  </a>
+  <div class="body">
+    <p class="brand">{{ product.brand.name }}</p>
+    <h3 class="title">
+      <a [routerLink]="['/products', product.slug]">{{ product.name }}</a>
+    </h3>
+    <div class="meta">
+      <span class="pill">{{ primaryFlavor() }}</span>
+      <span class="pill muted">{{ nicotineRange() }}</span>
+    </div>
+    <div class="row">
+      <p class="price">Desde <strong>{{ minPrice() | number : '1.2-2' }} €</strong></p>
+      <div class="row-actions">
+        @if (showQuickView) {
+          <button type="button" class="btn btn-secondary btn-sm" (click)="openQuickView($event)">
+            Vista rápida
+          </button>
+        }
+        <a class="btn btn-ghost btn-sm" [routerLink]="['/products', product.slug]">Ver detalle</a>
+      </div>
+    </div>
+  </div>
+</article>

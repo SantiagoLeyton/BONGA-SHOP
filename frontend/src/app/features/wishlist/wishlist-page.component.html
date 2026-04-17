@@ -1,0 +1,36 @@
+<div class="container wish">
+  <div class="head">
+    <div>
+      <p class="kicker">Tu selección</p>
+      <h1 class="title">Favoritos</h1>
+      <p class="sub">Guarda productos para volver después.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-ghost" routerLink="/products">Explorar productos</a>
+      <button type="button" class="btn btn-secondary" (click)="clear()" [disabled]="!items().length">
+        Limpiar
+      </button>
+    </div>
+  </div>
+
+  @if (items().length) {
+    <section class="grid" aria-label="Productos guardados">
+      @for (p of items(); track p.id; let i = $index) {
+        <app-product-card [product]="p" [showQuickView]="true" (quickView)="openQuickView($event)" />
+      }
+    </section>
+  } @else {
+    <section class="empty">
+      <h2>No tienes favoritos aún</h2>
+      <p class="muted">Toca el ♥ en un producto para guardarlo aquí.</p>
+      <a class="btn btn-primary" routerLink="/products">Ir al catálogo</a>
+    </section>
+  }
+</div>
+
+<app-product-quick-view
+  [isOpen]="quickViewOpen()"
+  [product]="quickViewProduct()"
+  (closed)="closeQuickView()"
+/>
+

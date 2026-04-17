@@ -1,0 +1,70 @@
+<header class="nav" [class.nav--open]="menuOpen()">
+  <div class="container nav-inner">
+    <a class="brand" routerLink="/" (click)="closeMenu()" aria-label="BONGA SHOP inicio">
+      <img src="/assets/logo-bonga.svg" width="168" height="36" alt="" />
+    </a>
+
+    <button
+      type="button"
+      class="burger"
+      (click)="toggleMenu()"
+      [attr.aria-expanded]="menuOpen()"
+      aria-controls="primary-nav"
+      aria-label="Abrir menú"
+    >
+      <span></span><span></span><span></span>
+    </button>
+
+    <div class="panel">
+      <nav id="primary-nav" class="links" aria-label="Principal">
+        <a
+          routerLink="/"
+          routerLinkActive="is-active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          (click)="closeMenu()"
+          >{{ 'home' | t }}</a
+        >
+        <a routerLink="/products" routerLinkActive="is-active" (click)="closeMenu()">{{ 'products' | t }}</a>
+        <a routerLink="/wishlist" routerLinkActive="is-active" (click)="closeMenu()">
+          {{ 'wishlist' | t }}
+          @if (wishlistCount()) {
+            <span class="badge" aria-hidden="true">{{ wishlistCount() }}</span>
+          }
+        </a>
+        <a routerLink="/admin" routerLinkActive="is-active" (click)="closeMenu()">{{ 'admin' | t }}</a>
+      </nav>
+
+      <div class="actions">
+        <button
+          type="button"
+          id="cart-btn"
+          class="btn btn-ghost btn-sm cart"
+          (click)="openCart()"
+          title="Carrito"
+        >
+          {{ 'cart' | t }}
+          <span class="dot" aria-hidden="true">{{ cartCount() }}</span>
+        </button>
+        <div class="prefs" aria-label="Preferencias">
+          <button type="button" class="btn btn-text btn-sm" (click)="setLang(lang() === 'es' ? 'en' : 'es')">
+            {{ lang() === 'es' ? 'ES' : 'EN' }}
+          </button>
+          <button type="button" class="btn btn-text btn-sm" (click)="setCurrency(currency() === 'EUR' ? 'COP' : 'EUR')">
+            {{ currency() }}
+          </button>
+        </div>
+        @if (user(); as u) {
+          <a class="btn btn-ghost btn-sm" routerLink="/orders" (click)="closeMenu()">{{ 'orders' | t }}</a>
+          <a class="btn btn-ghost btn-sm" routerLink="/wishlist" (click)="closeMenu()">Hola, {{ u.name }}</a>
+          <button type="button" class="btn btn-secondary btn-sm" (click)="logout()">{{ 'logout' | t }}</button>
+        } @else {
+          <button type="button" class="btn btn-ghost btn-sm" (click)="openLogin()">{{ 'login' | t }}</button>
+          <button type="button" class="btn btn-primary btn-sm" (click)="openRegister()">{{ 'register' | t }}</button>
+        }
+      </div>
+    </div>
+  </div>
+  @if (menuOpen()) {
+    <button type="button" class="scrim" (click)="closeMenu()" tabindex="-1" aria-hidden="true"></button>
+  }
+</header>

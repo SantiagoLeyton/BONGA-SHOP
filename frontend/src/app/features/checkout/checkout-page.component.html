@@ -1,0 +1,122 @@
+<div class="container checkout">
+  <div class="head">
+    <div>
+      <p class="kicker">Checkout</p>
+      <h1 class="title">Finalizar compra</h1>
+      <p class="sub">Flujo mock para demo (sin backend).</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-ghost" routerLink="/cart">Volver al carrito</a>
+    </div>
+  </div>
+
+  <div class="steps" aria-label="Progreso">
+    <div class="step" [class.on]="step() === 'address' || step() === 'shipping' || step() === 'payment' || step() === 'done'">
+      <span class="dot">1</span><span>Dirección</span>
+    </div>
+    <div class="line"></div>
+    <div class="step" [class.on]="step() === 'shipping' || step() === 'payment' || step() === 'done'">
+      <span class="dot">2</span><span>Envío</span>
+    </div>
+    <div class="line"></div>
+    <div class="step" [class.on]="step() === 'payment' || step() === 'done'">
+      <span class="dot">3</span><span>Pago</span>
+    </div>
+  </div>
+
+  @if (step() === 'address') {
+    <section class="panel">
+      <h2>Datos de contacto</h2>
+      <form class="form" [formGroup]="addressForm" (ngSubmit)="nextFromAddress()">
+        <label class="field">
+          <span>Nombre</span>
+          <input formControlName="name" placeholder="Tu nombre" />
+        </label>
+        <label class="field">
+          <span>Correo</span>
+          <input formControlName="email" type="email" placeholder="tu@correo.com" />
+        </label>
+        <label class="field">
+          <span>Teléfono</span>
+          <input formControlName="phone" inputmode="tel" placeholder="+57..." />
+        </label>
+        <label class="field">
+          <span>Ciudad</span>
+          <input formControlName="city" placeholder="Bogotá" />
+        </label>
+        <label class="field field--wide">
+          <span>Dirección</span>
+          <input formControlName="address1" placeholder="Calle 123 #45-67" />
+        </label>
+        <label class="field field--wide">
+          <span>Notas (opcional)</span>
+          <textarea formControlName="notes" rows="3" placeholder="Indicaciones para el repartidor…"></textarea>
+        </label>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary btn-lg">Continuar</button>
+        </div>
+      </form>
+    </section>
+  } @else if (step() === 'shipping') {
+    <section class="panel">
+      <h2>Envío</h2>
+      <div class="cards">
+        <button type="button" class="card" [class.on]="shipping() === 'standard'" (click)="shipping.set('standard')">
+          <p class="t">Estándar</p>
+          <p class="m muted">24–72h (mock)</p>
+          <p class="p">3,90 €</p>
+        </button>
+        <button type="button" class="card" [class.on]="shipping() === 'express'" (click)="shipping.set('express')">
+          <p class="t">Express</p>
+          <p class="m muted">Mismo día (mock)</p>
+          <p class="p">5,90 €</p>
+        </button>
+      </div>
+      <div class="nav">
+        <button type="button" class="btn btn-ghost" (click)="back()">Atrás</button>
+        <button type="button" class="btn btn-primary btn-lg" (click)="nextFromShipping()">Continuar</button>
+      </div>
+    </section>
+  } @else if (step() === 'payment') {
+    <section class="panel">
+      <h2>Pago</h2>
+      <div class="cards">
+        <button type="button" class="card" [class.on]="pay() === 'cod'" (click)="pay.set('cod')">
+          <p class="t">Contraentrega</p>
+          <p class="m muted">Pagas al recibir (mock)</p>
+          <p class="p">Recomendado</p>
+        </button>
+        <button type="button" class="card" [class.on]="pay() === 'card'" (click)="pay.set('card')">
+          <p class="t">Tarjeta</p>
+          <p class="m muted">Integración pendiente</p>
+          <p class="p">Mock</p>
+        </button>
+      </div>
+
+      <div class="summary">
+        <div class="row"><span>Envío</span><strong>{{ shippingPrice() | appCurrency }}</strong></div>
+        <div class="row total"><span>Total (mock)</span><strong>{{ shippingPrice() | appCurrency }}</strong></div>
+      </div>
+
+      <div class="nav">
+        <button type="button" class="btn btn-ghost" (click)="back()">Atrás</button>
+        <button type="button" class="btn btn-primary btn-lg" (click)="placeOrder()" [disabled]="placing()">
+          @if (placing()) { Procesando… } @else { Confirmar compra }
+        </button>
+      </div>
+      <p class="hint">Este checkout es demo: no cobra dinero ni crea orden real.</p>
+    </section>
+  } @else {
+    <section class="done">
+      <h2>¡Listo!</h2>
+      <p class="muted">Orden creada (mock).</p>
+      <p class="oid"><strong>{{ orderId() }}</strong></p>
+      <div class="nav">
+        <a class="btn btn-ghost" routerLink="/products">Volver al catálogo</a>
+        <a class="btn btn-primary" routerLink="/">Inicio</a>
+      </div>
+    </section>
+  }
+</div>
+

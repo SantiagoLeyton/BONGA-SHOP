@@ -1,0 +1,92 @@
+<section class="hero hero--mist" #heroSection>
+  <div class="container hero-grid">
+
+    <!-- TEXTO -->
+    <div class="hero-copy">
+      <p class="kicker hero-kicker">BONGA SHOP · VAPES PREMIUM</p>
+
+      <h1 class="title">
+        @for (w of heroWords; track $index) {
+          <span class="title-word">{{ w }}</span>
+          @if ($index < heroWords.length - 1) {
+            <span class="title-space">&nbsp;</span>
+          }
+        }
+      </h1>
+
+      <p class="lead hero-lead">
+        Descubre sabores únicos, diseño moderno y una experiencia pensada para destacar.
+        Hoy mock data, mañana conectado con tu backend real.
+      </p>
+
+      <div class="cta hero-cta">
+        <a class="btn btn-primary" routerLink="/products">
+          Ver productos
+        </a>
+
+        <a class="btn btn-secondary" routerLink="/admin">
+          Panel admin
+        </a>
+      </div>
+
+      <p class="fineprint hero-fine">
+        Solo +18. Consumo responsable.
+      </p>
+    </div>
+
+    <!-- IMAGEN / EFECTO -->
+    <div class="hero-art">
+      <div class="hero-art-inner">
+        <img
+          src="/assets/hero-vapor.svg"
+          width="900"
+          height="520"
+          alt="Vapes premium Bonga Shop"
+          loading="eager"
+        />
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- DESTACADOS -->
+<section class="section">
+  <div class="container">
+    <div class="section-head" appRevealScroll>
+      <h2>Productos destacados</h2>
+      <p class="muted">
+        Una selección pensada para mostrar lo mejor de nuestro catálogo.
+      </p>
+    </div>
+
+    <div class="grid">
+      @for (p of featured(); track p.id; let i = $index) {
+        <div appRevealScroll [appRevealDelay]="i * 0.04">
+          <app-product-card [product]="p" />
+        </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- SECCIÓN MARCA -->
+<section class="section section--brand">
+  <div class="container split" appRevealScroll>
+
+    <div>
+      <h2>Diseño urbano, experiencia premium</h2>
+      <p class="muted">
+        Interfaz moderna, rendimiento fluido y arquitectura lista para escalar.
+        Este proyecto está preparado para integrarse fácilmente con Spring Boot y JWT.
+      </p>
+    </div>
+
+    <ul class="ticks">
+      <li>Arquitectura lista para backend (Spring Boot + JWT)</li>
+      <li>Componentes reutilizables y escalables</li>
+      <li>Experiencia optimizada para móviles y desktop</li>
+    </ul>
+
+  </div>
+</section>

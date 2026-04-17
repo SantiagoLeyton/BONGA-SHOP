@@ -1,0 +1,73 @@
+.form {
+  display: grid;
+  gap: 1rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+.field--wide {
+  grid-column: 1 / -1;
+}
+
+.field input,
+.field textarea {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: rgba(2, 6, 23, 0.35);
+  color: var(--color-text);
+  padding: 0.65rem 0.75rem;
+  outline: none;
+}
+
+.check {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  color: var(--color-muted);
+
+  input {
+    accent-color: var(--color-accent);
+  }
+}
+
+.preview {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(2, 6, 23, 0.25);
+
+  img {
+    width: 100%;
+    max-height: 220px;
+    object-fit: cover;
+    border-radius: 14px;
+    border: 1px solid rgba(148, 163, 184, 0.12);
+  }
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 720px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+

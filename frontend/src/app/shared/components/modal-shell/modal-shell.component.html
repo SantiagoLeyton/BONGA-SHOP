@@ -1,0 +1,27 @@
+@if (isOpen) {
+  <div class="modal-root">
+    <button
+      type="button"
+      class="backdrop"
+      (click)="onBackdrop()"
+      aria-label="Cerrar diálogo"
+    ></button>
+    <div
+      class="panel"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-labelledby]="titleId"
+      (click)="$event.stopPropagation()"
+    >
+      <header class="panel-head">
+        <h2 class="panel-title" [id]="titleId">{{ title }}</h2>
+        <button type="button" class="icon-btn" (click)="onCloseClick($event)" aria-label="Cerrar">
+          <span aria-hidden="true">×</span>
+        </button>
+      </header>
+      <div class="panel-body">
+        <ng-content />
+      </div>
+    </div>
+  </div>
+}

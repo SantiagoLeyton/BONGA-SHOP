@@ -1,0 +1,90 @@
+<app-modal-shell
+  [isOpen]="isOpen()"
+  title="Crear cuenta"
+  (closed)="close()"
+>
+  <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+    <label class="field">
+      <span>Nombre</span>
+      <input
+        type="text"
+        formControlName="name"
+        autocomplete="name"
+        placeholder="Tu nombre"
+        [attr.aria-invalid]="form.controls.name.invalid && (form.controls.name.touched || form.controls.name.dirty)"
+      />
+      @if (form.controls.name.invalid && (form.controls.name.touched || form.controls.name.dirty)) {
+        <span class="err">Tu nombre debe tener al menos 2 caracteres.</span>
+      }
+    </label>
+    <label class="field">
+      <span>Correo</span>
+      <input
+        type="email"
+        formControlName="email"
+        autocomplete="email"
+        placeholder="tu@correo.com"
+        [attr.aria-invalid]="form.controls.email.invalid && (form.controls.email.touched || form.controls.email.dirty)"
+      />
+      @if (form.controls.email.invalid && (form.controls.email.touched || form.controls.email.dirty)) {
+        <span class="err">Ingresa un correo válido.</span>
+      }
+    </label>
+    <label class="field">
+      <span>Contraseña</span>
+      <div class="pw">
+        <input
+          [type]="showPassword() ? 'text' : 'password'"
+          formControlName="password"
+          autocomplete="new-password"
+          placeholder="Mínimo 8 caracteres"
+          [attr.aria-invalid]="
+            form.controls.password.invalid && (form.controls.password.touched || form.controls.password.dirty)
+          "
+        />
+        <button type="button" class="pw-btn" (click)="togglePassword()">
+          {{ showPassword() ? 'Ocultar' : 'Ver' }}
+        </button>
+      </div>
+      <div class="meter" [attr.data-s]="strength()">
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+      <p class="meter-hint">
+        @switch (strength()) {
+          @case (0) { Débil }
+          @case (1) { Débil }
+          @case (2) { OK }
+          @case (3) { Fuerte }
+          @default { Muy fuerte }
+        }
+      </p>
+      @if (form.controls.password.invalid && (form.controls.password.touched || form.controls.password.dirty)) {
+        <span class="err">Mínimo 8 caracteres.</span>
+      }
+    </label>
+    <label class="check">
+      <input type="checkbox" formControlName="accept" />
+      <span>Acepto los términos y condiciones (mock).</span>
+    </label>
+
+    @if (error()) {
+      <p class="alert" role="alert">{{ error() }}</p>
+    }
+
+    <button type="submit" class="btn btn-primary" [disabled]="!canSubmit()">
+      @if (loading()) {
+        Creando cuenta…
+      } @else {
+        Registrarme
+      }
+    </button>
+    <p class="hint">Mock register por ahora. Se conectará al API de Spring Boot.</p>
+    <p class="switch">
+      ¿Ya tienes cuenta?
+      <button type="button" class="linkish" (click)="openLogin()">Iniciar sesión</button>
+    </p>
+  </form>
+</app-modal-shell>
