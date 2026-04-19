@@ -1,6 +1,8 @@
 import { DecimalPipe } from '@angular/common';
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import type { Product } from '../../../core/models/product.model';
+import { CartService } from '../../../core/services/cart.service';
+import { CartUiService } from '../../../core/services/cart-ui.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { ModalShellComponent } from '../modal-shell/modal-shell.component';
 import { ProductBadgeComponent } from '../product-badge/product-badge.component';
@@ -14,6 +16,8 @@ import { ProductBadgeComponent } from '../product-badge/product-badge.component'
 })
 export class ProductQuickViewComponent {
   private readonly toast = inject(ToastService);
+  private readonly cart = inject(CartService);
+  private readonly cartUi = inject(CartUiService);
 
   @Input({ required: true }) isOpen = false;
   @Input({ required: false }) product?: Product;
@@ -24,13 +28,27 @@ export class ProductQuickViewComponent {
   }
 
   minPrice(): number {
-    const p = this.product;
-    if (!p?.variants?.length) return 0;
-    return Math.min(...p.variants.map((v) => v.price));
+    const product = this.product;
+    if (!product?.variants?.length) return 0;
+    return Math.min(...product.variants.map((variant) => variant.price));
   }
 
   addToCart(): void {
-    this.toast.show('Carrito próximamente. UI lista para integrar.', 'info', 'BONGA SHOP');
+    const product = this.product;
+    const variant = product?.variants.find((item) => item.stock > 0) ?? product?.variants[0];
+
+    if (!product || !variant) {
+      return;
+    }
+
+    if (variant.stock <= 0) {
+      this.toast.show('Este producto esta agotado.', 'warning', 'Carrito');
+      return;
+    }
+
+    this.cart.add(product.id, variant.id, 1);
+    this.toast.show(`${product.name} · ${variant.flavor}`, 'success', 'Anadido al carrito');
+    this.cartUi.show();
+    this.close();
   }
 }
-

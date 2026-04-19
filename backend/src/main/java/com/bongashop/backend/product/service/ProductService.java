@@ -40,9 +40,10 @@ public class ProductService {
             String flavor,
             String nicotineLevel,
             int page,
-            int size
+            int size,
+            boolean includeInactive
     ) {
-        Specification<Product> specification = Specification.where(activeProducts())
+        Specification<Product> specification = Specification.where(includeInactive ? null : activeProducts())
                 .and(filterBySearch(search))
                 .and(filterByBrand(brandId))
                 .and(filterByMinPrice(minPrice))
@@ -55,11 +56,11 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
-    public ProductDetailResponse getPublicDetail(Long id) {
+    public ProductDetailResponse getDetail(Long id, boolean includeInactiveVariants) {
         Product product = productRepository.findDetailedById(id)
-                .filter(Product::isActive)
+                .filter(item -> includeInactiveVariants || item.isActive())
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found with id " + id));
-        return productMapper.toDetail(product, false);
+        return productMapper.toDetail(product, includeInactiveVariants);
     }
 
     @Transactional(readOnly = true)

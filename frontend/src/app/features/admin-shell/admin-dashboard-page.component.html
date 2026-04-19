@@ -1,20 +1,20 @@
 <div class="container page">
   <header class="head">
-    <p class="kicker">Admin · UI shell</p>
+    <p class="kicker">Admin · panel operativo</p>
     <h1>Panel visual</h1>
     <p class="muted">
-      Esta vista reserva espacio para métricas, inventario y pedidos cuando el backend esté conectado.
+      Gestiona productos, marcas, inventario y pedidos reales desde el backend protegido con JWT.
     </p>
   </header>
 
   <div class="grid">
-    <aside class="side" aria-label="Navegación admin">
+    <aside class="side" aria-label="Navegacion admin">
       <p class="side-title">Secciones</p>
       <ul class="list">
-        <li><span class="pill">Resumen</span> <span class="tag">próximo</span></li>
-        <li><span class="pill">Productos</span> <span class="tag">próximo</span></li>
-        <li><span class="pill">Pedidos</span> <span class="tag">próximo</span></li>
-        <li><span class="pill">Usuarios</span> <span class="tag">próximo</span></li>
+        <li><span class="pill">Productos</span> <span class="tag">{{ filtered().length }}</span></li>
+        <li><span class="pill">Marcas</span> <span class="tag">{{ brands().length }}</span></li>
+        <li><span class="pill">Inventario</span> <span class="tag">{{ inventory().length }}</span></li>
+        <li><span class="pill">Pedidos</span> <span class="tag">{{ adminOrders().length }}</span></li>
       </ul>
       <a class="btn btn-secondary" routerLink="/products">Volver a tienda</a>
     </aside>
@@ -23,38 +23,40 @@
       <div class="cards">
         <article class="card">
           <p class="label">Ingresos</p>
-          <p class="value">—</p>
-          <p class="sub">Mock</p>
+          <p class="value">{{ metrics().revenue | appCurrency }}</p>
+          <p class="sub">Total acumulado en pedidos visibles</p>
         </article>
         <article class="card">
           <p class="label">Pedidos</p>
-          <p class="value">—</p>
-          <p class="sub">Mock</p>
+          <p class="value">{{ metrics().orders }}</p>
+          <p class="sub">Pedidos administrativos cargados</p>
         </article>
         <article class="card">
           <p class="label">Stock bajo</p>
-          <p class="value">—</p>
-          <p class="sub">Mock</p>
+          <p class="value">{{ metrics().lowStock }}</p>
+          <p class="sub">Variantes con inventario critico</p>
         </article>
       </div>
 
-      <div class="table-card" aria-label="Tabla mock de productos">
+      <div class="table-card" aria-label="Tabla de productos">
         <div class="table-head">
           <div>
             <h2>Productos</h2>
-            <p class="muted small">Mock table · lista para conectar al API</p>
+            <p class="muted small">CRUD real conectado a productos, variantes e inventario.</p>
           </div>
           <div class="table-actions">
             <label class="search">
               <span class="sr-only">Buscar</span>
               <input
                 type="search"
-                placeholder="Buscar…"
+                placeholder="Buscar..."
                 [value]="query()"
                 (input)="setQuery($any($event.target).value)"
               />
             </label>
-            <button type="button" class="btn btn-secondary btn-sm" (click)="openCreate()">Nuevo producto</button>
+            <button type="button" class="btn btn-secondary btn-sm" (click)="openCreate()" [disabled]="!brands().length">
+              Nuevo producto
+            </button>
           </div>
         </div>
 
@@ -84,11 +86,11 @@
                   <td>{{ p.brand.name }}</td>
                   <td>{{ p.variants.length }}</td>
                   <td>{{ stockTotal(p) }}</td>
+                  <td class="right">{{ minPrice(p) | appCurrency }}</td>
                   <td class="right">
-                    {{ minPrice(p) | number : '1.2-2' }} €
-                  </td>
-                  <td class="right">
-                    @if (stockTotal(p) <= 5) {
+                    @if (p.active === false) {
+                      <span class="pill warn">Inactivo</span>
+                    } @else if (stockTotal(p) <= 5) {
                       <span class="pill bad">Stock bajo</span>
                     } @else {
                       <span class="pill ok">Activo</span>
@@ -114,8 +116,218 @@
 
         <div class="pager">
           <button type="button" class="btn btn-ghost btn-sm" (click)="prev()">Anterior</button>
-          <p class="muted small">Página {{ page() }} / {{ totalPages() }}</p>
+          <p class="muted small">Pagina {{ page() }} / {{ totalPages() }}</p>
           <button type="button" class="btn btn-ghost btn-sm" (click)="next()">Siguiente</button>
+        </div>
+      </div>
+
+      <div class="split-grid">
+        <div class="table-card" aria-label="Tabla de marcas">
+          <div class="table-head">
+            <div>
+              <h2>Marcas</h2>
+              <p class="muted small">Crea, edita y elimina marcas reales.</p>
+            </div>
+            <div class="table-actions">
+              <label class="search">
+                <span class="sr-only">Nueva marca</span>
+                <input
+                  type="text"
+                  placeholder="Nueva marca"
+                  [value]="brandDraft()"
+                  (input)="setBrandDraft($any($event.target).value)"
+                />
+              </label>
+              <button type="button" class="btn btn-secondary btn-sm" (click)="createBrand()">Crear marca</button>
+            </div>
+          </div>
+
+          <div class="table-wrap" role="region" aria-label="Tabla de marcas" tabindex="0">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Marca</th>
+                  <th class="right">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (brand of brands(); track brand.id) {
+                  <tr>
+                    <td>
+                      @if (editingBrand() === brand.id) {
+                        <input
+                          class="inline-input"
+                          [value]="brandEditValue()"
+                          (input)="setBrandEditValue($any($event.target).value)"
+                        />
+                      } @else {
+                        {{ brand.name }}
+                      }
+                    </td>
+                    <td class="right">
+                      <div class="row-actions">
+                        @if (editingBrand() === brand.id) {
+                          <button type="button" class="btn btn-ghost btn-sm" (click)="saveBrand(brand)">Guardar</button>
+                          <button type="button" class="btn btn-text btn-sm" (click)="cancelBrandEdit()">Cancelar</button>
+                        } @else {
+                          <button type="button" class="btn btn-ghost btn-sm" (click)="startBrandEdit(brand)">Editar</button>
+                          <button type="button" class="btn btn-text btn-sm" (click)="deleteBrand(brand)">Eliminar</button>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="2">
+                      <p class="muted">No hay marcas registradas.</p>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="table-card" aria-label="Tabla de inventario">
+          <div class="table-head">
+            <div>
+              <h2>Inventario</h2>
+              <p class="muted small">Actualiza el stock real por variante.</p>
+            </div>
+            <div class="table-actions">
+              <button type="button" class="btn btn-ghost btn-sm" (click)="toggleLowStock()">
+                @if (inventoryLowStockOnly()) { Ver todo } @else { Solo stock bajo }
+              </button>
+            </div>
+          </div>
+
+          <div class="table-wrap" role="region" aria-label="Tabla de inventario" tabindex="0">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Variante</th>
+                  <th>Estado</th>
+                  <th class="right">Stock</th>
+                  <th class="right">Guardar</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (item of visibleInventory(); track item.variantId) {
+                  <tr>
+                    <td>
+                      <div class="cell-title">
+                        <span class="dot dot--b" aria-hidden="true"></span>
+                        {{ item.productName }}
+                      </div>
+                      <p class="muted small">{{ item.brandName }}</p>
+                    </td>
+                    <td>{{ item.flavor }} · {{ item.nicotineLevel }}</td>
+                    <td>
+                      @if (!item.active) {
+                        <span class="pill warn">Inactiva</span>
+                      } @else if (item.lowStock) {
+                        <span class="pill bad">Stock bajo</span>
+                      } @else {
+                        <span class="pill ok">Activa</span>
+                      }
+                    </td>
+                    <td class="right">
+                      <input
+                        class="inline-input inline-input--stock"
+                        type="number"
+                        min="0"
+                        [value]="stockValue(item)"
+                        (input)="setStockDraft(item.variantId, $any($event.target).value)"
+                      />
+                    </td>
+                    <td class="right">
+                      <button type="button" class="btn btn-ghost btn-sm" (click)="saveStock(item)">Guardar</button>
+                    </td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="5">
+                      <p class="muted">No hay registros de inventario.</p>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-card" aria-label="Tabla de pedidos">
+        <div class="table-head">
+          <div>
+            <h2>Pedidos</h2>
+            <p class="muted small">Consulta pedidos reales y actualiza su estado.</p>
+          </div>
+          <div class="table-actions">
+            <select class="select-control" [value]="orderStatusFilter()" (change)="setOrderStatusFilter($any($event.target).value)">
+              <option value="all">Todos los estados</option>
+              @for (status of orderStatuses; track status) {
+                <option [value]="status">{{ statusLabel(status) }}</option>
+              }
+            </select>
+            <label class="search">
+              <span class="sr-only">Filtrar por usuario</span>
+              <input
+                type="text"
+                placeholder="User ID"
+                [value]="orderUserFilter()"
+                (input)="setOrderUserFilter($any($event.target).value)"
+              />
+            </label>
+          </div>
+        </div>
+
+        <div class="table-wrap" role="region" aria-label="Tabla de pedidos" tabindex="0">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Pedido</th>
+                <th>Cliente</th>
+                <th>Usuario</th>
+                <th>Total</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th class="right">Aplicar</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (order of visibleOrders(); track order.id) {
+                <tr>
+                  <td>#{{ order.id }}</td>
+                  <td>{{ order.customerName }}</td>
+                  <td>{{ order.userId }}</td>
+                  <td>{{ order.total | appCurrency }}</td>
+                  <td>{{ order.placedAt | date : 'medium' }}</td>
+                  <td>
+                    <select
+                      class="select-control"
+                      [value]="statusValue(order)"
+                      (change)="setOrderStatusDraft(order.id, $any($event.target).value)"
+                    >
+                      @for (status of orderStatuses; track status) {
+                        <option [value]="status">{{ statusLabel(status) }}</option>
+                      }
+                    </select>
+                  </td>
+                  <td class="right">
+                    <button type="button" class="btn btn-ghost btn-sm" (click)="saveOrderStatus(order)">Actualizar</button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="7">
+                    <p class="muted">No hay pedidos con esos filtros.</p>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
         </div>
       </div>
     </section>
@@ -125,6 +337,7 @@
 <app-admin-product-modal
   [isOpen]="modalOpen()"
   [product]="editing()"
+  [brands]="brands()"
   (closed)="closeModal()"
   (saved)="saveProduct($event)"
 />

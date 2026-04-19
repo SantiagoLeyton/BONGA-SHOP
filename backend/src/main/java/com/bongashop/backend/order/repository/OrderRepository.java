@@ -18,5 +18,9 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
     Optional<Order> findDetailedById(@Param("id") Long id);
 
     @EntityGraph(attributePaths = {"user"})
-    Page<Order> findByUserIdOrderByPlacedAtDesc(Long userId, Pageable pageable);
+    @Query(
+            value = "select o from Order o where o.user.id = :userId order by o.placedAt desc",
+            countQuery = "select count(o) from Order o where o.user.id = :userId"
+    )
+    Page<Order> findPageByUserId(@Param("userId") Long userId, Pageable pageable);
 }

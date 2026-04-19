@@ -1,11 +1,13 @@
 package com.bongashop.backend.productvariant.controller;
 
+import com.bongashop.backend.config.security.CustomUserDetails;
 import com.bongashop.backend.productvariant.dto.ProductVariantRequest;
 import com.bongashop.backend.productvariant.dto.ProductVariantResponse;
 import com.bongashop.backend.productvariant.service.ProductVariantService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,8 +31,11 @@ public class ProductVariantController {
     }
 
     @GetMapping("/products/{productId}/variants")
-    public List<ProductVariantResponse> listVariants(@PathVariable Long productId) {
-        return productVariantService.listPublicVariants(productId);
+    public List<ProductVariantResponse> listVariants(
+            @PathVariable Long productId,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        return productVariantService.listVariants(productId, isAdmin(userDetails));
     }
 
     @PostMapping("/products/{productId}/variants")
@@ -54,5 +59,9 @@ public class ProductVariantController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteVariant(@PathVariable Long id) {
         productVariantService.delete(id);
+    }
+
+    private boolean isAdmin(CustomUserDetails userDetails) {
+        return userDetails != null && "ROLE_ADMIN".equals(userDetails.getRoleName());
     }
 }

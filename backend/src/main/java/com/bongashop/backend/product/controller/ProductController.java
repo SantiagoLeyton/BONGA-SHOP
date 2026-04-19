@@ -1,5 +1,6 @@
 package com.bongashop.backend.product.controller;
 
+import com.bongashop.backend.config.security.CustomUserDetails;
 import com.bongashop.backend.product.dto.ProductCardResponse;
 import com.bongashop.backend.product.dto.ProductDetailResponse;
 import com.bongashop.backend.product.dto.ProductRequest;
@@ -8,6 +9,7 @@ import com.bongashop.backend.shared.dto.PageResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,14 +42,28 @@ public class ProductController {
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
             @RequestParam(required = false) String flavor,
-            @RequestParam(required = false) String nicotineLevel
+            @RequestParam(required = false) String nicotineLevel,
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        return productService.listProducts(search, brandId, minPrice, maxPrice, flavor, nicotineLevel, page, size);
+        return productService.listProducts(
+                search,
+                brandId,
+                minPrice,
+                maxPrice,
+                flavor,
+                nicotineLevel,
+                page,
+                size,
+                isAdmin(userDetails)
+        );
     }
 
     @GetMapping("/{id}")
-    public ProductDetailResponse getProduct(@PathVariable Long id) {
-        return productService.getPublicDetail(id);
+    public ProductDetailResponse getProduct(
+            @PathVariable Long id,
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        return productService.getDetail(id, isAdmin(userDetails));
     }
 
     @PostMapping
@@ -68,5 +84,9 @@ public class ProductController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteProduct(@PathVariable Long id) {
         productService.delete(id);
+    }
+
+    private boolean isAdmin(CustomUserDetails userDetails) {
+        return userDetails != null && "ROLE_ADMIN".equals(userDetails.getRoleName());
     }
 }

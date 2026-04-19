@@ -1,9 +1,9 @@
 import { Component, computed, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { OrderService } from '../../core/services/order.service';
 import { ProductService } from '../../core/services/product.service';
-import type { Product } from '../../core/models/product.model';
 import type { Order } from '../../core/models/order.model';
 import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
 
@@ -19,35 +19,26 @@ type OrderView = Order & { linesCount: number };
 export class OrdersPageComponent {
   private readonly orders = inject(OrderService);
   private readonly products = inject(ProductService);
-
-  private _snapshot: Product[] | null = null;
-  private productsSnapshot(): Product[] {
-    if (this._snapshot) return this._snapshot;
-    let out: Product[] = [];
-    this.products.getProducts().subscribe((x) => (out = x)).unsubscribe();
-    this._snapshot = out;
-    return out;
-  }
+  readonly productList = toSignal(this.products.getProducts(), { initialValue: [] });
 
   readonly list = computed<OrderView[]>(() =>
     this.orders
       .list()
-      .map((o) => ({ ...o, linesCount: o.lines.reduce((s, l) => s + l.qty, 0) })),
+      .map((o) => ({ ...o, linesCount: o.lines.reduce((sum, line) => sum + line.quantity, 0) })),
   );
 
+  constructor() {
+    void this.orders.loadMyOrders();
+  }
+
   orderTotal(o: Order): number {
-    const byId = new Map(this.productsSnapshot().map((p) => [p.id, p]));
-    return o.lines.reduce((sum, l) => {
-      const p = byId.get(l.productId);
-      const v = p?.variants.find((x) => x.id === l.variantId);
-      return sum + (v?.price ?? 0) * l.qty;
-    }, 0);
+    return o.total;
   }
 
   statusLabel(s: Order['status']): string {
     switch (s) {
-      case 'paid':
-        return 'Pagada';
+      case 'processing':
+        return 'Procesando';
       case 'shipped':
         return 'Enviada';
       case 'delivered':

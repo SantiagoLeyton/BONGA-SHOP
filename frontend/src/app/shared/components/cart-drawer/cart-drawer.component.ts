@@ -1,9 +1,9 @@
 import { Component, computed, inject } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { CartService } from '../../../core/services/cart.service';
 import { CartUiService } from '../../../core/services/cart-ui.service';
 import { ProductService } from '../../../core/services/product.service';
-import { SaveForLaterService } from '../../../core/services/save-for-later.service';
 import { ToastService } from '../../../core/services/toast.service';
 import type { Product } from '../../../core/models/product.model';
 import { AppCurrencyPipe } from '../../pipes/app-currency.pipe';
@@ -30,14 +30,14 @@ export class CartDrawerComponent {
   private readonly cart = inject(CartService);
   private readonly ui = inject(CartUiService);
   private readonly products = inject(ProductService);
-  private readonly sfl = inject(SaveForLaterService);
   private readonly toasts = inject(ToastService);
 
   readonly isOpen = this.ui.open;
   readonly count = this.cart.count;
+  readonly productList = toSignal(this.products.getProducts(), { initialValue: [] });
 
   readonly viewLines = computed<ViewLine[]>(() => {
-    const list = this.productsSnapshot();
+    const list = this.productList();
     const byId = new Map(list.map((p) => [p.id, p]));
     return this.cart.items().flatMap((l) => {
       const p = byId.get(l.productId);
@@ -62,16 +62,6 @@ export class CartDrawerComponent {
 
   readonly subtotal = computed(() => this.viewLines().reduce((sum, l) => sum + l.lineTotal, 0));
 
-  // ProductService is RxJS-based; keep a tiny cached snapshot to avoid async template churn.
-  private _snapshot: Product[] | null = null;
-  private productsSnapshot(): Product[] {
-    if (this._snapshot) return this._snapshot;
-    let out: Product[] = [];
-    this.products.getProducts().subscribe((x) => (out = x)).unsubscribe();
-    this._snapshot = out;
-    return out;
-  }
-
   close(): void {
     this.ui.hide();
   }
@@ -79,7 +69,7 @@ export class CartDrawerComponent {
   inc(line: ViewLine): void {
     const v = line.product.variants.find((x) => x.id === line.variantId);
     if (v && line.qty >= v.stock) {
-      this.toasts.show('Llegaste al stock máximo.', 'warning', 'Carrito');
+      this.toasts.show('Llegaste al stock maximo.', 'warning', 'Carrito');
       return;
     }
     this.cart.add(line.product.id, line.variantId, 1);
@@ -100,11 +90,4 @@ export class CartDrawerComponent {
   changeVariant(line: ViewLine, nextVariantId: string): void {
     this.cart.changeVariant(line.product.id, line.variantId, nextVariantId);
   }
-
-  saveForLater(line: ViewLine): void {
-    this.cart.remove(line.product.id, line.variantId);
-    this.sfl.add(line.product.id, line.variantId, line.qty);
-    this.toasts.show('Guardado para después', 'info', 'Carrito');
-  }
 }
-

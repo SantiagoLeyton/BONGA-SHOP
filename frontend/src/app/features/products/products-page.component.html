@@ -1,7 +1,7 @@
 <div class="page-head container" appRevealScroll>
   <div>
-    <h1 class="title">Catálogo</h1>
-    <p class="muted">Mock data local — sustituye por HTTP cuando el API esté listo.</p>
+    <h1 class="title">Catalogo</h1>
+    <p class="muted">Explora productos, marcas y variantes cargados desde el backend real.</p>
   </div>
 </div>
 
@@ -36,13 +36,13 @@
         }
       </div>
 
-      <div class="toolbar-right" aria-label="Buscar en catálogo">
+      <div class="toolbar-right" aria-label="Buscar en catalogo">
         <label class="search">
           <span class="sr-only">Buscar</span>
           <input
             type="search"
             class="search-input"
-            placeholder="Buscar por nombre, marca o sabor…"
+            placeholder="Buscar por nombre, marca o sabor..."
             [value]="query()"
             (input)="setQuery($any($event.target).value)"
           />

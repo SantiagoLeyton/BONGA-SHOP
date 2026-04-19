@@ -94,7 +94,7 @@ public class OrderService {
 
     @Transactional(readOnly = true)
     public PageResponse<OrderSummaryResponse> getMyOrders(Long userId, int page, int size) {
-        return PageResponse.from(orderRepository.findByUserIdOrderByPlacedAtDesc(userId, PageRequest.of(page, Math.min(size, 100)))
+        return PageResponse.from(orderRepository.findPageByUserId(userId, PageRequest.of(page, Math.min(size, 100)))
                 .map(orderMapper::toSummary));
     }
 

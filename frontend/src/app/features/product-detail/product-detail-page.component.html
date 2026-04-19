@@ -5,7 +5,7 @@
       <span aria-hidden="true">/</span>
       <a routerLink="/products">Productos</a>
       <span aria-hidden="true">/</span>
-      <span class="current">Cargando…</span>
+      <span class="current">Cargando...</span>
     </nav>
 
     <div class="grid">
@@ -14,9 +14,9 @@
       </div>
 
       <div class="copy" appRevealScroll [appRevealDelay]="0.1">
-        <p class="brand">—</p>
-        <h1 class="title">Cargando producto…</h1>
-        <p class="desc">Preparando detalle visual.</p>
+        <p class="brand">-</p>
+        <h1 class="title">Cargando producto...</h1>
+        <p class="desc">Preparando detalle del producto.</p>
       </div>
     </div>
   </div>
@@ -68,7 +68,7 @@
                 (click)="pickVariant(v.id)"
               >
                 <span class="chip-title">{{ v.flavor }}</span>
-                <span class="chip-meta">{{ v.nicotineMg }} mg · {{ v.price | number : '1.2-2' }} €</span>
+                <span class="chip-meta">{{ v.nicotineMg }} mg · {{ v.price | number : '1.2-2' }} EUR</span>
               </button>
             }
           </div>
@@ -76,7 +76,7 @@
           @if (selectedVariant(); as v) {
             <div class="buy">
               <div class="price-row">
-                <p class="price">{{ v.price | number : '1.2-2' }} €</p>
+                <p class="price">{{ v.price | number : '1.2-2' }} EUR</p>
                 <p
                   class="stock"
                   [class.stock--bad]="v.stock === 0"
@@ -95,15 +95,15 @@
                   @if (v.stock === 0) {
                     Agotado
                   } @else {
-                    Añadir al carrito
+                    Anadir al carrito
                   }
                 </button>
-                <p class="hint">Carrito mock (listo para integración).</p>
+                <p class="hint">La variante seleccionada se agrega al carrito con stock real del catalogo.</p>
               </div>
             </div>
           }
 
-          <section class="tabs" aria-label="Información">
+          <section class="tabs" aria-label="Informacion">
             <div class="tab-head" role="tablist" aria-label="Secciones de producto">
               <button type="button" class="tab" [class.tab--on]="tab() === 'details'" (click)="tab.set('details')">
                 Detalles
@@ -112,7 +112,7 @@
                 Specs
               </button>
               <button type="button" class="tab" [class.tab--on]="tab() === 'shipping'" (click)="tab.set('shipping')">
-                Envío
+                Envio
               </button>
             </div>
 
@@ -121,7 +121,7 @@
                 <ul class="list">
                   <li><strong>Marca:</strong> {{ p.brand.name }}</li>
                   <li><strong>Sabores:</strong> {{ p.variants.length }} variantes</li>
-                  <li><strong>Precio:</strong> desde {{ p.variants[0].price | number : '1.2-2' }} €</li>
+                  <li><strong>Precio:</strong> desde {{ p.variants[0].price | number : '1.2-2' }} EUR</li>
                 </ul>
               } @else if (tab() === 'specs') {
                 @if (selectedVariant(); as sv) {
@@ -136,9 +136,9 @@
                 }
               } @else {
                 <ul class="list">
-                  <li><strong>Entrega:</strong> 24–72h (mock)</li>
-                  <li><strong>Pago:</strong> contraentrega / tarjeta (mock)</li>
-                  <li><strong>Devoluciones:</strong> 7 días (mock)</li>
+                  <li><strong>Entrega:</strong> la orden se confirma desde checkout y queda registrada en backend.</li>
+                  <li><strong>Pago:</strong> el flujo actual confirma la compra dentro de la aplicacion.</li>
+                  <li><strong>Historial:</strong> luego de comprar puedes consultar tus ordenes en la cuenta.</li>
                 </ul>
               }
             </div>
@@ -149,7 +149,7 @@
       @if (related().length) {
         <section class="related" appRevealScroll [appRevealDelay]="0.05">
           <div class="related-head">
-            <h2>También te puede gustar</h2>
+            <h2>Tambien te puede gustar</h2>
             <a class="btn btn-text btn-sm" routerLink="/products">Ver todo</a>
           </div>
           <div class="related-grid">
@@ -163,7 +163,7 @@
   } @else {
     <div class="container empty">
       <h1>Producto no encontrado</h1>
-      <p class="muted">Revisa la URL o vuelve al catálogo.</p>
+      <p class="muted">Revisa la URL o vuelve al catalogo.</p>
       <a class="btn btn-secondary" routerLink="/products">Volver a productos</a>
     </div>
   }

@@ -15,6 +15,9 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariant, 
     List<ProductVariant> findByProductIdAndActiveTrueOrderByIdAsc(Long productId);
 
     @EntityGraph(attributePaths = {"product", "product.brand", "inventory"})
+    List<ProductVariant> findByProductIdOrderByIdAsc(Long productId);
+
+    @EntityGraph(attributePaths = {"product", "product.brand", "inventory"})
     @Query("select v from ProductVariant v where v.id = :id")
     Optional<ProductVariant> findDetailedById(@Param("id") Long id);
 }

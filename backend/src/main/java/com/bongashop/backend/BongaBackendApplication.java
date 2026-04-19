@@ -1,5 +1,6 @@
 package com.bongashop.backend;
 
+import com.bongashop.backend.config.bootstrap.CatalogBootstrapService;
 import com.bongashop.backend.config.properties.BootstrapAdminProperties;
 import com.bongashop.backend.role.service.RoleService;
 import com.bongashop.backend.user.service.UserService;
@@ -22,11 +23,13 @@ public class BongaBackendApplication {
             RoleService roleService,
             UserService userService,
             BootstrapAdminProperties bootstrapAdminProperties,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder passwordEncoder,
+            CatalogBootstrapService catalogBootstrapService
     ) {
         return args -> {
             roleService.ensureDefaultRoles();
             userService.ensureBootstrapAdmin(bootstrapAdminProperties, passwordEncoder);
+            catalogBootstrapService.seedCatalogIfEmpty();
         };
     }
 

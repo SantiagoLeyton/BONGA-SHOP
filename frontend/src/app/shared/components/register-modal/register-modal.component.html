@@ -27,17 +27,17 @@
         [attr.aria-invalid]="form.controls.email.invalid && (form.controls.email.touched || form.controls.email.dirty)"
       />
       @if (form.controls.email.invalid && (form.controls.email.touched || form.controls.email.dirty)) {
-        <span class="err">Ingresa un correo válido.</span>
+        <span class="err">Ingresa un correo valido.</span>
       }
     </label>
     <label class="field">
-      <span>Contraseña</span>
+      <span>Contrasena</span>
       <div class="pw">
         <input
           [type]="showPassword() ? 'text' : 'password'"
           formControlName="password"
           autocomplete="new-password"
-          placeholder="Mínimo 8 caracteres"
+          placeholder="Minimo 8 caracteres"
           [attr.aria-invalid]="
             form.controls.password.invalid && (form.controls.password.touched || form.controls.password.dirty)
           "
@@ -54,20 +54,20 @@
       </div>
       <p class="meter-hint">
         @switch (strength()) {
-          @case (0) { Débil }
-          @case (1) { Débil }
+          @case (0) { Debil }
+          @case (1) { Debil }
           @case (2) { OK }
           @case (3) { Fuerte }
           @default { Muy fuerte }
         }
       </p>
       @if (form.controls.password.invalid && (form.controls.password.touched || form.controls.password.dirty)) {
-        <span class="err">Mínimo 8 caracteres.</span>
+        <span class="err">Minimo 8 caracteres.</span>
       }
     </label>
     <label class="check">
       <input type="checkbox" formControlName="accept" />
-      <span>Acepto los términos y condiciones (mock).</span>
+      <span>Acepto los terminos y condiciones.</span>
     </label>
 
     @if (error()) {
@@ -76,15 +76,15 @@
 
     <button type="submit" class="btn btn-primary" [disabled]="!canSubmit()">
       @if (loading()) {
-        Creando cuenta…
+        Creando cuenta...
       } @else {
         Registrarme
       }
     </button>
-    <p class="hint">Mock register por ahora. Se conectará al API de Spring Boot.</p>
+    <p class="hint">El registro crea la cuenta en backend y deja la sesion iniciada automaticamente.</p>
     <p class="switch">
-      ¿Ya tienes cuenta?
-      <button type="button" class="linkish" (click)="openLogin()">Iniciar sesión</button>
+      Ya tienes cuenta?
+      <button type="button" class="linkish" (click)="openLogin()">Iniciar sesion</button>
     </p>
   </form>
 </app-modal-shell>

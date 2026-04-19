@@ -3,7 +3,7 @@
     <div>
       <p class="kicker">Cuenta</p>
       <h1 class="title">Órdenes</h1>
-      <p class="sub">Historial mock guardado en tu navegador.</p>
+      <p class="sub">Historial real sincronizado con backend.</p>
     </div>
     <div class="actions">
       <a class="btn btn-ghost" routerLink="/products">Seguir comprando</a>
@@ -14,7 +14,7 @@
   @if (!list().length) {
     <section class="empty">
       <h2>Aún no tienes órdenes</h2>
-      <p class="muted">Completa un checkout para que aparezcan aquí.</p>
+      <p class="muted">Completa una compra para que aparezca aquí.</p>
       <a class="btn btn-primary" routerLink="/checkout">Ir a checkout</a>
     </section>
   } @else {
@@ -33,7 +33,6 @@
             <span>·</span>
             <span>{{ orderTotal(o) | appCurrency }}</span>
           </div>
-          <p class="ship muted small">Envío: {{ o.shipping === 'express' ? 'Express' : 'Estándar' }} · Pago: {{ o.payment === 'card' ? 'Tarjeta' : 'Contraentrega' }}</p>
           <p class="addr muted small">{{ o.address.city }} · {{ o.address.address1 }}</p>
         </article>
       }

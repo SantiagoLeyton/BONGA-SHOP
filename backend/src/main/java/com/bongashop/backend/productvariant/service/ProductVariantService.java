@@ -36,9 +36,11 @@ public class ProductVariantService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProductVariantResponse> listPublicVariants(Long productId) {
-        return productVariantRepository.findByProductIdAndActiveTrueOrderByIdAsc(productId).stream()
-                .filter(variant -> variant.getInventory() != null && variant.getInventory().getStock() > 0)
+    public List<ProductVariantResponse> listVariants(Long productId, boolean includeInactive) {
+        return (includeInactive
+                ? productVariantRepository.findByProductIdOrderByIdAsc(productId)
+                : productVariantRepository.findByProductIdAndActiveTrueOrderByIdAsc(productId)).stream()
+                .filter(variant -> includeInactive || (variant.getInventory() != null && variant.getInventory().getStock() > 0))
                 .map(productVariantMapper::toResponse)
                 .toList();
     }
