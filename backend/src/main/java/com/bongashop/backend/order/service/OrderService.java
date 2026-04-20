@@ -1,5 +1,8 @@
 package com.bongashop.backend.order.service;
 
+import com.bongashop.backend.cart.entity.Cart;
+import com.bongashop.backend.cart.service.CartService;
+import com.bongashop.backend.cartitem.entity.CartItem;
 import com.bongashop.backend.config.security.CustomUserDetails;
 import com.bongashop.backend.inventory.entity.Inventory;
 import com.bongashop.backend.inventory.repository.InventoryRepository;
@@ -15,6 +18,7 @@ import com.bongashop.backend.orderdetail.entity.OrderDetail;
 import com.bongashop.backend.productvariant.entity.ProductVariant;
 import com.bongashop.backend.shared.dto.PageResponse;
 import com.bongashop.backend.shared.enums.OrderStatus;
+import com.bongashop.backend.shared.exception.BusinessException;
 import com.bongashop.backend.shared.exception.ForbiddenOperationException;
 import com.bongashop.backend.shared.exception.InsufficientStockException;
 import com.bongashop.backend.shared.exception.ResourceNotFoundException;
@@ -37,22 +41,30 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final InventoryRepository inventoryRepository;
     private final UserService userService;
+    private final CartService cartService;
     private final OrderMapper orderMapper;
 
     public OrderService(
             OrderRepository orderRepository,
             InventoryRepository inventoryRepository,
             UserService userService,
+            CartService cartService,
             OrderMapper orderMapper
     ) {
         this.orderRepository = orderRepository;
         this.inventoryRepository = inventoryRepository;
         this.userService = userService;
+        this.cartService = cartService;
         this.orderMapper = orderMapper;
     }
 
     @Transactional
     public OrderDetailResponse createOrder(Long userId, OrderRequest request) {
+        Cart cart = cartService.getOrCreateActiveCartEntity(userId);
+        if (cart.getItems().isEmpty()) {
+            throw new BusinessException("Active cart is empty");
+        }
+
         Order order = new Order();
         order.setUser(userService.getById(userId));
         order.setStatus(OrderStatus.CREATED);
@@ -63,32 +75,33 @@ public class OrderService {
         order.setNotes(request.shippingData().notes() == null ? null : request.shippingData().notes().trim());
 
         BigDecimal total = BigDecimal.ZERO;
-        for (OrderItemRequest itemRequest : request.items()) {
-            Inventory inventory = inventoryRepository.findByVariantIdForUpdate(itemRequest.variantId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Variant not found with id " + itemRequest.variantId()));
+        for (CartItem cartItem : cart.getItems()) {
+            Inventory inventory = inventoryRepository.findByVariantIdForUpdate(cartItem.getVariant().getId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Variant not found with id " + cartItem.getVariant().getId()));
             ProductVariant variant = inventory.getVariant();
             if (!variant.isActive() || !variant.getProduct().isActive()) {
-                throw new InsufficientStockException("Variant " + itemRequest.variantId() + " is not available");
+                throw new InsufficientStockException("Variant " + cartItem.getVariant().getId() + " is not available");
             }
-            if (inventory.getStock() < itemRequest.quantity()) {
-                throw new InsufficientStockException("Insufficient stock for variant " + itemRequest.variantId());
+            if (inventory.getStock() < cartItem.getQuantity()) {
+                throw new InsufficientStockException("Insufficient stock for variant " + cartItem.getVariant().getId());
             }
 
-            inventory.setStock(inventory.getStock() - itemRequest.quantity());
+            inventory.setStock(inventory.getStock() - cartItem.getQuantity());
             OrderDetail detail = new OrderDetail();
             detail.setOrder(order);
             detail.setVariant(variant);
             detail.setProductName(variant.getProduct().getName());
             detail.setVariantDescription(variant.getFlavor() + " - " + variant.getNicotineLevel());
-            detail.setQuantity(itemRequest.quantity());
+            detail.setQuantity(cartItem.getQuantity());
             detail.setUnitPrice(variant.getPrice());
-            detail.setSubtotal(variant.getPrice().multiply(BigDecimal.valueOf(itemRequest.quantity())));
+            detail.setSubtotal(variant.getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity())));
             order.getItems().add(detail);
             total = total.add(detail.getSubtotal());
         }
 
         order.setTotal(total);
         Order savedOrder = orderRepository.save(order);
+        cartService.markCheckedOut(userId, savedOrder);
         return orderMapper.toDetail(getOrderEntity(savedOrder.getId()));
     }
 

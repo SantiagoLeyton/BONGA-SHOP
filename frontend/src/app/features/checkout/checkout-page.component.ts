@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -44,6 +44,7 @@ export class CheckoutPageComponent {
   readonly orderId = signal<string | null>(null);
 
   readonly cartCount = computed(() => this.cart.count());
+  readonly isLoading = computed(() => !this.cart.loaded());
   readonly subtotal = computed(() => {
     const products = new Map(this.productList().map((product) => [product.id, product]));
     return this.cart.items().reduce((sum, item) => {
@@ -56,9 +57,11 @@ export class CheckoutPageComponent {
   readonly total = computed(() => this.subtotal());
 
   constructor() {
-    if (this.cartCount() === 0) {
-      this.router.navigateByUrl('/cart');
-    }
+    effect(() => {
+      if (this.cart.loaded() && this.cartCount() === 0 && this.step() !== 'done') {
+        void this.router.navigateByUrl('/cart');
+      }
+    });
   }
 
   nextFromAddress(): void {
@@ -95,7 +98,6 @@ export class CheckoutPageComponent {
       const address = this.addressForm.getRawValue();
 
       const order = await this.orders.createOrder({
-        items: this.cart.items().map((item) => ({ ...item })),
         shippingData: {
           recipientName: address.name,
           phone: address.phone,
@@ -106,7 +108,7 @@ export class CheckoutPageComponent {
       });
 
       this.orderId.set(order.id);
-      this.cart.clear();
+      await this.cart.refresh();
       this.step.set('done');
       this.toasts.show('Orden creada', 'success', `Orden #${order.id}`);
     } catch (error) {
@@ -115,5 +117,10 @@ export class CheckoutPageComponent {
     } finally {
       this.placing.set(false);
     }
+  }
+
+  fieldInvalid(name: 'name' | 'phone' | 'city' | 'address1'): boolean {
+    const control = this.addressForm.controls[name];
+    return control.invalid && (control.touched || control.dirty);
   }
 }

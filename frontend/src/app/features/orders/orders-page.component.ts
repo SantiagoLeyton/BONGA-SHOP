@@ -1,10 +1,8 @@
-import { Component, computed, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { toSignal } from '@angular/core/rxjs-interop';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { OrderService } from '../../core/services/order.service';
-import { ProductService } from '../../core/services/product.service';
 import type { Order } from '../../core/models/order.model';
+import { OrderService } from '../../core/services/order.service';
 import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
 
 type OrderView = Order & { linesCount: number };
@@ -18,25 +16,25 @@ type OrderView = Order & { linesCount: number };
 })
 export class OrdersPageComponent {
   private readonly orders = inject(OrderService);
-  private readonly products = inject(ProductService);
-  readonly productList = toSignal(this.products.getProducts(), { initialValue: [] });
+  readonly loading = signal(true);
 
   readonly list = computed<OrderView[]>(() =>
-    this.orders
-      .list()
-      .map((o) => ({ ...o, linesCount: o.lines.reduce((sum, line) => sum + line.quantity, 0) })),
+    this.orders.list().map((order) => ({
+      ...order,
+      linesCount: order.lines.reduce((sum, line) => sum + line.quantity, 0),
+    })),
   );
 
   constructor() {
-    void this.orders.loadMyOrders();
+    void this.orders.loadMyOrders().finally(() => this.loading.set(false));
   }
 
-  orderTotal(o: Order): number {
-    return o.total;
+  orderTotal(order: Order): number {
+    return order.total;
   }
 
-  statusLabel(s: Order['status']): string {
-    switch (s) {
+  statusLabel(status: Order['status']): string {
+    switch (status) {
       case 'processing':
         return 'Procesando';
       case 'shipped':
@@ -50,5 +48,8 @@ export class OrdersPageComponent {
         return 'Creada';
     }
   }
-}
 
+  statusClass(status: Order['status']): string {
+    return `pill pill--${status}`;
+  }
+}

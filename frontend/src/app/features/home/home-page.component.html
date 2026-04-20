@@ -4,8 +4,8 @@
       <p class="kicker hero-kicker">BONGA SHOP · VAPES PREMIUM</p>
 
       <h1 class="title">
-        @for (w of heroWords; track $index) {
-          <span class="title-word">{{ w }}</span>
+        @for (word of heroWords; track $index) {
+          <span class="title-word">{{ word }}</span>
           @if ($index < heroWords.length - 1) {
             <span class="title-space">&nbsp;</span>
           }
@@ -13,23 +13,23 @@
       </h1>
 
       <p class="lead hero-lead">
-        Descubre sabores unicos, diseno moderno y una experiencia pensada para destacar.
-        Explora el catalogo real de Bonga Shop y compra con autenticacion y ordenes conectadas al backend.
+        Descubre sabores intensos, variantes reales y una compra mas clara de principio a fin.
+        Explora el catalogo, guarda tus favoritos y completa tu pedido con seguimiento real.
       </p>
 
       <div class="cta hero-cta">
-        <a class="btn btn-primary" routerLink="/products">
-          Ver productos
-        </a>
+        <a class="btn btn-primary" routerLink="/products">Explorar catalogo</a>
 
-        <a class="btn btn-secondary" routerLink="/admin">
-          Panel admin
-        </a>
+        @if (isAdmin()) {
+          <a class="btn btn-secondary" routerLink="/admin">Ir al panel admin</a>
+        } @else if (user()) {
+          <a class="btn btn-secondary" routerLink="/orders">Ver mis pedidos</a>
+        } @else {
+          <a class="btn btn-secondary" routerLink="/products">Ver destacados</a>
+        }
       </div>
 
-      <p class="fineprint hero-fine">
-        Solo +18. Consumo responsable.
-      </p>
+      <p class="fineprint hero-fine">Solo +18. Compra responsable y seguimiento claro de tus pedidos.</p>
     </div>
 
     <div class="hero-art">
@@ -49,16 +49,14 @@
 <section class="section">
   <div class="container">
     <div class="section-head" appRevealScroll>
-      <h2>Productos destacados</h2>
-      <p class="muted">
-        Una seleccion pensada para mostrar lo mejor de nuestro catalogo.
-      </p>
+      <h2>Seleccion destacada</h2>
+      <p class="muted">Lo mas buscado del catalogo para empezar a comprar con criterio y sin ruido.</p>
     </div>
 
     <div class="grid">
-      @for (p of featured(); track p.id; let i = $index) {
+      @for (product of featured(); track product.id; let i = $index) {
         <div appRevealScroll [appRevealDelay]="i * 0.04">
-          <app-product-card [product]="p" />
+          <app-product-card [product]="product" />
         </div>
       }
     </div>
@@ -68,17 +66,17 @@
 <section class="section section--brand">
   <div class="container split" appRevealScroll>
     <div>
-      <h2>Diseno urbano, experiencia premium</h2>
+      <h2>Compra mas clara, mas rapida y mejor conectada</h2>
       <p class="muted">
-        Interfaz moderna, rendimiento fluido y arquitectura lista para escalar.
-        Este proyecto ya conecta Angular con Spring Boot, JWT y PostgreSQL en los flujos del cliente.
+        BONGA SHOP ya conecta autenticacion, catalogo, favoritos, carrito persistente, checkout y ordenes reales
+        para que la experiencia se sienta consistente en toda la tienda.
       </p>
     </div>
 
     <ul class="ticks">
-      <li>Arquitectura integrada con backend (Spring Boot + JWT)</li>
-      <li>Componentes reutilizables y escalables</li>
-      <li>Experiencia optimizada para moviles y desktop</li>
+      <li>Favoritos y carrito asociados a tu cuenta</li>
+      <li>Checkout con stock e inventario reales</li>
+      <li>Panel admin conectado a productos, inventario y pedidos</li>
     </ul>
   </div>
 </section>

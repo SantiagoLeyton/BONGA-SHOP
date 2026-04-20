@@ -3,6 +3,23 @@
   gap: 1rem;
 }
 
+.intro {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.intro-title {
+  margin: 0;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+}
+
+.intro-copy {
+  margin: 0;
+  color: var(--color-muted);
+  line-height: 1.45;
+}
+
 .grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -29,6 +46,13 @@
   color: var(--color-text);
   padding: 0.65rem 0.75rem;
   outline: none;
+}
+
+.field input[aria-invalid='true'],
+.field textarea[aria-invalid='true'],
+.field select[aria-invalid='true'] {
+  border-color: rgba(251, 113, 133, 0.5);
+  box-shadow: 0 0 0 3px rgba(251, 113, 133, 0.1);
 }
 
 .check {
@@ -76,6 +100,12 @@
   border-radius: var(--radius-md);
   border: 1px solid rgba(148, 163, 184, 0.12);
   background: rgba(15, 23, 42, 0.22);
+  transition: border-color 160ms ease, transform 160ms ease;
+
+  &:hover {
+    border-color: rgba(94, 234, 212, 0.18);
+    transform: translateY(-1px);
+  }
 
   .check {
     align-self: center;

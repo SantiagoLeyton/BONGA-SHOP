@@ -1,7 +1,7 @@
 <div class="page-head container" appRevealScroll>
   <div>
     <h1 class="title">Catalogo</h1>
-    <p class="muted">Explora productos, marcas y variantes cargados desde el backend real.</p>
+    <p class="muted">Explora sabores, marcas y variantes disponibles para comprar hoy.</p>
   </div>
 </div>
 
@@ -20,14 +20,14 @@
       <div class="toolbar-left">
         <p class="count">
           <strong>{{ filtered().length }}</strong>
-          <span class="muted">resultados</span>
+          <span class="muted">resultados para explorar</span>
         </p>
 
         @if (activeChips().length) {
           <div class="chips" aria-label="Filtros activos">
-            @for (c of activeChips(); track c.key) {
-              <button type="button" class="chip" (click)="removeChip(c.type, c.value)" [title]="'Quitar: ' + c.label">
-                <span class="chip-label">{{ c.label }}</span>
+            @for (chip of activeChips(); track chip.key) {
+              <button type="button" class="chip" (click)="removeChip(chip.type, chip.value)" [title]="'Quitar: ' + chip.label">
+                <span class="chip-label">{{ chip.label }}</span>
                 <span class="chip-x" aria-hidden="true">×</span>
               </button>
             }
@@ -52,17 +52,19 @@
 
     <div class="grid">
       @if (initialLoading()) {
-        @for (x of [1, 2, 3, 4, 5, 6]; track x) {
+        @for (item of [1, 2, 3, 4, 5, 6]; track item) {
           <app-product-card-skeleton />
         }
       } @else {
-        @for (p of filtered(); track p.id; let i = $index) {
+        @for (product of filtered(); track product.id; let i = $index) {
           <div appRevealScroll [appRevealDelay]="0.03 * i">
-            <app-product-card [product]="p" [showQuickView]="true" (quickView)="openQuickView($event)" />
+            <app-product-card [product]="product" [showQuickView]="true" (quickView)="openQuickView($event)" />
           </div>
         } @empty {
           <div class="empty">
-            <p class="muted">No hay productos con estos filtros.</p>
+            <h2>No encontramos productos con esos filtros</h2>
+            <p class="muted">Prueba otra marca, sabor o limpia la busqueda para volver a explorar todo el catalogo.</p>
+            <button type="button" class="btn btn-secondary" (click)="clearAll()">Mostrar todo</button>
           </div>
         }
       }

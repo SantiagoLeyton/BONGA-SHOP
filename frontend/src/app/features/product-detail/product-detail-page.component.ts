@@ -1,21 +1,23 @@
 import { DecimalPipe } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { map, switchMap, tap } from 'rxjs';
-import { ProductService } from '../../core/services/product.service';
-import { ToastService } from '../../core/services/toast.service';
+import type { Product } from '../../core/models/product.model';
+import type { ProductVariant } from '../../core/models/product-variant.model';
+import { AuthService } from '../../core/services/auth.service';
 import { CartService } from '../../core/services/cart.service';
 import { CartUiService } from '../../core/services/cart-ui.service';
+import { ModalService } from '../../core/services/modal.service';
+import { ProductService } from '../../core/services/product.service';
+import { ToastService } from '../../core/services/toast.service';
 import { WishlistService } from '../../core/services/wishlist.service';
-import { ProductBadgeComponent } from '../../shared/components/product-badge/product-badge.component';
-import { RevealScrollDirective } from '../../shared/directives/reveal-scroll.directive';
-import { VaporFrameScrubComponent } from '../../shared/components/vapor-frame-scrub/vapor-frame-scrub.component';
-import type { ProductVariant } from '../../core/models/product-variant.model';
-import type { Product } from '../../core/models/product.model';
-import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
 import { flyToCart } from '../../shared/animation/fly-to-cart';
-import { Meta, Title } from '@angular/platform-browser';
+import { ProductBadgeComponent } from '../../shared/components/product-badge/product-badge.component';
+import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
+import { VaporFrameScrubComponent } from '../../shared/components/vapor-frame-scrub/vapor-frame-scrub.component';
+import { RevealScrollDirective } from '../../shared/directives/reveal-scroll.directive';
 
 @Component({
   selector: 'app-product-detail-page',
@@ -38,6 +40,8 @@ export class ProductDetailPageComponent {
   private readonly toasts = inject(ToastService);
   private readonly cart = inject(CartService);
   private readonly cartUi = inject(CartUiService);
+  private readonly auth = inject(AuthService);
+  private readonly modal = inject(ModalService);
   private readonly title = inject(Title);
   private readonly meta = inject(Meta);
 
@@ -59,36 +63,53 @@ export class ProductDetailPageComponent {
   private readonly selectedVariantId = signal<string | null>(null);
 
   readonly selectedVariant = computed<ProductVariant | undefined>(() => {
-    const p = this.product();
+    const product = this.product();
     const id = this.selectedVariantId();
-    if (!p?.variants?.length) {
+    if (!product?.variants?.length) {
       return undefined;
     }
     if (!id) {
-      return p.variants[0];
+      return product.variants[0];
     }
-    return p.variants.find((v) => v.id === id) ?? p.variants[0];
+    return product.variants.find((variant) => variant.id === id) ?? product.variants[0];
+  });
+
+  readonly wished = computed(() => {
+    const product = this.product();
+    return product ? this.wishlist.has(product.id) : false;
+  });
+
+  readonly related = computed<Product[]>(() => {
+    const product = this.product();
+    if (!product) return [];
+    const list = this.allProducts().filter((item) => item.id !== product.id);
+    const sameBrand = list.filter((item) => item.brand?.id === product.brand?.id);
+    const featured = list.filter((item) => item.featured);
+    const pool = [...sameBrand, ...featured];
+    const unique = new Map<string, Product>();
+    for (const item of pool) unique.set(item.id, item);
+    return [...unique.values()].slice(0, 6);
   });
 
   constructor() {
     effect(() => {
-      const p = this.product();
-      if (p?.variants?.length) {
-        this.selectedVariantId.set(p.variants[0].id);
+      const product = this.product();
+      if (product?.variants?.length) {
+        this.selectedVariantId.set(product.variants[0].id);
       } else {
         this.selectedVariantId.set(null);
       }
     });
 
     effect(() => {
-      const p = this.product();
-      if (!p) return;
-      this.title.setTitle(`${p.name} · BONGA SHOP`);
-      this.meta.updateTag({ name: 'description', content: p.description });
-      this.meta.updateTag({ property: 'og:title', content: `${p.name} · BONGA SHOP` });
-      this.meta.updateTag({ property: 'og:description', content: p.description });
+      const product = this.product();
+      if (!product) return;
+      this.title.setTitle(`${product.name} · BONGA SHOP`);
+      this.meta.updateTag({ name: 'description', content: product.description });
+      this.meta.updateTag({ property: 'og:title', content: `${product.name} · BONGA SHOP` });
+      this.meta.updateTag({ property: 'og:description', content: product.description });
       this.meta.updateTag({ property: 'og:type', content: 'product' });
-      this.meta.updateTag({ property: 'og:image', content: p.imageUrl });
+      this.meta.updateTag({ property: 'og:image', content: product.imageUrl });
     });
   }
 
@@ -96,43 +117,53 @@ export class ProductDetailPageComponent {
     this.selectedVariantId.set(id);
   }
 
-  wished = computed(() => {
-    const p = this.product();
-    return p ? this.wishlist.has(p.id) : false;
-  });
+  async toggleWish(): Promise<void> {
+    const product = this.product();
+    if (!product) return;
 
-  toggleWish(): void {
-    const p = this.product();
-    if (!p) return;
-    const isOn = this.wishlist.toggle(p.id);
-    this.toasts.show(isOn ? 'Guardado en favoritos' : 'Quitado de favoritos', isOn ? 'success' : 'info', 'Favoritos');
+    if (!this.auth.isAuthed()) {
+      this.promptLogin('guardar favoritos');
+      return;
+    }
+
+    try {
+      const isOn = await this.wishlist.toggle(product.id);
+      this.toasts.show(
+        isOn ? 'Guardado en favoritos' : 'Quitado de favoritos',
+        isOn ? 'success' : 'info',
+        'Favoritos',
+      );
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'No se pudo actualizar favoritos.';
+      this.toasts.show(message, 'danger', 'Favoritos');
+    }
   }
 
-  addToCart(): void {
-    const p = this.product();
-    const v = this.selectedVariant();
-    if (!p || !v) return;
-    if (v.stock <= 0) {
+  async addToCart(): Promise<void> {
+    const product = this.product();
+    const variant = this.selectedVariant();
+    if (!product || !variant) return;
+
+    if (!this.auth.isAuthed()) {
+      this.promptLogin('agregar productos al carrito');
+      return;
+    }
+
+    if (variant.stock <= 0) {
       this.toasts.show('Este producto está agotado.', 'warning', 'Carrito');
       return;
     }
-    this.cart.add(p.id, v.id, 1);
-    this.toasts.show(`${p.name} · ${v.flavor}`, 'success', 'Añadido al carrito');
-    flyToCart(p.imageUrl);
-    this.cartUi.show();
-  }
 
-  readonly related = computed<Product[]>(() => {
-    const p = this.product();
-    if (!p) return [];
-    const list = this.allProducts().filter((x) => x.id !== p.id);
-    const sameBrand = list.filter((x) => x.brand?.id === p.brand?.id);
-    const featured = list.filter((x) => x.featured);
-    const pool = [...sameBrand, ...featured];
-    const unique = new Map<string, Product>();
-    for (const x of pool) unique.set(x.id, x);
-    return [...unique.values()].slice(0, 6);
-  });
+    try {
+      await this.cart.add(product.id, variant.id, 1);
+      this.toasts.show(`${product.name} · ${variant.flavor}`, 'success', 'Añadido al carrito');
+      flyToCart(product.imageUrl);
+      this.cartUi.show();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'No se pudo actualizar el carrito.';
+      this.toasts.show(message, 'danger', 'Carrito');
+    }
+  }
 
   stockLabel(stock: number): string {
     if (stock <= 0) {
@@ -142,5 +173,10 @@ export class ProductDetailPageComponent {
       return `Stock bajo (${stock})`;
     }
     return `En stock (${stock})`;
+  }
+
+  private promptLogin(action: string): void {
+    this.modal.openLogin();
+    this.toasts.show(`Inicia sesión para ${action}.`, 'info', 'Cuenta');
   }
 }

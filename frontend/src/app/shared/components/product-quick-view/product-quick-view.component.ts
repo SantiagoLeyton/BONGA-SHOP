@@ -1,8 +1,10 @@
 import { DecimalPipe } from '@angular/common';
-import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, Output, inject, signal } from '@angular/core';
 import type { Product } from '../../../core/models/product.model';
+import { AuthService } from '../../../core/services/auth.service';
 import { CartService } from '../../../core/services/cart.service';
 import { CartUiService } from '../../../core/services/cart-ui.service';
+import { ModalService } from '../../../core/services/modal.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { ModalShellComponent } from '../modal-shell/modal-shell.component';
 import { ProductBadgeComponent } from '../product-badge/product-badge.component';
@@ -18,10 +20,14 @@ export class ProductQuickViewComponent {
   private readonly toast = inject(ToastService);
   private readonly cart = inject(CartService);
   private readonly cartUi = inject(CartUiService);
+  private readonly auth = inject(AuthService);
+  private readonly modal = inject(ModalService);
 
   @Input({ required: true }) isOpen = false;
   @Input({ required: false }) product?: Product;
   @Output() closed = new EventEmitter<void>();
+
+  readonly adding = signal(false);
 
   close(): void {
     this.closed.emit();
@@ -33,11 +39,17 @@ export class ProductQuickViewComponent {
     return Math.min(...product.variants.map((variant) => variant.price));
   }
 
-  addToCart(): void {
+  async addToCart(): Promise<void> {
     const product = this.product;
     const variant = product?.variants.find((item) => item.stock > 0) ?? product?.variants[0];
 
     if (!product || !variant) {
+      return;
+    }
+
+    if (!this.auth.isAuthed()) {
+      this.modal.openLogin();
+      this.toast.show('Inicia sesion para agregar productos al carrito.', 'info', 'Cuenta');
       return;
     }
 
@@ -46,9 +58,17 @@ export class ProductQuickViewComponent {
       return;
     }
 
-    this.cart.add(product.id, variant.id, 1);
-    this.toast.show(`${product.name} · ${variant.flavor}`, 'success', 'Anadido al carrito');
-    this.cartUi.show();
-    this.close();
+    this.adding.set(true);
+    try {
+      await this.cart.add(product.id, variant.id, 1);
+      this.toast.show(`${product.name} · ${variant.flavor}`, 'success', 'Añadido al carrito');
+      this.cartUi.show();
+      this.close();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'No se pudo actualizar el carrito.';
+      this.toast.show(message, 'danger', 'Carrito');
+    } finally {
+      this.adding.set(false);
+    }
   }
 }

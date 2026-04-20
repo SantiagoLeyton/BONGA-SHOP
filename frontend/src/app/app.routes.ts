@@ -27,11 +27,13 @@ export const routes: Routes = [
       },
       {
         path: 'wishlist',
+        canActivate: [authGuard],
         loadComponent: () =>
           import('./features/wishlist/wishlist-page.component').then((m) => m.WishlistPageComponent),
       },
       {
         path: 'cart',
+        canActivate: [authGuard],
         loadComponent: () => import('./features/cart/cart-page.component').then((m) => m.CartPageComponent),
       },
       {

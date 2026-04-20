@@ -1,8 +1,10 @@
 package com.bongashop.backend.order.service;
 
+import com.bongashop.backend.cart.entity.Cart;
+import com.bongashop.backend.cart.service.CartService;
+import com.bongashop.backend.cartitem.entity.CartItem;
 import com.bongashop.backend.inventory.entity.Inventory;
 import com.bongashop.backend.inventory.repository.InventoryRepository;
-import com.bongashop.backend.order.dto.OrderItemRequest;
 import com.bongashop.backend.order.dto.OrderRequest;
 import com.bongashop.backend.order.dto.ShippingDataRequest;
 import com.bongashop.backend.order.entity.Order;
@@ -22,12 +24,12 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +41,8 @@ class OrderServiceTest {
     private InventoryRepository inventoryRepository;
     @Mock
     private UserService userService;
+    @Mock
+    private CartService cartService;
 
     private OrderMapper orderMapper;
 
@@ -48,7 +52,7 @@ class OrderServiceTest {
     @BeforeEach
     void setUp() {
         orderMapper = new OrderMapper();
-        orderService = new OrderService(orderRepository, inventoryRepository, userService, orderMapper);
+        orderService = new OrderService(orderRepository, inventoryRepository, userService, cartService, orderMapper);
     }
 
     @Test
@@ -60,6 +64,9 @@ class OrderServiceTest {
         product.setName("Bonga Mango");
         product.setDescription("Sample");
         ProductVariant variant = new ProductVariant();
+        java.lang.reflect.Field variantIdField = ProductVariant.class.getDeclaredField("id");
+        variantIdField.setAccessible(true);
+        variantIdField.set(variant, 9L);
         variant.setProduct(product);
         variant.setFlavor("Mango");
         variant.setNicotineLevel("3mg");
@@ -69,9 +76,17 @@ class OrderServiceTest {
         inventory.setVariant(variant);
         inventory.setStock(10);
         variant.setInventory(inventory);
+        CartItem cartItem = new CartItem();
+        cartItem.setVariant(variant);
+        cartItem.setQuantity(2);
+        Cart cart = new Cart();
+        cart.setUser(user);
+        cart.getItems().add(cartItem);
 
         when(userService.getById(5L)).thenReturn(user);
+        when(cartService.getOrCreateActiveCartEntity(5L)).thenReturn(cart);
         when(inventoryRepository.findByVariantIdForUpdate(9L)).thenReturn(Optional.of(inventory));
+        when(cartService.markCheckedOut(eq(5L), any(Order.class))).thenReturn(null);
         when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
             Order order = invocation.getArgument(0);
             java.lang.reflect.Field idField = Order.class.getDeclaredField("id");
@@ -89,7 +104,7 @@ class OrderServiceTest {
         });
 
         OrderRequest request = new OrderRequest(
-                List.of(new OrderItemRequest(9L, 2)),
+                null,
                 new ShippingDataRequest("Alice", "3001234567", "Street 1", "Bogota", "Leave at door")
         );
 
@@ -105,6 +120,13 @@ class OrderServiceTest {
         Product product = new Product();
         product.setActive(true);
         ProductVariant variant = new ProductVariant();
+        try {
+            java.lang.reflect.Field variantIdField = ProductVariant.class.getDeclaredField("id");
+            variantIdField.setAccessible(true);
+            variantIdField.set(variant, 3L);
+        } catch (ReflectiveOperationException exception) {
+            throw new RuntimeException(exception);
+        }
         variant.setProduct(product);
         variant.setFlavor("Mint");
         variant.setNicotineLevel("5mg");
@@ -114,12 +136,19 @@ class OrderServiceTest {
         inventory.setVariant(variant);
         inventory.setStock(1);
         variant.setInventory(inventory);
+        CartItem cartItem = new CartItem();
+        cartItem.setVariant(variant);
+        cartItem.setQuantity(2);
+        Cart cart = new Cart();
+        cart.setUser(new User());
+        cart.getItems().add(cartItem);
 
         when(userService.getById(1L)).thenReturn(new User());
+        when(cartService.getOrCreateActiveCartEntity(1L)).thenReturn(cart);
         when(inventoryRepository.findByVariantIdForUpdate(3L)).thenReturn(Optional.of(inventory));
 
         OrderRequest request = new OrderRequest(
-                List.of(new OrderItemRequest(3L, 2)),
+                null,
                 new ShippingDataRequest("Bob", "3009876543", "Street 2", "Bogota", null)
         );
 

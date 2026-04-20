@@ -25,6 +25,7 @@ export class AdminProductModalComponent implements OnChanges {
   @Input({ required: true }) isOpen = false;
   @Input() product: Product | null = null;
   @Input() brands: Brand[] = [];
+  @Input() saving = false;
   @Output() closed = new EventEmitter<void>();
   @Output() saved = new EventEmitter<AdminProductDraft>();
 
@@ -115,6 +116,11 @@ export class AdminProductModalComponent implements OnChanges {
 
   selectedBrandName(): string {
     return this.brands.find((brand) => brand.id === this.form.controls.brandId.value)?.name ?? 'Sin marca';
+  }
+
+  fieldInvalid(name: 'name' | 'brandId' | 'description'): boolean {
+    const control = this.form.controls[name];
+    return control.invalid && (control.touched || control.dirty);
   }
 
   private resetForm(): void {

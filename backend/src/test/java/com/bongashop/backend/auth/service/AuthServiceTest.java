@@ -112,6 +112,14 @@ class AuthServiceTest {
 
     @Test
     void shouldRejectInvalidCredentials() {
+        User user = new User();
+        user.setName("Bad User");
+        user.setEmail("bad@example.com");
+        user.setPassword("encoded");
+        user.setActive(true);
+        user.setRole(new Role(RoleName.ROLE_CLIENT));
+
+        when(userRepository.findByEmailIgnoreCase("bad@example.com")).thenReturn(Optional.of(user));
         when(authenticationManager.authenticate(any())).thenThrow(new BadCredentialsException("Bad credentials"));
 
         assertThatThrownBy(() -> authService.login(new LoginRequest("bad@example.com", "wrong")))

@@ -1,6 +1,7 @@
 <div class="toasts" aria-live="polite" aria-relevant="additions removals">
   @for (t of toast.toasts(); track t.id) {
     <div class="toast" [class]="'toast toast--' + t.tone">
+      <div class="toast-accent" aria-hidden="true"></div>
       <div class="toast-body">
         @if (t.title) {
           <p class="toast-title">{{ t.title }}</p>

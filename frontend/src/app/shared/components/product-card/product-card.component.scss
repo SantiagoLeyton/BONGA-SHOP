@@ -69,6 +69,10 @@
     transform: translateY(-1px);
     border-color: rgba(94, 234, 212, 0.22);
   }
+
+  &:active {
+    transform: scale(0.96);
+  }
 }
 
 .wish--on {
@@ -153,6 +157,10 @@
   padding: 0.5rem 0.8rem;
 }
 
+.price strong {
+  letter-spacing: -0.02em;
+}
+
 @media (max-width: 420px) {
   .row {
     flex-direction: column;
@@ -179,6 +187,10 @@
     color: var(--color-text);
     font-size: 1rem;
   }
+}
+
+.body {
+  align-content: start;
 }
 
 @media (prefers-reduced-motion: reduce) {

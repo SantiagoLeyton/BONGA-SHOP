@@ -13,6 +13,7 @@ import com.bongashop.backend.shared.exception.InvalidCredentialsException;
 import com.bongashop.backend.user.entity.User;
 import com.bongashop.backend.user.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -67,18 +68,19 @@ public class AuthService {
 
     @Transactional(readOnly = true)
     public AuthResponse login(LoginRequest request) {
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(request.email().trim().toLowerCase(), request.password())
-            );
-        } catch (BadCredentialsException exception) {
-            throw new InvalidCredentialsException("Invalid email or password");
-        }
-
-        User user = userRepository.findByEmailIgnoreCase(request.email().trim().toLowerCase())
+        String email = request.email().trim().toLowerCase();
+        User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
         if (!user.isActive()) {
             throw new InvalidCredentialsException("Inactive users cannot log in");
+        }
+
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, request.password())
+            );
+        } catch (BadCredentialsException | AuthenticationServiceException exception) {
+            throw new InvalidCredentialsException("Invalid email or password");
         }
 
         String token = jwtService.generateToken(new CustomUserDetails(user));

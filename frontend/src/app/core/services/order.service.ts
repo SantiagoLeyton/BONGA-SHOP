@@ -3,7 +3,6 @@ import { Injectable, signal } from '@angular/core';
 import { BehaviorSubject, Observable, catchError, firstValueFrom, map, of, shareReplay, switchMap } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import type { Order, OrderStatus } from '../models/order.model';
-import type { CartLine } from './cart.service';
 
 type OrderSummaryApiResponse = {
   id: number;
@@ -56,7 +55,6 @@ export interface AdminOrderSummary {
 }
 
 export type CreateOrderInput = {
-  items: CartLine[];
   shippingData: {
     recipientName: string;
     phone: string;
@@ -109,10 +107,6 @@ export class OrderService {
     try {
       const response = await firstValueFrom(
         this.http.post<OrderDetailApiResponse>(`${environment.apiUrl}/orders`, {
-          items: input.items.map((item) => ({
-            variantId: Number(item.variantId),
-            quantity: item.qty,
-          })),
           shippingData: input.shippingData,
         }),
       );

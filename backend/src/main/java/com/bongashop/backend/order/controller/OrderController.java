@@ -33,7 +33,7 @@ public class OrderController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('CLIENT')")
+    @PreAuthorize("hasAnyRole('CLIENT', 'ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     public OrderDetailResponse createOrder(
             @AuthenticationPrincipal CustomUserDetails userDetails,
@@ -43,7 +43,7 @@ public class OrderController {
     }
 
     @GetMapping("/my-orders")
-    @PreAuthorize("hasRole('CLIENT')")
+    @PreAuthorize("hasAnyRole('CLIENT', 'ADMIN')")
     public PageResponse<OrderSummaryResponse> getMyOrders(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(defaultValue = "0") int page,

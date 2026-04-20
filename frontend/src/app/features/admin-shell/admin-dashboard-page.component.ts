@@ -28,10 +28,10 @@ export class AdminDashboardPageComponent {
   private readonly ordersService = inject(OrderService);
   private readonly toasts = inject(ToastService);
 
-  readonly all = toSignal(this.products.getProducts(), { initialValue: [] as Product[] });
-  readonly brands = toSignal(this.brandsService.getBrands(), { initialValue: [] as Brand[] });
-  readonly inventory = toSignal(this.inventoryService.listInventory(), { initialValue: [] as InventoryRecord[] });
-  readonly adminOrders = toSignal(this.ordersService.getAdminOrders(), { initialValue: [] as AdminOrderSummary[] });
+  readonly all = toSignal(this.products.getProducts());
+  readonly brands = toSignal(this.brandsService.getBrands());
+  readonly inventory = toSignal(this.inventoryService.listInventory());
+  readonly adminOrders = toSignal(this.ordersService.getAdminOrders());
 
   readonly query = signal('');
   readonly page = signal(1);
@@ -45,10 +45,23 @@ export class AdminDashboardPageComponent {
 
   readonly stockDrafts = signal<Record<string, number>>({});
   readonly orderStatusDrafts = signal<Record<string, OrderStatus>>({});
+  readonly productSaving = signal(false);
+  readonly deletingProductId = signal<string | null>(null);
+  readonly brandSaving = signal(false);
+  readonly deletingBrandId = signal<string | null>(null);
+  readonly savingStockId = signal<string | null>(null);
+  readonly savingOrderId = signal<string | null>(null);
+  readonly dashboardLoading = computed(
+    () => this.all() === undefined || this.brands() === undefined || this.inventory() === undefined || this.adminOrders() === undefined,
+  );
+  readonly productsData = computed(() => this.all() ?? []);
+  readonly brandsData = computed(() => this.brands() ?? []);
+  readonly inventoryData = computed(() => this.inventory() ?? []);
+  readonly adminOrdersData = computed(() => this.adminOrders() ?? []);
 
   readonly filtered = computed(() => {
     const q = this.query().trim().toLowerCase();
-    const list = this.all();
+    const list = this.productsData();
     if (!q) return list;
     return list.filter((p) => {
       const hay = [p.name, p.slug, p.brand?.name, p.brand?.slug, ...p.variants.map((v) => v.flavor)]
@@ -70,13 +83,13 @@ export class AdminDashboardPageComponent {
 
   readonly visibleInventory = computed(() => {
     const lowStockOnly = this.inventoryLowStockOnly();
-    return this.inventory().filter((item) => (!lowStockOnly ? true : item.lowStock));
+    return this.inventoryData().filter((item) => (!lowStockOnly ? true : item.lowStock));
   });
 
   readonly visibleOrders = computed(() => {
     const status = this.orderStatusFilter();
     const userId = this.orderUserFilter().trim();
-    return this.adminOrders().filter((order) => {
+    return this.adminOrdersData().filter((order) => {
       if (status !== 'all' && order.status !== status) {
         return false;
       }
@@ -88,9 +101,9 @@ export class AdminDashboardPageComponent {
   });
 
   readonly metrics = computed(() => ({
-    revenue: this.adminOrders().reduce((sum, order) => sum + order.total, 0),
-    orders: this.adminOrders().length,
-    lowStock: this.inventory().filter((item) => item.lowStock).length,
+    revenue: this.adminOrdersData().reduce((sum, order) => sum + order.total, 0),
+    orders: this.adminOrdersData().length,
+    lowStock: this.inventoryData().filter((item) => item.lowStock).length,
   }));
 
   readonly modalOpen = signal(false);
@@ -112,6 +125,7 @@ export class AdminDashboardPageComponent {
   }
 
   async saveProduct(next: AdminProductDraft): Promise<void> {
+    this.productSaving.set(true);
     try {
       await this.products.upsertProduct(next);
       this.inventoryService.refresh();
@@ -119,6 +133,8 @@ export class AdminDashboardPageComponent {
       this.toasts.show('Producto guardado correctamente.', 'success', 'Admin');
     } catch (error) {
       this.toasts.show(this.errorMessage(error, 'No se pudo guardar el producto.'), 'danger', 'Admin');
+    } finally {
+      this.productSaving.set(false);
     }
   }
 
@@ -127,12 +143,15 @@ export class AdminDashboardPageComponent {
       return;
     }
 
+    this.deletingProductId.set(p.id);
     try {
       await this.products.deleteProduct(p.id);
       this.inventoryService.refresh();
       this.toasts.show('Producto eliminado correctamente.', 'info', 'Admin');
     } catch (error) {
       this.toasts.show(this.errorMessage(error, 'No se pudo eliminar el producto.'), 'danger', 'Admin');
+    } finally {
+      this.deletingProductId.set(null);
     }
   }
 
@@ -142,6 +161,7 @@ export class AdminDashboardPageComponent {
       return;
     }
 
+    this.brandSaving.set(true);
     try {
       await this.brandsService.createBrand(name);
       this.products.refresh();
@@ -149,6 +169,8 @@ export class AdminDashboardPageComponent {
       this.toasts.show('Marca creada correctamente.', 'success', 'Marcas');
     } catch (error) {
       this.toasts.show(this.errorMessage(error, 'No se pudo crear la marca.'), 'danger', 'Marcas');
+    } finally {
+      this.brandSaving.set(false);
     }
   }
 
@@ -168,6 +190,7 @@ export class AdminDashboardPageComponent {
       return;
     }
 
+    this.brandSaving.set(true);
     try {
       await this.brandsService.updateBrand(brand.id, name);
       this.products.refresh();
@@ -175,6 +198,8 @@ export class AdminDashboardPageComponent {
       this.toasts.show('Marca actualizada correctamente.', 'success', 'Marcas');
     } catch (error) {
       this.toasts.show(this.errorMessage(error, 'No se pudo actualizar la marca.'), 'danger', 'Marcas');
+    } finally {
+      this.brandSaving.set(false);
     }
   }
 
@@ -183,12 +208,15 @@ export class AdminDashboardPageComponent {
       return;
     }
 
+    this.deletingBrandId.set(brand.id);
     try {
       await this.brandsService.deleteBrand(brand.id);
       this.products.refresh();
       this.toasts.show('Marca eliminada correctamente.', 'info', 'Marcas');
     } catch (error) {
       this.toasts.show(this.errorMessage(error, 'No se pudo eliminar la marca.'), 'danger', 'Marcas');
+    } finally {
+      this.deletingBrandId.set(null);
     }
   }
 
@@ -230,6 +258,7 @@ export class AdminDashboardPageComponent {
   }
 
   async saveStock(item: InventoryRecord): Promise<void> {
+    this.savingStockId.set(item.variantId);
     try {
       await this.inventoryService.updateStock(item.variantId, this.stockValue(item));
       this.stockDrafts.update((drafts) => {
@@ -241,6 +270,8 @@ export class AdminDashboardPageComponent {
       this.toasts.show('Stock actualizado correctamente.', 'success', 'Inventario');
     } catch (error) {
       this.toasts.show(this.errorMessage(error, 'No se pudo actualizar el stock.'), 'danger', 'Inventario');
+    } finally {
+      this.savingStockId.set(null);
     }
   }
 
@@ -256,6 +287,7 @@ export class AdminDashboardPageComponent {
   }
 
   async saveOrderStatus(order: AdminOrderSummary): Promise<void> {
+    this.savingOrderId.set(order.id);
     try {
       await this.ordersService.updateAdminOrderStatus(order.id, this.statusValue(order));
       this.orderStatusDrafts.update((drafts) => {
@@ -266,6 +298,8 @@ export class AdminDashboardPageComponent {
       this.toasts.show('Estado de orden actualizado.', 'success', 'Pedidos');
     } catch (error) {
       this.toasts.show(this.errorMessage(error, 'No se pudo actualizar la orden.'), 'danger', 'Pedidos');
+    } finally {
+      this.savingOrderId.set(null);
     }
   }
 

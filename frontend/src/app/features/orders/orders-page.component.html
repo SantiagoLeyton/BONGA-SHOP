@@ -1,42 +1,51 @@
 <div class="container orders">
   <div class="head">
     <div>
-      <p class="kicker">Cuenta</p>
-      <h1 class="title">Órdenes</h1>
-      <p class="sub">Historial real sincronizado con backend.</p>
+      <p class="kicker">Mi cuenta</p>
+      <h1 class="title">Mis pedidos</h1>
+      <p class="sub">Consulta tu historial y revisa el estado de cada compra en un solo lugar.</p>
     </div>
     <div class="actions">
       <a class="btn btn-ghost" routerLink="/products">Seguir comprando</a>
-      <a class="btn btn-secondary" routerLink="/cart">Carrito</a>
+      <a class="btn btn-secondary" routerLink="/cart">Ver carrito</a>
     </div>
   </div>
 
-  @if (!list().length) {
-    <section class="empty">
-      <h2>Aún no tienes órdenes</h2>
-      <p class="muted">Completa una compra para que aparezca aquí.</p>
-      <a class="btn btn-primary" routerLink="/checkout">Ir a checkout</a>
+  @if (loading()) {
+    <section class="grid" aria-label="Cargando pedidos">
+      @for (item of [1, 2]; track item) {
+        <article class="card loading-card">
+          <span class="loading-line loading-line--short"></span>
+          <span class="loading-line loading-line--mid"></span>
+          <span class="loading-line"></span>
+        </article>
+      }
+    </section>
+  } @else if (!list().length) {
+    <section class="empty empty-state">
+      <h2>Aun no tienes pedidos</h2>
+      <p class="muted">Cuando completes tu primera compra, aqui veras el estado y total de cada orden.</p>
+      <a class="btn btn-primary" routerLink="/products">Explorar catalogo</a>
     </section>
   } @else {
-    <section class="grid" aria-label="Órdenes">
-      @for (o of list(); track o.id) {
+    <section class="grid" aria-label="Ordenes">
+      @for (order of list(); track order.id) {
         <article class="card">
           <div class="row">
             <div>
-              <p class="id">{{ o.id }}</p>
-              <p class="muted small">{{ o.createdAt | date : 'medium' }}</p>
+              <p class="id">Pedido #{{ order.id }}</p>
+              <p class="muted small">{{ order.createdAt | date : 'medium' }}</p>
             </div>
-            <span class="pill">{{ statusLabel(o.status) }}</span>
+            <span [class]="statusClass(order.status)">{{ statusLabel(order.status) }}</span>
           </div>
           <div class="meta">
-            <span>{{ o.linesCount }} items</span>
+            <span>{{ order.linesCount }} items</span>
             <span>·</span>
-            <span>{{ orderTotal(o) | appCurrency }}</span>
+            <span>{{ orderTotal(order) | appCurrency }}</span>
           </div>
-          <p class="addr muted small">{{ o.address.city }} · {{ o.address.address1 }}</p>
+          <p class="addr muted small">{{ order.address.city }} · {{ order.address.address1 }}</p>
         </article>
       }
     </section>
   }
 </div>
-

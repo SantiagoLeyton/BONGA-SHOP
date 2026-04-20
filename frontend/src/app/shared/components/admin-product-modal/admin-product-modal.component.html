@@ -1,29 +1,45 @@
 <app-modal-shell [isOpen]="isOpen" [title]="product ? 'Editar producto' : 'Nuevo producto'" (closed)="close()">
   <form class="form" [formGroup]="form" (ngSubmit)="save()">
+    <div class="intro">
+      <p class="intro-title">{{ product ? 'Actualiza la ficha del producto' : 'Crea un nuevo producto para el catalogo' }}</p>
+      <p class="intro-copy">Define la informacion principal, sus variantes y el stock inicial sin salir del panel.</p>
+    </div>
+
     <div class="grid">
       <label class="field">
-        <span>Nombre</span>
-        <input formControlName="name" placeholder="Nombre del producto" />
+        <span>Nombre <span class="required-mark">*</span></span>
+        <input formControlName="name" placeholder="Nombre del producto" [attr.aria-invalid]="fieldInvalid('name')" />
+        @if (fieldInvalid('name')) {
+          <span class="field-error">Usa un nombre claro y reconocible para el catalogo.</span>
+        }
       </label>
 
       <label class="field">
-        <span>Marca</span>
-        <select formControlName="brandId">
+        <span>Marca <span class="required-mark">*</span></span>
+        <select formControlName="brandId" [attr.aria-invalid]="fieldInvalid('brandId')">
           <option value="" disabled>Selecciona una marca</option>
           @for (brand of brands; track brand.id) {
             <option [value]="brand.id">{{ brand.name }}</option>
           }
         </select>
+        @if (fieldInvalid('brandId')) {
+          <span class="field-error">Selecciona una marca antes de guardar.</span>
+        }
       </label>
 
       <label class="field field--wide">
-        <span>Descripcion</span>
-        <textarea formControlName="description" rows="3" placeholder="Descripcion del producto..."></textarea>
+        <span>Descripcion <span class="required-mark">*</span></span>
+        <textarea formControlName="description" rows="3" placeholder="Describe el producto, el perfil de sabor o su propuesta."></textarea>
+        @if (fieldInvalid('description')) {
+          <span class="field-error">La descripcion debe ayudar a entender el producto rapidamente.</span>
+        } @else {
+          <span class="field-note">Procura explicar el perfil general del producto y sus puntos fuertes.</span>
+        }
       </label>
 
       <label class="check field--wide">
         <input type="checkbox" formControlName="active" />
-        <span>Producto activo</span>
+        <span>Producto visible en el catalogo</span>
       </label>
     </div>
 
@@ -67,7 +83,7 @@
     </section>
 
     <div class="preview">
-      <p class="muted small">Resumen</p>
+      <p class="muted small">Resumen rapido</p>
       <div class="summary-grid">
         <p><strong>Marca:</strong> {{ selectedBrandName() }}</p>
         <p><strong>Variantes:</strong> {{ variants.length }}</p>
@@ -76,9 +92,15 @@
     </div>
 
     <div class="actions">
-      <button type="button" class="btn btn-ghost" (click)="close()">Cancelar</button>
-      <button type="submit" class="btn btn-primary" [disabled]="form.invalid || !brands.length || !variants.length">
-        Guardar
+      <button type="button" class="btn btn-ghost" (click)="close()" [disabled]="saving">Cancelar</button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [class.is-loading]="saving"
+        [attr.aria-busy]="saving"
+        [disabled]="saving || form.invalid || !brands.length || !variants.length"
+      >
+        {{ saving ? 'Guardando cambios...' : 'Guardar cambios' }}
       </button>
     </div>
   </form>

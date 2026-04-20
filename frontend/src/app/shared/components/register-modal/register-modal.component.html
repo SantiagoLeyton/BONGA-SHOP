@@ -1,9 +1,10 @@
-<app-modal-shell
-  [isOpen]="isOpen()"
-  title="Crear cuenta"
-  (closed)="close()"
->
+<app-modal-shell [isOpen]="isOpen()" title="Crear cuenta" (closed)="close()">
   <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="intro">
+      <p class="intro-title">Empieza tu experiencia BONGA</p>
+      <p class="intro-copy">Crea tu cuenta para guardar productos, recuperar tu carrito y seguir tus pedidos.</p>
+    </div>
+
     <label class="field">
       <span>Nombre</span>
       <input
@@ -17,6 +18,7 @@
         <span class="err">Tu nombre debe tener al menos 2 caracteres.</span>
       }
     </label>
+
     <label class="field">
       <span>Correo</span>
       <input
@@ -30,6 +32,7 @@
         <span class="err">Ingresa un correo valido.</span>
       }
     </label>
+
     <label class="field">
       <span>Contrasena</span>
       <div class="pw">
@@ -56,7 +59,7 @@
         @switch (strength()) {
           @case (0) { Debil }
           @case (1) { Debil }
-          @case (2) { OK }
+          @case (2) { Aceptable }
           @case (3) { Fuerte }
           @default { Muy fuerte }
         }
@@ -65,9 +68,10 @@
         <span class="err">Minimo 8 caracteres.</span>
       }
     </label>
+
     <label class="check">
       <input type="checkbox" formControlName="accept" />
-      <span>Acepto los terminos y condiciones.</span>
+      <span>Acepto los terminos de uso y confirmo que soy mayor de edad.</span>
     </label>
 
     @if (error()) {
@@ -78,10 +82,11 @@
       @if (loading()) {
         Creando cuenta...
       } @else {
-        Registrarme
+        Crear mi cuenta
       }
     </button>
-    <p class="hint">El registro crea la cuenta en backend y deja la sesion iniciada automaticamente.</p>
+
+    <p class="hint">Tu cuenta se crea en el backend y la sesion queda lista para comprar al instante.</p>
     <p class="switch">
       Ya tienes cuenta?
       <button type="button" class="linkish" (click)="openLogin()">Iniciar sesion</button>

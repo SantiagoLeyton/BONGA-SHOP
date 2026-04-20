@@ -5,44 +5,57 @@
       <header class="head">
         <div>
           <p class="kicker">Carrito</p>
-          <p class="count">{{ count() }} items</p>
+          <p class="count">{{ count() }} {{ count() === 1 ? 'item guardado' : 'items guardados' }}</p>
         </div>
         <button type="button" class="icon" (click)="close()" aria-label="Cerrar">×</button>
       </header>
 
       <div class="body">
-        @if (!viewLines().length) {
-          <div class="empty">
+        @if (!loading()) {
+          <div class="loading-grid" aria-label="Cargando carrito">
+            @for (item of [1, 2]; track item) {
+              <article class="line line--loading">
+                <div class="thumb thumb--loading"></div>
+                <div class="loading-stack">
+                  <span class="loading-line loading-line--mid"></span>
+                  <span class="loading-line loading-line--short"></span>
+                  <span class="loading-line"></span>
+                </div>
+              </article>
+            }
+          </div>
+        } @else if (!viewLines().length) {
+          <div class="empty empty-state">
             <h3>Tu carrito esta vacio</h3>
-            <p class="muted">Agrega un producto para comenzar.</p>
-            <a class="btn btn-primary" routerLink="/products" (click)="close()">Explorar</a>
+            <p class="muted">Agrega productos desde el catalogo y retoma la compra cuando quieras.</p>
+            <a class="btn btn-primary" routerLink="/products" (click)="close()">Explorar productos</a>
           </div>
         } @else {
           <ul class="lines" aria-label="Items del carrito">
-            @for (l of viewLines(); track l.key) {
+            @for (line of viewLines(); track line.key) {
               <li class="line">
-                <img class="thumb" [src]="l.product.imageUrl" [alt]="l.product.name" loading="lazy" />
+                <img class="thumb" [src]="line.product.imageUrl" [alt]="line.product.name" loading="lazy" />
                 <div class="info">
-                  <p class="name">{{ l.product.name }}</p>
-                  <p class="meta">{{ l.flavor }} · {{ l.nicotineMg }} mg</p>
+                  <p class="name">{{ line.product.name }}</p>
+                  <p class="meta">{{ line.flavor }} · {{ line.nicotineMg }} mg</p>
                   <label class="sel">
                     <span class="sr-only">Variante</span>
-                    <select [value]="l.variantId" (change)="changeVariant(l, $any($event.target).value)">
-                      @for (v of l.product.variants; track v.id) {
-                        <option [value]="v.id">{{ v.flavor }} · {{ v.nicotineMg }} mg</option>
+                    <select [value]="line.variantId" [disabled]="isBusy(line)" (change)="changeVariant(line, $any($event.target).value)">
+                      @for (variant of line.product.variants; track variant.id) {
+                        <option [value]="variant.id">{{ variant.flavor }} · {{ variant.nicotineMg }} mg</option>
                       }
                     </select>
                   </label>
                   <div class="qty">
-                    <button type="button" class="qbtn" (click)="dec(l)" [disabled]="l.qty <= 1">−</button>
-                    <span class="q">{{ l.qty }}</span>
-                    <button type="button" class="qbtn" (click)="inc(l)">+</button>
+                    <button type="button" class="qbtn" (click)="dec(line)" [disabled]="line.qty <= 1 || isBusy(line)">−</button>
+                    <span class="q">{{ line.qty }}</span>
+                    <button type="button" class="qbtn" (click)="inc(line)" [disabled]="isBusy(line)">+</button>
                   </div>
                 </div>
                 <div class="price">
-                  <p class="p">{{ l.lineTotal | appCurrency }}</p>
+                  <p class="p">{{ line.lineTotal | appCurrency }}</p>
                   <div class="acts">
-                    <button type="button" class="rm" (click)="remove(l)">Quitar</button>
+                    <button type="button" class="rm" (click)="remove(line)" [disabled]="isBusy(line)">Quitar</button>
                   </div>
                 </div>
               </li>
@@ -56,8 +69,17 @@
           <span>Subtotal</span>
           <strong>{{ subtotal() | appCurrency }}</strong>
         </div>
+        <p class="foot-copy">Tu carrito queda guardado en tu cuenta para continuar despues sin perder la seleccion.</p>
         <div class="actions">
-          <button type="button" class="btn btn-ghost" (click)="clear()" [disabled]="!viewLines().length">Vaciar</button>
+          <button
+            type="button"
+            class="btn btn-ghost"
+            [class.is-loading]="clearing()"
+            [disabled]="!viewLines().length || clearing() || !loading()"
+            (click)="clear()"
+          >
+            {{ clearing() ? 'Vaciando...' : 'Vaciar' }}
+          </button>
           <a class="btn btn-primary" routerLink="/cart" (click)="close()" [class.is-disabled]="!viewLines().length">
             Ver carrito
           </a>
