@@ -1,28 +1,27 @@
-import type { CartLine } from '../services/cart.service';
-
-export type OrderStatus = 'created' | 'paid' | 'shipped' | 'delivered' | 'cancelled';
+export type OrderStatus = 'created' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
 
 export interface OrderAddress {
   name: string;
-  email: string;
   phone: string;
   city: string;
   address1: string;
   notes?: string;
 }
 
-export interface Order {
-  id: string;
-  createdAt: string; // ISO
-  status: OrderStatus;
-  shipping: 'standard' | 'express';
-  payment: 'cod' | 'card';
-  address: OrderAddress;
-  lines: CartLine[];
+export interface OrderLine {
+  variantId: string;
+  quantity: number;
+  productName: string;
+  variantDescription: string;
+  unitPrice: number;
+  subtotal: number;
 }
 
-/** Prepared for future orders integration */
-export interface OrderModel {
+export interface Order {
   id: string;
-  status: string;
+  createdAt: string;
+  status: OrderStatus;
+  total: number;
+  address: OrderAddress;
+  lines: OrderLine[];
 }

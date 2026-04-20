@@ -2,7 +2,7 @@
   @if (product; as p) {
     <div class="qv">
       <div class="media">
-        <img [src]="p.imageUrl" [alt]="'Ilustración de ' + p.name" loading="lazy" />
+        <img [src]="p.imageUrl" [alt]="'Ilustracion de ' + p.name" loading="lazy" />
         @if (p.badge) {
           <div class="badge">
             <app-product-badge [badge]="p.badge" />
@@ -21,7 +21,16 @@
         </div>
 
         <div class="actions">
-          <button type="button" class="btn btn-primary" (click)="addToCart()">Añadir al carrito</button>
+          <button
+            type="button"
+            class="btn btn-primary"
+            [class.is-loading]="adding()"
+            [attr.aria-busy]="adding()"
+            [disabled]="adding()"
+            (click)="addToCart()"
+          >
+            {{ adding() ? 'Añadiendo...' : 'Añadir al carrito' }}
+          </button>
           <button type="button" class="btn btn-secondary" (click)="close()">Cerrar</button>
         </div>
       </div>
@@ -30,4 +39,3 @@
     <p class="muted">Sin datos.</p>
   }
 </app-modal-shell>
-

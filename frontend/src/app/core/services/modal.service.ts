@@ -5,12 +5,15 @@ export type ModalId = 'login' | 'register' | 'info';
 @Injectable({ providedIn: 'root' })
 export class ModalService {
   readonly active = signal<ModalId | null>(null);
+  readonly authRedirect = signal<string | null>(null);
 
-  openLogin(): void {
+  openLogin(redirectTo?: string | null): void {
+    this.authRedirect.set(redirectTo ?? null);
     this.active.set('login');
   }
 
-  openRegister(): void {
+  openRegister(redirectTo?: string | null): void {
+    this.authRedirect.set(redirectTo ?? null);
     this.active.set('register');
   }
 
@@ -20,5 +23,11 @@ export class ModalService {
 
   close(): void {
     this.active.set(null);
+  }
+
+  consumeAuthRedirect(): string | null {
+    const redirect = this.authRedirect();
+    this.authRedirect.set(null);
+    return redirect;
   }
 }

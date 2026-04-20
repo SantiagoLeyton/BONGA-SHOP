@@ -1,10 +1,8 @@
-import { Component, computed, inject } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { OrderService } from '../../core/services/order.service';
-import { ProductService } from '../../core/services/product.service';
-import type { Product } from '../../core/models/product.model';
 import type { Order } from '../../core/models/order.model';
+import { OrderService } from '../../core/services/order.service';
 import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
 
 type OrderView = Order & { linesCount: number };
@@ -18,36 +16,27 @@ type OrderView = Order & { linesCount: number };
 })
 export class OrdersPageComponent {
   private readonly orders = inject(OrderService);
-  private readonly products = inject(ProductService);
-
-  private _snapshot: Product[] | null = null;
-  private productsSnapshot(): Product[] {
-    if (this._snapshot) return this._snapshot;
-    let out: Product[] = [];
-    this.products.getProducts().subscribe((x) => (out = x)).unsubscribe();
-    this._snapshot = out;
-    return out;
-  }
+  readonly loading = signal(true);
 
   readonly list = computed<OrderView[]>(() =>
-    this.orders
-      .list()
-      .map((o) => ({ ...o, linesCount: o.lines.reduce((s, l) => s + l.qty, 0) })),
+    this.orders.list().map((order) => ({
+      ...order,
+      linesCount: order.lines.reduce((sum, line) => sum + line.quantity, 0),
+    })),
   );
 
-  orderTotal(o: Order): number {
-    const byId = new Map(this.productsSnapshot().map((p) => [p.id, p]));
-    return o.lines.reduce((sum, l) => {
-      const p = byId.get(l.productId);
-      const v = p?.variants.find((x) => x.id === l.variantId);
-      return sum + (v?.price ?? 0) * l.qty;
-    }, 0);
+  constructor() {
+    void this.orders.loadMyOrders().finally(() => this.loading.set(false));
   }
 
-  statusLabel(s: Order['status']): string {
-    switch (s) {
-      case 'paid':
-        return 'Pagada';
+  orderTotal(order: Order): number {
+    return order.total;
+  }
+
+  statusLabel(status: Order['status']): string {
+    switch (status) {
+      case 'processing':
+        return 'Procesando';
       case 'shipped':
         return 'Enviada';
       case 'delivered':
@@ -59,5 +48,8 @@ export class OrdersPageComponent {
         return 'Creada';
     }
   }
-}
 
+  statusClass(status: Order['status']): string {
+    return `pill pill--${status}`;
+  }
+}

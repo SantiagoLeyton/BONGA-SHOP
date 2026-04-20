@@ -28,7 +28,7 @@ function minPrice(p: Product): number {
   return Math.min(...p.variants.map((v) => v.price));
 }
 
-/** Applies UI filters to the mock catalog (client-side). Replace with API query later. */
+/** Applies client-side UI filters over product data already loaded from the API. */
 export function applyProductFilters(products: Product[], f: ProductFilterState): Product[] {
   let list = products.filter((p) => {
     if (f.brandSlugs.length && !f.brandSlugs.includes(p.brand.slug)) {

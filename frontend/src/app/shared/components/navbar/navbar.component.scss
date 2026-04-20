@@ -74,6 +74,24 @@
   background: rgba(94, 234, 212, 0.9);
 }
 
+.admin-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.admin-mark {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.16rem 0.42rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: rgba(2, 6, 23, 0.92);
+  background: rgba(251, 191, 36, 0.88);
+}
+
 .actions {
   grid-column: 3 / 4;
   display: flex;
@@ -86,6 +104,35 @@
   display: inline-flex;
   gap: 0.35rem;
   align-items: center;
+}
+
+.account-chip {
+  display: inline-grid;
+  gap: 0.1rem;
+  min-width: 0;
+  padding: 0.45rem 0.7rem;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: rgba(15, 23, 42, 0.4);
+  color: var(--color-text);
+  text-decoration: none;
+
+  strong {
+    font-size: 0.92rem;
+    line-height: 1.15;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 14ch;
+  }
+}
+
+.account-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-muted);
+  font-weight: 800;
 }
 
 .cart {
@@ -198,6 +245,10 @@
     grid-column: auto;
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .account-chip {
+    width: 100%;
   }
 
   .scrim {

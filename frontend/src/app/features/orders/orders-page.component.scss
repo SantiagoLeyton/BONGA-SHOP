@@ -51,6 +51,12 @@
   box-shadow: var(--shadow-sm);
   display: grid;
   gap: 0.6rem;
+  transition: transform 160ms ease, border-color 160ms ease;
+}
+
+.card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(94, 234, 212, 0.2);
 }
 
 .row {
@@ -75,6 +81,30 @@
   color: var(--color-text);
 }
 
+.pill--created {
+  background: rgba(148, 163, 184, 0.1);
+}
+
+.pill--processing {
+  background: rgba(250, 204, 21, 0.12);
+  color: #fde68a;
+}
+
+.pill--shipped {
+  background: rgba(96, 165, 250, 0.14);
+  color: #bfdbfe;
+}
+
+.pill--delivered {
+  background: rgba(52, 211, 153, 0.14);
+  color: #a7f3d0;
+}
+
+.pill--cancelled {
+  background: rgba(251, 113, 133, 0.14);
+  color: #fecdd3;
+}
+
 .meta {
   display: inline-flex;
   gap: 0.5rem;
@@ -84,9 +114,6 @@
 
 .empty {
   padding: 2rem 0;
-  display: grid;
-  gap: 0.75rem;
-  justify-items: start;
 }
 
 .small {

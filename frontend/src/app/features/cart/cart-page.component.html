@@ -1,50 +1,82 @@
 <div class="container cart">
   <div class="head">
     <div>
-      <p class="kicker">Checkout</p>
-      <h1 class="title">Tu carrito</h1>
-      <p class="sub">Mock checkout listo para conectar al backend.</p>
+      <p class="kicker">Tu compra</p>
+      <h1 class="title">Carrito</h1>
+      <p class="sub">Tus productos guardados viven en tu cuenta y se mantienen listos para checkout.</p>
     </div>
     <div class="actions">
       <a class="btn btn-ghost" routerLink="/products">Seguir comprando</a>
-      <button type="button" class="btn btn-secondary" (click)="clear()" [disabled]="!lines().length">Vaciar</button>
+      <button
+        type="button"
+        class="btn btn-secondary"
+        [class.is-loading]="clearing()"
+        [attr.aria-busy]="clearing()"
+        (click)="clear()"
+        [disabled]="!lines().length || clearing() || isLoading()"
+      >
+        {{ clearing() ? 'Vaciando...' : 'Vaciar carrito' }}
+      </button>
     </div>
   </div>
 
-  @if (!lines().length) {
-    <section class="empty">
-      <h2>Carrito vacío</h2>
-      <p class="muted">Agrega un producto desde el catálogo o desde el detalle.</p>
-      <a class="btn btn-primary" routerLink="/products">Ir a productos</a>
+  @if (isLoading()) {
+    <section class="loading-grid" aria-label="Cargando carrito">
+      @for (item of [1, 2, 3]; track item) {
+        <article class="item item--loading">
+          <div class="thumb thumb--loading"></div>
+          <div class="info loading-stack">
+            <span class="loading-line loading-line--mid"></span>
+            <span class="loading-line loading-line--short"></span>
+            <span class="loading-line"></span>
+          </div>
+          <div class="side loading-stack">
+            <span class="loading-line loading-line--short"></span>
+            <span class="loading-line loading-line--short"></span>
+          </div>
+        </article>
+      }
+    </section>
+  } @else if (!lines().length) {
+    <section class="empty empty-state">
+      <h2>Tu carrito esta vacio</h2>
+      <p class="muted">Explora el catalogo, elige una variante y guardala aqui para comprar despues.</p>
+      <a class="btn btn-primary" routerLink="/products">Explorar productos</a>
     </section>
   } @else {
     <div class="grid">
       <section class="list" aria-label="Items del carrito">
-        @for (l of lines(); track l.key) {
+        @for (line of lines(); track line.key) {
           <article class="item">
-            <img class="thumb" [src]="l.product.imageUrl" [alt]="l.product.name" loading="lazy" />
+            <img class="thumb" [src]="line.product.imageUrl" [alt]="line.product.name" loading="lazy" />
             <div class="info">
-              <h3 class="name">{{ l.product.name }}</h3>
-              <p class="meta">{{ l.flavor }} · {{ l.nicotineMg }} mg</p>
+              <h3 class="name">{{ line.product.name }}</h3>
+              <p class="meta">{{ line.flavor }} · {{ line.nicotineMg }} mg</p>
               <label class="sel">
                 <span class="sr-only">Variante</span>
-                <select [value]="l.variantId" (change)="changeVariant(l, $any($event.target).value)">
-                  @for (v of l.product.variants; track v.id) {
-                    <option [value]="v.id">{{ v.flavor }} · {{ v.nicotineMg }} mg</option>
+                <select
+                  [value]="line.variantId"
+                  [disabled]="isBusy(line)"
+                  (change)="changeVariant(line, $any($event.target).value)"
+                >
+                  @for (variant of line.product.variants; track variant.id) {
+                    <option [value]="variant.id">{{ variant.flavor }} · {{ variant.nicotineMg }} mg</option>
                   }
                 </select>
               </label>
               <div class="qty">
-                <button type="button" class="qbtn" (click)="dec(l)" [disabled]="l.qty <= 1">−</button>
-                <span class="q">{{ l.qty }}</span>
-                <button type="button" class="qbtn" (click)="inc(l)">+</button>
+                <button type="button" class="qbtn" (click)="dec(line)" [disabled]="line.qty <= 1 || isBusy(line)">−</button>
+                <span class="q">{{ line.qty }}</span>
+                <button type="button" class="qbtn" (click)="inc(line)" [disabled]="isBusy(line)">+</button>
               </div>
+              @if (isBusy(line)) {
+                <p class="field-note">Actualizando esta linea...</p>
+              }
             </div>
             <div class="side">
-              <p class="p">{{ l.lineTotal | appCurrency }}</p>
+              <p class="p">{{ line.lineTotal | appCurrency }}</p>
               <div class="acts">
-                <button type="button" class="rm" (click)="saveForLater(l)">Guardar</button>
-                <button type="button" class="rm" (click)="remove(l)">Quitar</button>
+                <button type="button" class="rm" (click)="remove(line)" [disabled]="isBusy(line)">Quitar</button>
               </div>
             </div>
           </article>
@@ -52,43 +84,16 @@
       </section>
 
       <aside class="summary" aria-label="Resumen">
-        <h2 class="sum-title">Resumen</h2>
+        <h2 class="sum-title">Resumen del pedido</h2>
         <div class="row"><span>Subtotal</span><strong>{{ subtotal() | appCurrency }}</strong></div>
-        <div class="promo">
-          <label class="field">
-            <span>Cupón</span>
-            <div class="promo-row">
-              <input
-                [value]="promoCode()"
-                placeholder="BONGA10"
-                (input)="setPromo($any($event.target).value)"
-              />
-              @if (promoActive()) {
-                <button type="button" class="btn btn-ghost btn-sm" (click)="clearPromo()">Quitar</button>
-              }
-            </div>
-          </label>
-          @if (discount() > 0) {
-            <div class="row">
-              <span>Descuento</span>
-              <strong>-{{ discount() | appCurrency }}</strong>
-            </div>
-          }
-        </div>
-        <div class="row">
-          <span>Envío</span>
-          <strong>
-            @if (shipping() === 0) { Gratis } @else { {{ shipping() | appCurrency }} }
-          </strong>
-        </div>
+        <div class="row"><span>Envio</span><strong>Se define en checkout</strong></div>
         <div class="row total">
-          <span>Total</span><strong>{{ total() | appCurrency }}</strong>
+          <span>Total estimado</span><strong>{{ total() | appCurrency }}</strong>
         </div>
 
-        <a class="btn btn-primary btn-lg" routerLink="/checkout">Continuar</a>
-        <p class="hint">Checkout mock (listo para integración).</p>
+        <a class="btn btn-primary btn-lg" routerLink="/checkout">Continuar al checkout</a>
+        <p class="hint">Antes de confirmar, revisaras tu direccion, el total final y el stock validado en tiempo real.</p>
       </aside>
     </div>
   }
 </div>
-

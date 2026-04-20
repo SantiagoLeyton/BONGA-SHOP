@@ -1,29 +1,46 @@
 <div class="container wish">
   <div class="head">
     <div>
-      <p class="kicker">Tu selección</p>
+      <p class="kicker">Tu seleccion</p>
       <h1 class="title">Favoritos</h1>
-      <p class="sub">Guarda productos para volver después.</p>
+      <p class="sub">Guarda productos para compararlos mejor y volver a ellos cuando quieras.</p>
     </div>
     <div class="actions">
       <a class="btn btn-ghost" routerLink="/products">Explorar productos</a>
-      <button type="button" class="btn btn-secondary" (click)="clear()" [disabled]="!items().length">
-        Limpiar
+      <button
+        type="button"
+        class="btn btn-secondary"
+        [class.is-loading]="clearing()"
+        [attr.aria-busy]="clearing()"
+        (click)="clear()"
+        [disabled]="!items().length || clearing() || !wishlistLoaded()"
+      >
+        {{ clearing() ? 'Limpiando...' : 'Vaciar favoritos' }}
       </button>
     </div>
   </div>
 
-  @if (items().length) {
+  @if (!wishlistLoaded()) {
+    <section class="grid" aria-label="Cargando favoritos">
+      @for (item of [1, 2, 3]; track item) {
+        <article class="loading-card">
+          <span class="loading-line loading-line--short"></span>
+          <span class="loading-line"></span>
+          <span class="loading-line loading-line--mid"></span>
+        </article>
+      }
+    </section>
+  } @else if (items().length) {
     <section class="grid" aria-label="Productos guardados">
-      @for (p of items(); track p.id; let i = $index) {
-        <app-product-card [product]="p" [showQuickView]="true" (quickView)="openQuickView($event)" />
+      @for (product of items(); track product.id; let i = $index) {
+        <app-product-card [product]="product" [showQuickView]="true" (quickView)="openQuickView($event)" />
       }
     </section>
   } @else {
-    <section class="empty">
-      <h2>No tienes favoritos aún</h2>
-      <p class="muted">Toca el ♥ en un producto para guardarlo aquí.</p>
-      <a class="btn btn-primary" routerLink="/products">Ir al catálogo</a>
+    <section class="empty empty-state">
+      <h2>Tu lista de favoritos esta vacia</h2>
+      <p class="muted">Marca productos con el corazon para revisarlos despues y decidir con mas calma.</p>
+      <a class="btn btn-primary" routerLink="/products">Ir al catalogo</a>
     </section>
   }
 </div>
@@ -33,4 +50,3 @@
   [product]="quickViewProduct()"
   (closed)="closeQuickView()"
 />
-

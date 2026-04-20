@@ -38,6 +38,12 @@ h1 {
   align-items: start;
 }
 
+.split-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
 .side {
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-border);
@@ -113,18 +119,6 @@ h1 {
   color: var(--color-muted);
 }
 
-.placeholder {
-  border-radius: var(--radius-xl);
-  border: 1px dashed rgba(148, 163, 184, 0.22);
-  padding: clamp(1.25rem, 3vw, 2rem);
-  background: rgba(15, 23, 42, 0.25);
-
-  h2 {
-    margin: 0 0 0.5rem;
-    letter-spacing: -0.02em;
-  }
-}
-
 .table-card {
   border-radius: var(--radius-xl);
   border: 1px solid var(--color-border);
@@ -153,7 +147,9 @@ h1 {
   flex-wrap: wrap;
 }
 
-.search input {
+.search input,
+.inline-input,
+.select-control {
   height: 38px;
   border-radius: 999px;
   border: 1px solid rgba(148, 163, 184, 0.18);
@@ -161,7 +157,23 @@ h1 {
   color: var(--color-text);
   padding: 0 0.75rem;
   outline: none;
+}
+
+.search input {
   width: min(260px, 40vw);
+}
+
+.inline-input {
+  width: 100%;
+}
+
+.inline-input--stock {
+  width: 90px;
+  text-align: right;
+}
+
+.select-control {
+  min-width: 150px;
 }
 
 .row-actions {
@@ -196,6 +208,10 @@ h1 {
 .table-wrap {
   overflow: auto;
   outline: none;
+}
+
+.admin-loading {
+  padding: 1rem;
 }
 
 .table {
@@ -249,21 +265,27 @@ h1 {
 .dot--a {
   background: rgba(94, 234, 212, 0.95);
 }
+
 .dot--b {
   background: rgba(251, 191, 36, 0.95);
-}
-.dot--c {
-  background: rgba(124, 58, 237, 0.95);
 }
 
 .pill.ok {
   color: #5eead4;
 }
+
 .pill.warn {
   color: #fbbf24;
 }
+
 .pill.bad {
   color: #fecaca;
+}
+
+@media (max-width: 1200px) {
+  .split-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 900px) {

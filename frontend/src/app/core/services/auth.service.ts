@@ -1,4 +1,7 @@
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, computed, signal } from '@angular/core';
+import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../environments/environment';
 
 export type AuthRole = 'customer' | 'admin';
 
@@ -9,20 +12,25 @@ export interface AuthUser {
   role: AuthRole;
 }
 
+type AuthResponse = {
+  token: string;
+  type?: string;
+  user: {
+    id: number | string;
+    name: string;
+    email: string;
+    role: string;
+    active: boolean;
+  };
+};
+
 const STORAGE_KEY = 'bonga.auth.v1';
 
 type StoredAuth = {
   token: string;
+  type: string;
   user: AuthUser;
 };
-
-function uid(): string {
-  return Math.random().toString(16).slice(2) + Date.now().toString(16);
-}
-
-function sleep(ms: number): Promise<void> {
-  return new Promise((r) => setTimeout(r, ms));
-}
 
 function safeRead(): StoredAuth | null {
   try {
@@ -42,62 +50,78 @@ function safeWrite(next: StoredAuth | null): void {
     }
     localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
   } catch {
-    // ignore storage failures (private mode, quota, etc.)
+    // ignore
   }
 }
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly stored = signal<StoredAuth | null>(safeRead());
+  private readonly apiUrl = environment.apiUrl;
 
   readonly user = computed(() => this.stored()?.user ?? null);
   readonly token = computed(() => this.stored()?.token ?? null);
   readonly isAuthed = computed(() => Boolean(this.stored()?.token));
 
+  constructor(private readonly http: HttpClient) {}
+
   async login(email: string, password: string): Promise<AuthUser> {
-    await sleep(650);
-    const e = email.trim().toLowerCase();
-    if (!e.includes('@') || password.trim().length < 8) {
-      throw new Error('Correo o contraseña inválidos.');
+    try {
+      const response = await firstValueFrom(
+        this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, { email, password }),
+      );
+      const next = this.normalizeAuthResponse(response);
+      this.stored.set(next);
+      safeWrite(next);
+      return next.user;
+    } catch (error) {
+      throw this.mapHttpError(error, 'No se pudo iniciar sesi\u00f3n.');
     }
-
-    const isAdmin = e.endsWith('@bonga.shop') || e.includes('admin');
-    const user: AuthUser = {
-      id: uid(),
-      name: isAdmin ? 'Admin' : e.split('@')[0] || 'Cliente',
-      email: e,
-      role: isAdmin ? 'admin' : 'customer',
-    };
-
-    const next: StoredAuth = { token: `mock.${uid()}`, user };
-    this.stored.set(next);
-    safeWrite(next);
-    return user;
   }
 
   async register(name: string, email: string, password: string): Promise<AuthUser> {
-    await sleep(850);
-    const n = name.trim();
-    const e = email.trim().toLowerCase();
-    if (n.length < 2) {
-      throw new Error('Tu nombre debe tener al menos 2 caracteres.');
+    try {
+      const response = await firstValueFrom(
+        this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, { name, email, password }),
+      );
+      const next = this.normalizeAuthResponse(response);
+      this.stored.set(next);
+      safeWrite(next);
+      return next.user;
+    } catch (error) {
+      throw this.mapHttpError(error, 'No se pudo completar el registro.');
     }
-    if (!e.includes('@')) {
-      throw new Error('Ingresa un correo válido.');
-    }
-    if (password.trim().length < 8) {
-      throw new Error('Tu contraseña debe tener al menos 8 caracteres.');
-    }
-
-    const user: AuthUser = { id: uid(), name: n, email: e, role: 'customer' };
-    const next: StoredAuth = { token: `mock.${uid()}`, user };
-    this.stored.set(next);
-    safeWrite(next);
-    return user;
   }
 
   logout(): void {
     this.stored.set(null);
     safeWrite(null);
+  }
+
+  private normalizeAuthResponse(response: AuthResponse): StoredAuth {
+    return {
+      token: response.token,
+      type: response.type ?? 'Bearer',
+      user: {
+        id: String(response.user.id),
+        name: response.user.name,
+        email: response.user.email,
+        role: response.user.role?.toUpperCase() === 'ADMIN' ? 'admin' : 'customer',
+      },
+    };
+  }
+
+  private mapHttpError(error: unknown, fallback: string): Error {
+    if (error instanceof HttpErrorResponse) {
+      const message =
+        (typeof error.error?.message === 'string' && error.error.message) ||
+        (Array.isArray(error.error?.validationErrors) &&
+          typeof error.error.validationErrors[0]?.message === 'string' &&
+          error.error.validationErrors[0].message) ||
+        fallback;
+      return new Error(message);
+    }
+
+    return error instanceof Error ? error : new Error(fallback);
   }
 }

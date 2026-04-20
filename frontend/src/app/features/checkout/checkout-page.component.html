@@ -3,7 +3,7 @@
     <div>
       <p class="kicker">Checkout</p>
       <h1 class="title">Finalizar compra</h1>
-      <p class="sub">Flujo mock para demo (sin backend).</p>
+      <p class="sub">Revisa tus datos, confirma tu pedido y deja tu orden registrada con inventario real.</p>
     </div>
     <div class="actions">
       <a class="btn btn-ghost" routerLink="/cart">Volver al carrito</a>
@@ -11,112 +11,125 @@
   </div>
 
   <div class="steps" aria-label="Progreso">
-    <div class="step" [class.on]="step() === 'address' || step() === 'shipping' || step() === 'payment' || step() === 'done'">
-      <span class="dot">1</span><span>Dirección</span>
+    <div class="step" [class.on]="step() === 'address' || step() === 'review' || step() === 'confirm' || step() === 'done'">
+      <span class="dot">1</span><span>Entrega</span>
     </div>
     <div class="line"></div>
-    <div class="step" [class.on]="step() === 'shipping' || step() === 'payment' || step() === 'done'">
-      <span class="dot">2</span><span>Envío</span>
+    <div class="step" [class.on]="step() === 'review' || step() === 'confirm' || step() === 'done'">
+      <span class="dot">2</span><span>Revision</span>
     </div>
     <div class="line"></div>
-    <div class="step" [class.on]="step() === 'payment' || step() === 'done'">
-      <span class="dot">3</span><span>Pago</span>
+    <div class="step" [class.on]="step() === 'confirm' || step() === 'done'">
+      <span class="dot">3</span><span>Confirmacion</span>
     </div>
   </div>
 
-  @if (step() === 'address') {
+  @if (isLoading()) {
+    <section class="panel loading-grid" aria-label="Preparando checkout">
+      <span class="loading-line loading-line--short"></span>
+      <span class="loading-line"></span>
+      <span class="loading-line loading-line--mid"></span>
+      <span class="loading-line"></span>
+      <span class="loading-line loading-line--mid"></span>
+    </section>
+  } @else if (step() === 'address') {
     <section class="panel">
-      <h2>Datos de contacto</h2>
+      <h2>Datos de entrega</h2>
+      <p class="panel-copy">Usaremos esta informacion para registrar tu pedido y mantener el seguimiento claro.</p>
       <form class="form" [formGroup]="addressForm" (ngSubmit)="nextFromAddress()">
         <label class="field">
-          <span>Nombre</span>
-          <input formControlName="name" placeholder="Tu nombre" />
+          <span>Nombre <span class="required-mark">*</span></span>
+          <input formControlName="name" placeholder="Tu nombre" [attr.aria-invalid]="fieldInvalid('name')" />
+          @if (fieldInvalid('name')) {
+            <span class="field-error">Ingresa el nombre de la persona que recibira el pedido.</span>
+          }
         </label>
         <label class="field">
-          <span>Correo</span>
-          <input formControlName="email" type="email" placeholder="tu@correo.com" />
+          <span>Telefono <span class="required-mark">*</span></span>
+          <input formControlName="phone" inputmode="tel" placeholder="+57..." [attr.aria-invalid]="fieldInvalid('phone')" />
+          @if (fieldInvalid('phone')) {
+            <span class="field-error">Ingresa un telefono valido para coordinar la entrega.</span>
+          }
         </label>
         <label class="field">
-          <span>Teléfono</span>
-          <input formControlName="phone" inputmode="tel" placeholder="+57..." />
-        </label>
-        <label class="field">
-          <span>Ciudad</span>
-          <input formControlName="city" placeholder="Bogotá" />
+          <span>Ciudad <span class="required-mark">*</span></span>
+          <input formControlName="city" placeholder="Bogota" [attr.aria-invalid]="fieldInvalid('city')" />
+          @if (fieldInvalid('city')) {
+            <span class="field-error">Selecciona la ciudad donde recibiras tu compra.</span>
+          }
         </label>
         <label class="field field--wide">
-          <span>Dirección</span>
-          <input formControlName="address1" placeholder="Calle 123 #45-67" />
+          <span>Direccion <span class="required-mark">*</span></span>
+          <input formControlName="address1" placeholder="Calle 123 #45-67" [attr.aria-invalid]="fieldInvalid('address1')" />
+          @if (fieldInvalid('address1')) {
+            <span class="field-error">Escribe una direccion completa para registrar la orden sin dudas.</span>
+          }
         </label>
         <label class="field field--wide">
-          <span>Notas (opcional)</span>
-          <textarea formControlName="notes" rows="3" placeholder="Indicaciones para el repartidor…"></textarea>
+          <span>Notas de entrega (opcional)</span>
+          <textarea formControlName="notes" rows="3" placeholder="Ej. Porteria, piso, horario sugerido..."></textarea>
+          <span class="field-note">Solo agrega referencias utiles para que la entrega sea mas clara.</span>
         </label>
 
         <div class="form-actions">
-          <button type="submit" class="btn btn-primary btn-lg">Continuar</button>
+          <button type="submit" class="btn btn-primary btn-lg" [disabled]="addressForm.invalid">Continuar</button>
         </div>
       </form>
     </section>
-  } @else if (step() === 'shipping') {
+  } @else if (step() === 'review') {
     <section class="panel">
-      <h2>Envío</h2>
-      <div class="cards">
-        <button type="button" class="card" [class.on]="shipping() === 'standard'" (click)="shipping.set('standard')">
-          <p class="t">Estándar</p>
-          <p class="m muted">24–72h (mock)</p>
-          <p class="p">3,90 €</p>
-        </button>
-        <button type="button" class="card" [class.on]="shipping() === 'express'" (click)="shipping.set('express')">
-          <p class="t">Express</p>
-          <p class="m muted">Mismo día (mock)</p>
-          <p class="p">5,90 €</p>
-        </button>
+      <h2>Revision del pedido</h2>
+      <p class="panel-copy">Confirma que tus datos esten bien antes de pasar a la confirmacion final.</p>
+      <div class="summary">
+        <div class="row"><span>Cliente</span><strong>{{ addressForm.controls.name.value }}</strong></div>
+        <div class="row"><span>Telefono</span><strong>{{ addressForm.controls.phone.value }}</strong></div>
+        <div class="row"><span>Ciudad</span><strong>{{ addressForm.controls.city.value }}</strong></div>
+        <div class="row"><span>Direccion</span><strong>{{ addressForm.controls.address1.value }}</strong></div>
+        @if (addressForm.controls.notes.value) {
+          <div class="row"><span>Notas</span><strong>{{ addressForm.controls.notes.value }}</strong></div>
+        }
+        <div class="row"><span>Productos</span><strong>{{ subtotal() | appCurrency }}</strong></div>
+        <div class="row total"><span>Total estimado</span><strong>{{ total() | appCurrency }}</strong></div>
       </div>
       <div class="nav">
-        <button type="button" class="btn btn-ghost" (click)="back()">Atrás</button>
-        <button type="button" class="btn btn-primary btn-lg" (click)="nextFromShipping()">Continuar</button>
+        <button type="button" class="btn btn-ghost" (click)="back()">Volver</button>
+        <button type="button" class="btn btn-primary btn-lg" (click)="nextFromReview()">Continuar</button>
       </div>
     </section>
-  } @else if (step() === 'payment') {
+  } @else if (step() === 'confirm') {
     <section class="panel">
-      <h2>Pago</h2>
-      <div class="cards">
-        <button type="button" class="card" [class.on]="pay() === 'cod'" (click)="pay.set('cod')">
-          <p class="t">Contraentrega</p>
-          <p class="m muted">Pagas al recibir (mock)</p>
-          <p class="p">Recomendado</p>
-        </button>
-        <button type="button" class="card" [class.on]="pay() === 'card'" (click)="pay.set('card')">
-          <p class="t">Tarjeta</p>
-          <p class="m muted">Integración pendiente</p>
-          <p class="p">Mock</p>
-        </button>
-      </div>
+      <h2>Confirmacion final</h2>
+      <p class="sub">Al confirmar, validamos stock, descontamos inventario y registramos la orden en tu cuenta.</p>
 
       <div class="summary">
-        <div class="row"><span>Envío</span><strong>{{ shippingPrice() | appCurrency }}</strong></div>
-        <div class="row total"><span>Total (mock)</span><strong>{{ shippingPrice() | appCurrency }}</strong></div>
+        <div class="row"><span>Productos</span><strong>{{ subtotal() | appCurrency }}</strong></div>
+        <div class="row total"><span>Total final</span><strong>{{ total() | appCurrency }}</strong></div>
       </div>
 
       <div class="nav">
-        <button type="button" class="btn btn-ghost" (click)="back()">Atrás</button>
-        <button type="button" class="btn btn-primary btn-lg" (click)="placeOrder()" [disabled]="placing()">
-          @if (placing()) { Procesando… } @else { Confirmar compra }
+        <button type="button" class="btn btn-ghost" (click)="back()">Volver</button>
+        <button
+          type="button"
+          class="btn btn-primary btn-lg"
+          [class.is-loading]="placing()"
+          [attr.aria-busy]="placing()"
+          (click)="placeOrder()"
+          [disabled]="placing()"
+        >
+          @if (placing()) { Confirmando pedido... } @else { Confirmar compra }
         </button>
       </div>
-      <p class="hint">Este checkout es demo: no cobra dinero ni crea orden real.</p>
+      <p class="hint">Tu carrito se convierte en orden y queda disponible en el historial apenas se confirme.</p>
     </section>
   } @else {
     <section class="done">
-      <h2>¡Listo!</h2>
-      <p class="muted">Orden creada (mock).</p>
-      <p class="oid"><strong>{{ orderId() }}</strong></p>
+      <h2>Pedido confirmado</h2>
+      <p class="muted">Tu compra quedo registrada correctamente y ya puedes seguir su estado desde tu cuenta.</p>
+      <p class="oid"><strong>#{{ orderId() }}</strong></p>
       <div class="nav">
-        <a class="btn btn-ghost" routerLink="/products">Volver al catálogo</a>
-        <a class="btn btn-primary" routerLink="/">Inicio</a>
+        <a class="btn btn-ghost" routerLink="/products">Seguir comprando</a>
+        <a class="btn btn-primary" routerLink="/orders">Ver mis pedidos</a>
       </div>
     </section>
   }
 </div>
-

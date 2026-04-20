@@ -1,9 +1,10 @@
-<app-modal-shell
-  [isOpen]="isOpen()"
-  title="Iniciar sesión"
-  (closed)="close()"
->
+<app-modal-shell [isOpen]="isOpen()" title="Iniciar sesion" (closed)="close()">
   <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="intro">
+      <p class="intro-title">Accede a tu cuenta</p>
+      <p class="intro-copy">Guarda favoritos, recupera tu carrito y revisa tus pedidos en un solo lugar.</p>
+    </div>
+
     <label class="field">
       <span>Correo</span>
       <input
@@ -14,11 +15,12 @@
         [attr.aria-invalid]="form.controls.email.invalid && (form.controls.email.touched || form.controls.email.dirty)"
       />
       @if (form.controls.email.invalid && (form.controls.email.touched || form.controls.email.dirty)) {
-        <span class="err">Ingresa un correo válido.</span>
+        <span class="err">Ingresa un correo valido.</span>
       }
     </label>
+
     <label class="field">
-      <span>Contraseña</span>
+      <span>Contrasena</span>
       <div class="pw">
         <input
           [type]="showPassword() ? 'text' : 'password'"
@@ -34,15 +36,16 @@
         </button>
       </div>
       @if (form.controls.password.invalid && (form.controls.password.touched || form.controls.password.dirty)) {
-        <span class="err">Mínimo 8 caracteres.</span>
+        <span class="err">Minimo 8 caracteres.</span>
       }
     </label>
+
     <div class="row">
       <label class="check">
         <input type="checkbox" formControlName="remember" />
-        <span>Recordarme</span>
+        <span>Mantener sesion abierta</span>
       </label>
-      <button type="button" class="linkish" (click)="forgotPassword()">¿Olvidaste tu contraseña?</button>
+      <button type="button" class="linkish" (click)="forgotPassword()">Necesitas ayuda?</button>
     </div>
 
     @if (error()) {
@@ -51,14 +54,15 @@
 
     <button type="submit" class="btn btn-primary" [disabled]="!canSubmit()">
       @if (loading()) {
-        Continuando…
+        Entrando...
       } @else {
-        Continuar
+        Entrar a mi cuenta
       }
     </button>
-    <p class="hint">Mock auth por ahora. Con JWT y backend se validará el login real.</p>
+
+    <p class="hint">Tu sesion te permite guardar favoritos, mantener tu carrito y finalizar compras protegidas.</p>
     <p class="switch">
-      ¿No tienes cuenta?
+      Aun no tienes cuenta?
       <button type="button" class="linkish" (click)="openRegister()">Crear cuenta</button>
     </p>
   </form>

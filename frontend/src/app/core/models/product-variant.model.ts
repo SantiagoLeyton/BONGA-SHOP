@@ -6,5 +6,6 @@ export interface ProductVariant {
   nicotineMg: number;
   price: number;
   stock: number;
+  active?: boolean;
   label?: string;
 }

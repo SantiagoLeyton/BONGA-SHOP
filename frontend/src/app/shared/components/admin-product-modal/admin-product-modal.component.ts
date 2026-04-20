@@ -1,20 +1,18 @@
-import { Component, EventEmitter, Input, Output, computed, signal } from '@angular/core';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import type { Brand } from '../../../core/models/brand.model';
 import type { Product } from '../../../core/models/product.model';
-import type { ProductVariant } from '../../../core/models/product-variant.model';
+import type { AdminProductDraft, AdminProductVariantDraft } from '../../../core/services/product.service';
 import { ModalShellComponent } from '../modal-shell/modal-shell.component';
 
-function slugify(s: string): string {
-  return s
-    .trim()
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '');
-}
-
-function uid(prefix: string): string {
-  return `${prefix}_${Math.random().toString(16).slice(2)}${Date.now().toString(16)}`;
-}
+type VariantFormGroup = FormGroup<{
+  id: FormControl<string>;
+  flavor: FormControl<string>;
+  nicotineMg: FormControl<number>;
+  price: FormControl<number>;
+  stock: FormControl<number>;
+  active: FormControl<boolean>;
+}>;
 
 @Component({
   selector: 'app-admin-product-modal',
@@ -23,138 +21,143 @@ function uid(prefix: string): string {
   templateUrl: './admin-product-modal.component.html',
   styleUrl: './admin-product-modal.component.scss',
 })
-export class AdminProductModalComponent {
+export class AdminProductModalComponent implements OnChanges {
   @Input({ required: true }) isOpen = false;
   @Input() product: Product | null = null;
+  @Input() brands: Brand[] = [];
+  @Input() saving = false;
   @Output() closed = new EventEmitter<void>();
-  @Output() saved = new EventEmitter<Product>();
-
-  readonly filePreview = signal<string | null>(null);
+  @Output() saved = new EventEmitter<AdminProductDraft>();
 
   readonly form = new FormGroup({
     name: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(2)] }),
-    slug: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    brandName: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    brandSlug: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    description: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(10)] }),
-    imageUrl: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
-    featured: new FormControl(false, { nonNullable: true }),
+    brandId: new FormControl('', { nonNullable: true, validators: [Validators.required] }),
+    description: new FormControl('', {
+      nonNullable: true,
+      validators: [Validators.required, Validators.minLength(10), Validators.maxLength(1000)],
+    }),
+    active: new FormControl(true, { nonNullable: true }),
+    variants: new FormArray<VariantFormGroup>([]),
   });
 
-  readonly variantsText = new FormControl<string>('', { nonNullable: true });
+  get variants(): FormArray<VariantFormGroup> {
+    return this.form.controls.variants;
+  }
 
-  readonly canSave = computed(() => this.form.valid);
-
-  ngOnChanges(): void {
-    const p = this.product;
-    if (!p) {
-      this.form.reset({
-        name: '',
-        slug: '',
-        brandName: '',
-        brandSlug: '',
-        description: '',
-        imageUrl: '',
-        featured: false,
-      });
-      this.variantsText.setValue('');
-      this.filePreview.set(null);
-      return;
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['product'] || changes['brands'] || changes['isOpen']) {
+      this.resetForm();
     }
-    this.form.reset({
-      name: p.name,
-      slug: p.slug,
-      brandName: p.brand.name,
-      brandSlug: p.brand.slug,
-      description: p.description,
-      imageUrl: p.imageUrl,
-      featured: Boolean(p.featured),
-    });
-    this.variantsText.setValue(
-      p.variants
-        .map((v) => `${v.flavor} | ${v.nicotineMg} | ${v.price} | ${v.stock}`)
-        .join('\n'),
-    );
-    this.filePreview.set(null);
   }
 
   close(): void {
     this.closed.emit();
   }
 
-  autofillSlug(): void {
-    const name = this.form.controls.name.value;
-    if (!this.form.controls.slug.dirty) this.form.controls.slug.setValue(slugify(name));
+  addVariant(seed?: Partial<AdminProductVariantDraft>): void {
+    this.variants.push(
+      new FormGroup({
+        id: new FormControl(seed?.id ?? '', { nonNullable: true }),
+        flavor: new FormControl(seed?.flavor ?? '', {
+          nonNullable: true,
+          validators: [Validators.required, Validators.minLength(2)],
+        }),
+        nicotineMg: new FormControl(seed?.nicotineMg ?? 20, {
+          nonNullable: true,
+          validators: [Validators.required, Validators.min(0)],
+        }),
+        price: new FormControl(seed?.price ?? 10, {
+          nonNullable: true,
+          validators: [Validators.required, Validators.min(0.01)],
+        }),
+        stock: new FormControl(seed?.stock ?? 0, {
+          nonNullable: true,
+          validators: [Validators.required, Validators.min(0)],
+        }),
+        active: new FormControl(seed?.active ?? true, { nonNullable: true }),
+      }),
+    );
   }
 
-  autofillBrandSlug(): void {
-    const name = this.form.controls.brandName.value;
-    if (!this.form.controls.brandSlug.dirty) this.form.controls.brandSlug.setValue(slugify(name));
-  }
-
-  onFilePicked(file: File | null): void {
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    this.filePreview.set(url);
-    this.form.controls.imageUrl.setValue(url);
+  removeVariant(index: number): void {
+    if (this.variants.length <= 1) {
+      return;
+    }
+    this.variants.removeAt(index);
   }
 
   save(): void {
-    if (!this.form.valid) {
+    if (this.form.invalid || !this.variants.length) {
       this.form.markAllAsTouched();
       return;
     }
 
     const raw = this.form.getRawValue();
-    const baseId = this.product?.id ?? uid('p');
-    const variants = this.parseVariants(baseId);
-    const next: Product = {
-      id: baseId,
+    this.saved.emit({
+      id: this.product?.id,
       name: raw.name.trim(),
-      slug: raw.slug.trim(),
+      brandId: raw.brandId,
       description: raw.description.trim(),
-      brand: { id: slugify(raw.brandSlug.trim()) || uid('b'), name: raw.brandName.trim(), slug: raw.brandSlug.trim() },
-      imageUrl: raw.imageUrl.trim(),
-      featured: raw.featured,
-      variants,
-    };
-    this.saved.emit(next);
+      active: raw.active,
+      variants: raw.variants.map((variant) => ({
+        id: variant.id || undefined,
+        flavor: variant.flavor.trim(),
+        nicotineMg: Number(variant.nicotineMg),
+        price: Number(variant.price),
+        stock: Math.max(0, Math.floor(Number(variant.stock))),
+        active: variant.active,
+      })),
+    });
   }
 
-  private parseVariants(productId: string): ProductVariant[] {
-    const lines = this.variantsText.value
-      .split('\n')
-      .map((l) => l.trim())
-      .filter(Boolean);
-    const out: ProductVariant[] = [];
-    for (const line of lines) {
-      const [flavor, nic, price, stock] = line.split('|').map((x) => x.trim());
-      const nicotineMg = Number(nic);
-      const p = Number(price);
-      const s = Number(stock);
-      if (!flavor || !Number.isFinite(nicotineMg) || !Number.isFinite(p) || !Number.isFinite(s)) continue;
-      out.push({
-        id: uid('v'),
-        productId,
-        sku: `${productId}-${slugify(flavor)}-${nicotineMg}`,
-        flavor,
-        nicotineMg,
-        price: p,
-        stock: Math.max(0, Math.floor(s)),
+  trackVariant(_: number, group: VariantFormGroup): string {
+    return group.controls.id.value || `${group.controls.flavor.value}-${group.controls.nicotineMg.value}`;
+  }
+
+  selectedBrandName(): string {
+    return this.brands.find((brand) => brand.id === this.form.controls.brandId.value)?.name ?? 'Sin marca';
+  }
+
+  fieldInvalid(name: 'name' | 'brandId' | 'description'): boolean {
+    const control = this.form.controls[name];
+    return control.invalid && (control.touched || control.dirty);
+  }
+
+  private resetForm(): void {
+    this.variants.clear();
+
+    const product = this.product;
+    const firstBrandId = this.brands[0]?.id ?? '';
+
+    if (!product) {
+      this.form.reset({
+        name: '',
+        brandId: firstBrandId,
+        description: '',
+        active: true,
       });
+      this.addVariant();
+      return;
     }
-    if (out.length) return out;
-    return [
-      {
-        id: uid('v'),
-        productId,
-        sku: `${productId}-default-20`,
-        flavor: 'Default',
-        nicotineMg: 20,
-        price: 10,
-        stock: 10,
-      },
-    ];
+
+    this.form.reset({
+      name: product.name,
+      brandId: product.brand.id,
+      description: product.description,
+      active: product.active ?? true,
+    });
+
+    const variants = product.variants.length
+      ? product.variants.map((variant) => ({
+          id: variant.id,
+          flavor: variant.flavor,
+          nicotineMg: variant.nicotineMg,
+          price: variant.price,
+          stock: variant.stock,
+          active: variant.active ?? true,
+        }))
+      : [{ active: true }];
+
+    variants.forEach((variant) => this.addVariant(variant));
   }
 }
-

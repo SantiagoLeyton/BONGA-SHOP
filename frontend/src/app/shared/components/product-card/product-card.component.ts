@@ -19,6 +19,10 @@ export class ProductCardComponent {
 
   @Input({ required: true }) product!: Product;
   @Input() showQuickView = false;
+  /** Variante visual para vitrinas premium (ej. home destacados) */
+  @Input() variant: 'default' | 'spotlight' = 'default';
+  /** Destaca la card (ej. producto central en Destacados) */
+  @Input() highlight = false;
   @Output() quickView = new EventEmitter<Product>();
 
   readonly wished = computed(() => this.wishlist.has(this.product?.id));
@@ -44,10 +48,10 @@ export class ProductCardComponent {
     this.quickView.emit(this.product);
   }
 
-  toggleWish(event: MouseEvent): void {
+  async toggleWish(event: MouseEvent): Promise<void> {
     event.preventDefault();
     event.stopPropagation();
-    const isOn = this.wishlist.toggle(this.product.id);
+    const isOn = await this.wishlist.toggle(this.product.id);
     this.toasts.show(
       isOn ? 'Guardado en favoritos' : 'Quitado de favoritos',
       isOn ? 'success' : 'info',

@@ -9,9 +9,9 @@ export interface Product {
   slug: string;
   description: string;
   brand: Brand;
-  /** Path under /public, typically SVG */
   imageUrl: string;
   badge?: ProductBadge;
   featured?: boolean;
+  active?: boolean;
   variants: ProductVariant[];
 }

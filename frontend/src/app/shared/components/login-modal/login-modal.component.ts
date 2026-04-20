@@ -1,8 +1,9 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-import { ToastService } from '../../../core/services/toast.service';
 import { ModalService } from '../../../core/services/modal.service';
+import { ToastService } from '../../../core/services/toast.service';
 import { ModalShellComponent } from '../modal-shell/modal-shell.component';
 
 @Component({
@@ -16,6 +17,7 @@ export class LoginModalComponent {
   private readonly modal = inject(ModalService);
   private readonly auth = inject(AuthService);
   private readonly toasts = inject(ToastService);
+  private readonly router = inject(Router);
 
   readonly isOpen = computed(() => this.modal.active() === 'login');
   readonly loading = signal(false);
@@ -43,12 +45,12 @@ export class LoginModalComponent {
   }
 
   openRegister(): void {
-    this.modal.openRegister();
+    this.modal.openRegister(this.modal.authRedirect());
     this.error.set(null);
   }
 
   togglePassword(): void {
-    this.showPassword.update((v) => !v);
+    this.showPassword.update((value) => !value);
   }
 
   async submit(): Promise<void> {
@@ -61,18 +63,22 @@ export class LoginModalComponent {
     try {
       const { email, password } = this.form.getRawValue();
       const user = await this.auth.login(email, password);
-      this.toasts.show(`Bienvenido, ${user.name}`, 'success', 'Sesión iniciada');
+      const redirectTo = this.modal.consumeAuthRedirect();
+      this.toasts.show(`Bienvenido, ${user.name}`, 'success', 'Sesion iniciada');
       this.close();
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : 'No se pudo iniciar sesión.';
-      this.error.set(msg);
-      this.toasts.show(msg, 'danger', 'Error');
+      if (redirectTo) {
+        await this.router.navigateByUrl(redirectTo);
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'No se pudo iniciar sesion.';
+      this.error.set(message);
+      this.toasts.show(message, 'danger', 'Error');
     } finally {
       this.loading.set(false);
     }
   }
 
   forgotPassword(): void {
-    this.toasts.show('Te enviaremos un enlace cuando integremos el backend.', 'info', 'Recuperar contraseña');
+    this.toasts.show('La recuperacion de contrasena estara disponible en una siguiente etapa.', 'info', 'Ayuda');
   }
 }

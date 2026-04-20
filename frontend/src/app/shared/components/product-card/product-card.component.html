@@ -1,4 +1,8 @@
-<article class="card">
+<article
+  class="card"
+  [class.card--spotlight]="variant === 'spotlight'"
+  [class.card--highlight]="highlight && variant === 'spotlight'"
+>
   <a class="media" [routerLink]="['/products', product.slug]">
     <img [src]="product.imageUrl" [alt]="'Ilustración de ' + product.name" loading="lazy" />
     <button
@@ -30,12 +34,20 @@
     <div class="row">
       <p class="price">Desde <strong>{{ minPrice() | number : '1.2-2' }} €</strong></p>
       <div class="row-actions">
-        @if (showQuickView) {
+        @if (showQuickView && variant !== 'spotlight') {
           <button type="button" class="btn btn-secondary btn-sm" (click)="openQuickView($event)">
             Vista rápida
           </button>
         }
-        <a class="btn btn-ghost btn-sm" [routerLink]="['/products', product.slug]">Ver detalle</a>
+        <a
+          class="btn btn-sm"
+          [class.btn-ghost]="variant !== 'spotlight'"
+          [class.btn-secondary]="variant === 'spotlight'"
+          [class.btn-spotlight-cta]="variant === 'spotlight'"
+          [routerLink]="['/products', product.slug]"
+        >
+          {{ variant === 'spotlight' ? 'Ver producto' : 'Ver detalle' }}
+        </a>
       </div>
     </div>
   </div>
