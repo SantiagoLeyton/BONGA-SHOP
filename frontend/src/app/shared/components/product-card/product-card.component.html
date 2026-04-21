@@ -2,6 +2,7 @@
   class="card"
   [class.card--spotlight]="variant === 'spotlight'"
   [class.card--highlight]="highlight && variant === 'spotlight'"
+  [class.card--catalog-featured]="catalogFeatured && variant !== 'spotlight'"
 >
   <a class="media" [routerLink]="['/products', product.slug]">
     <img [src]="product.imageUrl" [alt]="'Ilustración de ' + product.name" loading="lazy" />

@@ -23,6 +23,8 @@ export class ProductCardComponent {
   @Input() variant: 'default' | 'spotlight' = 'default';
   /** Destaca la card (ej. producto central en Destacados) */
   @Input() highlight = false;
+  /** Primer producto / héroe visual en listados (ej. catálogo) */
+  @Input() catalogFeatured = false;
   @Output() quickView = new EventEmitter<Product>();
 
   readonly wished = computed(() => this.wishlist.has(this.product?.id));
