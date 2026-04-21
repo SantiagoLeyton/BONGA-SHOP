@@ -4,12 +4,12 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import gsap from 'gsap';
 import { map } from 'rxjs';
 import { MOCK_PRODUCTS } from '../../core/data/mock-products';
+import type { Product } from '../../core/models/product.model';
 import { AuthService } from '../../core/services/auth.service';
 import { ProductService } from '../../core/services/product.service';
 import { ModalService } from '../../core/services/modal.service';
 import { prefersReducedMotion, registerGsap } from '../../shared/animation/register-gsap';
 import { RevealScrollDirective } from '../../shared/directives/reveal-scroll.directive';
-import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
 
 function countVariants(products: typeof MOCK_PRODUCTS): number {
   return products.reduce((n, p) => n + p.variants.length, 0);
@@ -18,7 +18,7 @@ function countVariants(products: typeof MOCK_PRODUCTS): number {
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [RouterLink, RevealScrollDirective, ProductCardComponent],
+  imports: [RouterLink, RevealScrollDirective],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss',
 })
@@ -35,7 +35,7 @@ export class HomePageComponent {
   readonly heroLine2 = ['Sin', 'ruido.'];
 
   readonly featuredPicks = toSignal(
-    this.products.getFeaturedProducts().pipe(map((list) => list.slice(0, 4))),
+    this.products.getFeaturedProducts().pipe(map((list) => list.slice(0, 8))),
     { initialValue: [] },
   );
 
@@ -49,6 +49,7 @@ export class HomePageComponent {
   });
 
   readonly heroImageReady = signal(false);
+  readonly featuredActive = signal(0);
 
   readonly statTargets = {
     products: MOCK_PRODUCTS.length,
@@ -56,6 +57,7 @@ export class HomePageComponent {
   };
 
   private readonly heroSection = viewChild.required<ElementRef<HTMLElement>>('heroSection');
+  private readonly featuredTrack = viewChild<ElementRef<HTMLElement>>('featuredTrack');
   private readonly statProductsEl = viewChild<ElementRef<HTMLElement>>('statProducts');
   private readonly statVariantsEl = viewChild<ElementRef<HTMLElement>>('statVariants');
 
@@ -63,6 +65,7 @@ export class HomePageComponent {
     afterNextRender(() => {
       this.runHeroIntro();
       this.runHeroMicroMotion();
+      this.updateFeaturedActive();
     });
   }
 
@@ -82,6 +85,71 @@ export class HomePageComponent {
 
   openLegalInfo(): void {
     this.modals.openInfo();
+  }
+
+  featuredTag(product: Product): string {
+    switch (product.badge) {
+      case 'new':
+        return 'Nuevos sabores';
+      case 'popular':
+        return 'Top pedidos';
+      case 'low-stock':
+        return 'Selección limitada';
+      default:
+        return 'Colección destacada';
+    }
+  }
+
+  featuredFlavor(product: Product): string {
+    return product.variants[0]?.flavor ?? 'Blend premium';
+  }
+
+  scrollFeatured(direction: 1 | -1): void {
+    const track = this.featuredTrack()?.nativeElement;
+    if (!track) return;
+    const step = Math.max(track.clientWidth * 0.82, 280);
+    track.scrollBy({
+      left: step * direction,
+      behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+    });
+  }
+
+  scrollFeaturedTo(index: number): void {
+    const track = this.featuredTrack()?.nativeElement;
+    if (!track) return;
+    const cards = Array.from(track.querySelectorAll<HTMLElement>('.featured-showcase__item'));
+    const card = cards[index];
+    if (!card) return;
+    const left = card.offsetLeft - (track.clientWidth - card.offsetWidth) / 2;
+    track.scrollTo({
+      left: Math.max(0, left),
+      behavior: prefersReducedMotion() ? 'auto' : 'smooth',
+    });
+  }
+
+  onFeaturedScroll(): void {
+    this.updateFeaturedActive();
+  }
+
+  private updateFeaturedActive(): void {
+    const track = this.featuredTrack()?.nativeElement;
+    if (!track) return;
+    const cards = Array.from(track.querySelectorAll<HTMLElement>('.featured-showcase__item'));
+    if (!cards.length) return;
+    const center = track.scrollLeft + track.clientWidth / 2;
+    let closestIndex = 0;
+    let closestDistance = Number.POSITIVE_INFINITY;
+    cards.forEach((card, index) => {
+      const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+      const dist = Math.abs(cardCenter - center);
+      if (dist < closestDistance) {
+        closestDistance = dist;
+        closestIndex = index;
+      }
+    });
+    if (closestIndex !== this.featuredActive()) {
+      this.featuredActive.set(closestIndex);
+    }
   }
 
   private runHeroIntro(): void {
