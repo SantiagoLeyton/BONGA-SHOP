@@ -1,20 +1,16 @@
 <section class="hero hero--photo" #heroSection>
-  <!-- Lectura clara del titular: dos frases con respiro -->
   <div class="hero-media" [class.hero-media--ready]="heroImageReady()" aria-hidden="true">
-    <picture>
-      <source type="image/webp" srcset="/assets/home-hero-bg.webp" />
-      <img
-        class="hero-bg"
-        src="/assets/home-hero-bg.png"
-        width="1920"
-        height="1080"
-        alt=""
-        decoding="async"
-        fetchpriority="high"
-        (load)="onHeroImageLoad()"
-        (error)="onHeroImageLoad()"
-      />
-    </picture>
+    <img
+      class="hero-bg"
+      src="/assets/home-hero-bonga-vape.png"
+      width="1536"
+      height="1024"
+      alt=""
+      decoding="async"
+      fetchpriority="high"
+      (load)="onHeroImageLoad()"
+      (error)="onHeroImageLoad()"
+    />
   </div>
 
   <div class="hero-grain" aria-hidden="true"></div>
@@ -24,81 +20,80 @@
   <div class="hero-scrim" aria-hidden="true"></div>
   <div class="hero-vignette" aria-hidden="true"></div>
   <div class="hero-glow" aria-hidden="true"></div>
-  <!-- Refuerza lectura del copy sin tapar la foto -->
   <div class="hero-readability" aria-hidden="true"></div>
 
   <div class="container hero-inner">
     <div class="hero-copy">
-      <div class="hero-copy-card">
-        <p class="kicker hero-kicker">BONGA SHOP — vapes desechables</p>
+      <p class="kicker hero-kicker">BONGA SHOP — vapes desechables</p>
 
-        <div class="hero-badge hero-badge--pulse" aria-label="Promoción activa">
-          <span class="hero-badge__dot" aria-hidden="true"></span>
-          <span class="hero-badge__text">Nuevos sabores y envíos nacionales</span>
-        </div>
+      <div class="hero-badge hero-badge--pulse" aria-label="Promoción activa">
+        <span class="hero-badge__dot" aria-hidden="true"></span>
+        <span class="hero-badge__text">Nuevos sabores y envíos nacionales</span>
+      </div>
 
-        <h1 class="title hero-title">
-          <span class="hero-title__phrase">
-            @for (w of heroLine1; track $index) {
-              <span class="title-word">{{ w }}</span>
-              @if ($index < heroLine1.length - 1) {
-                <span class="title-space">&nbsp;</span>
-              }
+      <h1 class="title hero-title">
+        <span class="hero-title__phrase">
+          @for (w of heroLine1; track $index) {
+            <span class="title-word">{{ w }}</span>
+            @if ($index < heroLine1.length - 1) {
+              <span class="title-space">&nbsp;</span>
             }
-          </span>
-          <span class="hero-title__break" aria-hidden="true"></span>
-          <span class="hero-title__phrase">
-            @for (w of heroLine2; track $index) {
-              <span class="title-word">{{ w }}</span>
-              @if ($index < heroLine2.length - 1) {
-                <span class="title-space">&nbsp;</span>
-              }
-            }
-          </span>
-        </h1>
-
-        <p class="lead hero-lead">Vapes desechables, envío directo. Tú eliges el sabor</p>
-
-        <div class="hero-stats" aria-label="Datos del catálogo">
-          <div class="hero-stat">
-            <span class="hero-stat__value" #statProducts>0</span>
-            <span class="hero-stat__label">Productos</span>
-          </div>
-          <div class="hero-stat">
-            <span class="hero-stat__value" #statVariants>0</span>
-            <span class="hero-stat__label">Combinaciones sabor y mg</span>
-          </div>
-          <div class="hero-stat">
-            <span class="hero-stat__value hero-stat__value--text">24/7</span>
-            <span class="hero-stat__label">Compra online</span>
-          </div>
-        </div>
-
-        <div class="cta hero-cta">
-          <a class="btn btn-primary btn-lg hero-btn-primary" routerLink="/products">Ver colección</a>
-          <button type="button" class="btn btn-secondary btn-lg hero-btn-secondary" (click)="openBuyingInfo()">
-            Cómo comprar
-          </button>
-          @if (isAdmin()) {
-            <a class="btn btn-secondary btn-lg" routerLink="/admin">Panel admin</a>
-          } @else if (user()) {
-            <a class="btn btn-ghost btn-lg" routerLink="/orders">Mis pedidos</a>
           }
-        </div>
+        </span>
+        <span class="hero-title__break" aria-hidden="true"></span>
+        <span class="hero-title__phrase">
+          @for (w of heroLine2; track $index) {
+            <span class="title-word">{{ w }}</span>
+            @if ($index < heroLine2.length - 1) {
+              <span class="title-space">&nbsp;</span>
+            }
+          }
+        </span>
+      </h1>
 
-        <p class="fineprint hero-fine">
-          <span class="hero-fine__row">
-            <svg class="hero-fine__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-            </svg>
-            <span>Solo +18</span>
-            <button type="button" class="hero-fine__link" (click)="openLegalInfo()">Aviso legal</button>
-          </span>
-          <span class="hero-fine__sep" aria-hidden="true"> </span>
-          <span>Consume con responsabilidad</span>
-        </p>
+      <p class="lead hero-lead">Vapes desechables, envío directo. Tú eliges el sabor</p>
+    </div>
+
+    <div class="hero-actions">
+      <div class="cta hero-cta">
+        <a class="btn btn-primary btn-lg hero-btn-primary" routerLink="/products">Ver colección</a>
+        <button type="button" class="btn btn-secondary btn-lg hero-btn-secondary" (click)="openBuyingInfo()">
+          Cómo comprar
+        </button>
+        @if (isAdmin()) {
+          <a class="btn btn-secondary btn-lg" routerLink="/admin">Panel admin</a>
+        } @else if (user()) {
+          <a class="btn btn-ghost btn-lg" routerLink="/orders">Mis pedidos</a>
+        }
       </div>
     </div>
+
+    <div class="hero-stats" aria-label="Datos del catálogo">
+      <div class="hero-stat">
+        <span class="hero-stat__value" #statProducts>0</span>
+        <span class="hero-stat__label">Productos</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat__value" #statVariants>0</span>
+        <span class="hero-stat__label">Combinaciones sabor y mg</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat__value hero-stat__value--text">24/7</span>
+        <span class="hero-stat__label">Compra online</span>
+      </div>
+    </div>
+
+    <p class="fineprint hero-fine">
+      <span class="hero-fine__row">
+        <svg class="hero-fine__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+        </svg>
+        <span>Solo +18</span>
+        <button type="button" class="hero-fine__link" (click)="openLegalInfo()">Aviso legal</button>
+      </span>
+      <span class="hero-fine__sep" aria-hidden="true"> </span>
+      <span>Consume con responsabilidad</span>
+    </p>
   </div>
 
   <button type="button" class="hero-scroll-min" (click)="scrollToDestacados()" aria-label="Ir a destacados">
@@ -126,24 +121,74 @@
   <div class="container section--featured__wrap">
     <header class="featured-head" appRevealScroll>
       <h2 class="featured-head__title">Destacados</h2>
-      <p class="featured-head__sub">Los sabores más buscados ahora mismo</p>
+      <p class="featured-head__sub">
+        Una vitrina visual de lo más buscado: sabores premium, selección limitada y lanzamientos que marcan tendencia.
+      </p>
     </header>
 
-    <div class="featured-grid" [attr.data-featured-count]="featuredPicks().length">
-      @for (p of featuredPicks(); track p.id; let i = $index) {
-        <div class="featured-grid__cell" appRevealScroll [appRevealDelay]="i * 0.06">
-          <app-product-card
-            [product]="p"
-            variant="spotlight"
-            [highlight]="featuredPicks().length > 1 && i === featuredCenterIndex()"
-            [showQuickView]="false"
-          />
-        </div>
-      }
+    <div class="featured-showcase" appRevealScroll>
+      <div class="featured-showcase__controls">
+        <button
+          type="button"
+          class="featured-showcase__ctrl"
+          (click)="scrollFeatured(-1)"
+          aria-label="Ver destacados anteriores"
+        >
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          class="featured-showcase__ctrl"
+          (click)="scrollFeatured(1)"
+          aria-label="Ver más destacados"
+        >
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+
+      <div
+        class="featured-showcase__track"
+        #featuredTrack
+        (scroll)="onFeaturedScroll()"
+        tabindex="0"
+        aria-label="Colecciones destacadas"
+      >
+        @for (p of featuredPicks(); track p.id; let i = $index) {
+          <article class="featured-showcase__item" [class.is-active]="featuredActive() === i">
+            <a class="featured-showcase__media" [routerLink]="['/products', p.slug]" [attr.aria-label]="'Explorar ' + p.name">
+              <span class="featured-showcase__halo" aria-hidden="true"></span>
+              <img [src]="p.imageUrl" [alt]="p.name" loading="lazy" />
+            </a>
+            <div class="featured-showcase__body">
+              <p class="featured-showcase__tag">{{ featuredTag(p) }}</p>
+              <h3 class="featured-showcase__name">{{ p.name }}</h3>
+              <p class="featured-showcase__meta">{{ p.brand.name }} · {{ featuredFlavor(p) }}</p>
+              <a class="featured-showcase__cta" [routerLink]="['/products', p.slug]">Explorar</a>
+            </div>
+          </article>
+        }
+      </div>
+
+      <div class="featured-showcase__dots" role="tablist" aria-label="Navegar destacados">
+        @for (p of featuredPicks(); track p.id; let i = $index) {
+          <button
+            type="button"
+            class="featured-showcase__dot"
+            [class.is-active]="featuredActive() === i"
+            [attr.aria-label]="'Ir al destacado ' + (i + 1)"
+            [attr.aria-selected]="featuredActive() === i"
+            (click)="scrollFeaturedTo(i)"
+          ></button>
+        }
+      </div>
     </div>
 
     <p class="featured-more" appRevealScroll>
-      <a class="featured-more__link" routerLink="/products">Ver catálogo completo</a>
+      <a class="featured-more__link" routerLink="/products">Explorar todo el catálogo</a>
     </p>
   </div>
 </section>
