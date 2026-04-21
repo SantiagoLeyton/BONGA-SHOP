@@ -782,13 +782,16 @@
    COMPARE FLOATING BAR
    ========================================================== */
 .cbar {
+  --cbar-offset: 0px;
+  --cbar-base: clamp(0.9rem, 2.5vw, 1.5rem);
   position: fixed;
   left: 50%;
-  bottom: clamp(0.9rem, 2.5vw, 1.5rem);
+  bottom: calc(var(--cbar-base) + var(--cbar-offset));
   transform: translateX(-50%);
   z-index: 80;
   width: min(960px, calc(100% - 1.5rem));
   animation: cbarIn 320ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  transition: bottom 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @keyframes cbarIn {

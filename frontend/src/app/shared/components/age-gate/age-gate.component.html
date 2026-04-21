@@ -1,0 +1,139 @@
+@if (isOpen()) {
+  <div class="age-gate" role="dialog" aria-modal="true" aria-labelledby="age-gate-title">
+    <div class="age-gate__scrim" aria-hidden="true"></div>
+    <div class="age-gate__glow age-gate__glow--a" aria-hidden="true"></div>
+    <div class="age-gate__glow age-gate__glow--b" aria-hidden="true"></div>
+
+    <section class="age-gate__card">
+      <header class="age-gate__head">
+        <span class="age-gate__badge" aria-hidden="true">
+          <span>{{ minAge }}+</span>
+        </span>
+        <p class="age-gate__kicker">Verificación de edad</p>
+        <h2 id="age-gate-title" class="age-gate__title">
+          @if (!blocked()) {
+            Confirma que eres mayor de {{ minAge }}
+          } @else {
+            Acceso no permitido
+          }
+        </h2>
+        <p class="age-gate__sub">
+          @if (!blocked()) {
+            Este sitio comercializa productos de nicotina. Ingresa tu fecha de nacimiento para continuar.
+          } @else {
+            Según la fecha ingresada, no cumples con la edad mínima requerida para acceder a este catálogo.
+          }
+        </p>
+      </header>
+
+      @if (!blocked()) {
+        <form class="age-gate__form" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+          <fieldset class="age-gate__dob" aria-describedby="age-gate-legal">
+            <legend class="age-gate__label">Fecha de nacimiento</legend>
+
+            <div class="age-gate__grid">
+              <div class="age-gate__col age-gate__col--day">
+                <label class="age-gate__sublabel" for="age-gate-day">Día</label>
+                <div class="age-gate__select-wrap">
+                  <select
+                    id="age-gate-day"
+                    formControlName="day"
+                    class="age-gate__select"
+                    autocomplete="bday-day"
+                    required
+                  >
+                    <option value="" disabled hidden>DD</option>
+                    @for (d of days(); track d) {
+                      <option [value]="d">{{ d }}</option>
+                    }
+                  </select>
+                  <svg class="age-gate__chev" viewBox="0 0 24 24" width="12" height="12" fill="none" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+
+              <div class="age-gate__col age-gate__col--month">
+                <label class="age-gate__sublabel" for="age-gate-month">Mes</label>
+                <div class="age-gate__select-wrap">
+                  <select
+                    id="age-gate-month"
+                    formControlName="month"
+                    class="age-gate__select"
+                    autocomplete="bday-month"
+                    required
+                  >
+                    <option value="" disabled hidden>Mes</option>
+                    @for (m of months; track m.value) {
+                      <option [value]="m.value">{{ m.label }}</option>
+                    }
+                  </select>
+                  <svg class="age-gate__chev" viewBox="0 0 24 24" width="12" height="12" fill="none" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+
+              <div class="age-gate__col age-gate__col--year">
+                <label class="age-gate__sublabel" for="age-gate-year">Año</label>
+                <div class="age-gate__select-wrap">
+                  <select
+                    id="age-gate-year"
+                    formControlName="year"
+                    class="age-gate__select"
+                    autocomplete="bday-year"
+                    required
+                  >
+                    <option value="" disabled hidden>AAAA</option>
+                    @for (y of years; track y) {
+                      <option [value]="y">{{ y }}</option>
+                    }
+                  </select>
+                  <svg class="age-gate__chev" viewBox="0 0 24 24" width="12" height="12" fill="none" aria-hidden="true">
+                    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </fieldset>
+
+          @if (currentAge() !== null && currentAge()! >= 0 && currentAge()! <= maxAge) {
+            <p class="age-gate__age" aria-live="polite">
+              Tienes <strong>{{ currentAge() }}</strong> año{{ currentAge() === 1 ? '' : 's' }}.
+            </p>
+          }
+
+          @if (error()) {
+            <p class="age-gate__error" role="alert">{{ error() }}</p>
+          }
+
+          <button
+            type="submit"
+            class="age-gate__submit"
+            [disabled]="submitting()"
+            [attr.aria-busy]="submitting()"
+          >
+            <span>Entrar al sitio</span>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+
+          <p id="age-gate-legal" class="age-gate__legal">
+            Al continuar, confirmas que eres mayor de {{ minAge }} años y aceptas las normativas locales aplicables.
+          </p>
+        </form>
+      } @else {
+        <div class="age-gate__blocked">
+          <p class="age-gate__blocked-copy">
+            Lo sentimos, <strong>BONGA SHOP</strong> solo está disponible para personas mayores de
+            {{ minAge }} años. No puedes acceder al catálogo.
+          </p>
+          <button type="button" class="age-gate__retry" (click)="retry()">
+            Ingresé una fecha incorrecta
+          </button>
+        </div>
+      }
+    </section>
+  </div>
+}

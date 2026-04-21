@@ -190,7 +190,12 @@
 
 <!-- Compare floating bar -->
 @if (selectedCount() > 0) {
-  <div class="cbar" role="region" aria-label="Comparación de productos">
+  <div
+    class="cbar"
+    role="region"
+    aria-label="Comparación de productos"
+    [style.--cbar-offset.px]="cbarOffset()"
+  >
     <div class="cbar__inner">
       <div class="cbar__left">
         <span class="cbar__icon" aria-hidden="true">

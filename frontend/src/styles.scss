@@ -64,7 +64,8 @@ body {
  * Bloquea el scroll del body cuando el drawer móvil del navbar está abierto.
  * La clase la gestiona NavbarComponent mediante un effect().
  */
-body.is-nav-open {
+body.is-nav-open,
+body.is-age-gate-open {
   overflow: hidden;
 }
 

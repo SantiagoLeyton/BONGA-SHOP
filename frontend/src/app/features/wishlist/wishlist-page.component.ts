@@ -40,6 +40,8 @@ export class WishlistPageComponent {
   /** IDs seleccionados para comparar (max 3) */
   readonly selectedIds = signal<string[]>([]);
   readonly compareOpen = signal(false);
+  /** Desplazamiento vertical para que la barra de comparar no tape el footer */
+  readonly cbarOffset = signal(0);
 
   readonly items = computed<Product[]>(() => {
     const ids = this.wishlist.list();
@@ -269,6 +271,27 @@ export class WishlistPageComponent {
   onEscape(): void {
     if (this.compareOpen()) {
       this.closeCompare();
+    }
+  }
+
+  @HostListener('window:scroll')
+  @HostListener('window:resize')
+  onScroll(): void {
+    this.updateCbarOffset();
+  }
+
+  private updateCbarOffset(): void {
+    if (typeof window === 'undefined' || typeof document === 'undefined') return;
+    const footer = document.querySelector('.footer') as HTMLElement | null;
+    if (!footer) {
+      if (this.cbarOffset() !== 0) this.cbarOffset.set(0);
+      return;
+    }
+    const rect = footer.getBoundingClientRect();
+    const overlap = Math.max(0, window.innerHeight - rect.top);
+    const next = Math.round(overlap);
+    if (next !== this.cbarOffset()) {
+      this.cbarOffset.set(next);
     }
   }
 }

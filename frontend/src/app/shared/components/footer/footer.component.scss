@@ -208,29 +208,43 @@
 }
 
 .footer__btn--primary {
-  border: 1px solid rgba(94, 234, 212, 0.45);
-  background: linear-gradient(180deg, rgba(94, 234, 212, 0.26), rgba(45, 212, 191, 0.18));
-  color: #052e21;
-  box-shadow: 0 10px 24px rgba(45, 212, 191, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.28);
+  border: 1px solid rgba(94, 234, 212, 0.7);
+  background: linear-gradient(180deg, #5eead4 0%, #2dd4bf 100%);
+  color: #042f2e;
+  font-weight: 800;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.25);
+  box-shadow: 0 10px 24px rgba(45, 212, 191, 0.35),
+    0 0 22px rgba(94, 234, 212, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -1px 0 rgba(6, 78, 59, 0.25);
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 14px 28px rgba(45, 212, 191, 0.28),
-      inset 0 1px 0 rgba(255, 255, 255, 0.35);
-    filter: brightness(1.04);
+    background: linear-gradient(180deg, #7df0dc 0%, #3fdec6 100%);
+    border-color: rgba(94, 234, 212, 0.95);
+    box-shadow: 0 14px 30px rgba(45, 212, 191, 0.45),
+      0 0 30px rgba(94, 234, 212, 0.35),
+      inset 0 1px 0 rgba(255, 255, 255, 0.55),
+      inset 0 -1px 0 rgba(6, 78, 59, 0.3);
   }
 }
 
 .footer__btn--ghost {
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  background: transparent;
-  color: rgba(226, 232, 240, 0.92);
+  border: 1px solid rgba(94, 234, 212, 0.45);
+  background: linear-gradient(180deg, rgba(94, 234, 212, 0.14), rgba(45, 212, 191, 0.08));
+  color: #d6fff5;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(94, 234, 212, 0.35);
+  box-shadow: 0 6px 16px rgba(45, 212, 191, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 
   &:hover {
-    color: #f4f7fb;
-    border-color: rgba(94, 234, 212, 0.35);
-    background: rgba(148, 163, 184, 0.06);
+    transform: translateY(-1px);
+    color: #ecfffa;
+    border-color: rgba(94, 234, 212, 0.7);
+    background: linear-gradient(180deg, rgba(94, 234, 212, 0.22), rgba(45, 212, 191, 0.14));
+    box-shadow: 0 10px 22px rgba(45, 212, 191, 0.24),
+      inset 0 1px 0 rgba(255, 255, 255, 0.14);
   }
 }
 
