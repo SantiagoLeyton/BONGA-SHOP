@@ -17,6 +17,8 @@ type OrderView = Order & { linesCount: number };
 export class OrdersPageComponent {
   private readonly orders = inject(OrderService);
   readonly loading = signal(true);
+  /** IDs de pedidos cerrados manualmente; por defecto todos estan abiertos. */
+  private readonly collapsedIds = signal<Set<string>>(new Set());
 
   readonly list = computed<OrderView[]>(() =>
     this.orders.list().map((order) => ({
@@ -33,23 +35,40 @@ export class OrdersPageComponent {
     return order.total;
   }
 
+  isExpanded(id: string): boolean {
+    return !this.collapsedIds().has(id);
+  }
+
+  toggleExpanded(id: string): void {
+    const current = this.collapsedIds();
+    const next = new Set(current);
+    if (next.has(id)) {
+      next.delete(id);
+    } else {
+      next.add(id);
+    }
+    this.collapsedIds.set(next);
+  }
+
   statusLabel(status: Order['status']): string {
     switch (status) {
       case 'processing':
         return 'Procesando';
       case 'shipped':
-        return 'Enviada';
+        return 'En camino';
       case 'delivered':
-        return 'Entregada';
+        return 'Entregado';
       case 'cancelled':
-        return 'Cancelada';
+        return 'Cancelado';
       case 'created':
       default:
-        return 'Creada';
+        return 'Creado';
     }
   }
 
   statusClass(status: Order['status']): string {
     return `pill pill--${status}`;
   }
+
+  trackLine = (index: number, line: { variantId: string }): string => `${line.variantId}-${index}`;
 }

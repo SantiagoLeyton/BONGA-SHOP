@@ -25,18 +25,27 @@ export class LoginModalComponent {
   readonly showPassword = signal(false);
 
   readonly form = new FormGroup({
+    /**
+     * Solo exigimos que no esté vacío. El formato lo valida el backend
+     * (y ya normalizamos con trim + toLowerCase al enviar).
+     */
     email: new FormControl<string>('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.email],
+      validators: [Validators.required],
     }),
+    /**
+     * En un login NO aplicamos reglas de complejidad (minLength, mayúsculas, etc.).
+     * Eso es responsabilidad del registro. Aquí solo exigimos que no esté vacío
+     * para no bloquear a usuarios cuyas credenciales ya fueron aceptadas antes.
+     */
     password: new FormControl<string>('', {
       nonNullable: true,
-      validators: [Validators.required, Validators.minLength(8)],
+      validators: [Validators.required],
     }),
     remember: new FormControl<boolean>(true, { nonNullable: true }),
   });
 
-  readonly canSubmit = computed(() => this.form.valid && !this.loading());
+  readonly canSubmit = computed(() => !this.loading());
 
   close(): void {
     this.modal.close();
@@ -64,21 +73,21 @@ export class LoginModalComponent {
       const { email, password } = this.form.getRawValue();
       const user = await this.auth.login(email, password);
       const redirectTo = this.modal.consumeAuthRedirect();
-      this.toasts.show(`Bienvenido, ${user.name}`, 'success', 'Sesion iniciada');
+      this.toasts.show(`Bienvenido, ${user.name}`, 'success', 'Sesión iniciada');
       this.close();
       if (redirectTo) {
         await this.router.navigateByUrl(redirectTo);
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'No se pudo iniciar sesion.';
+      const message = error instanceof Error ? error.message : 'No se pudo iniciar sesión.';
       this.error.set(message);
-      this.toasts.show(message, 'danger', 'Error');
+      this.toasts.show(message, 'danger', 'Error al iniciar sesión');
     } finally {
       this.loading.set(false);
     }
   }
 
   forgotPassword(): void {
-    this.toasts.show('La recuperacion de contrasena estara disponible en una siguiente etapa.', 'info', 'Ayuda');
+    this.toasts.show('La recuperación de contraseña estará disponible en una próxima etapa.', 'info', 'Ayuda');
   }
 }

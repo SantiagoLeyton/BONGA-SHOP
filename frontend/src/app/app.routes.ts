@@ -49,6 +49,12 @@ export const routes: Routes = [
           import('./features/orders/orders-page.component').then((m) => m.OrdersPageComponent),
       },
       {
+        path: 'account',
+        canActivate: [authGuard],
+        loadComponent: () =>
+          import('./features/account/account-page.component').then((m) => m.AccountPageComponent),
+      },
+      {
         path: 'admin',
         canActivate: [adminGuard],
         loadComponent: () =>

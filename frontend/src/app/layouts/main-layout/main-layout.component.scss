@@ -7,6 +7,12 @@
 .main {
   flex: 1;
   outline: none;
+  /**
+   * El header es sticky; este padding evita que el primer contenido
+   * quede rozando el borde inferior del navbar en páginas que no
+   * traen hero superior con su propio respiro.
+   */
+  padding-top: 0.5rem;
 }
 
 .route-wrap {

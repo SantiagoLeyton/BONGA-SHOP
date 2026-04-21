@@ -11,16 +11,27 @@
   </div>
 
   <div class="steps" aria-label="Progreso">
-    <div class="step" [class.on]="step() === 'address' || step() === 'review' || step() === 'confirm' || step() === 'done'">
-      <span class="dot">1</span><span>Entrega</span>
+    <div
+      class="step"
+      [class.on]="step() === 'address'"
+      [class.is-done]="step() === 'review' || step() === 'confirm' || step() === 'done'"
+    >
+      <span class="dot"><span class="dot-num">1</span></span>
+      <span class="step-label">Entrega</span>
     </div>
-    <div class="line"></div>
-    <div class="step" [class.on]="step() === 'review' || step() === 'confirm' || step() === 'done'">
-      <span class="dot">2</span><span>Revision</span>
+    <div class="line" [class.line--on]="step() === 'review' || step() === 'confirm' || step() === 'done'"></div>
+    <div
+      class="step"
+      [class.on]="step() === 'review'"
+      [class.is-done]="step() === 'confirm' || step() === 'done'"
+    >
+      <span class="dot"><span class="dot-num">2</span></span>
+      <span class="step-label">Revisión</span>
     </div>
-    <div class="line"></div>
-    <div class="step" [class.on]="step() === 'confirm' || step() === 'done'">
-      <span class="dot">3</span><span>Confirmacion</span>
+    <div class="line" [class.line--on]="step() === 'confirm' || step() === 'done'"></div>
+    <div class="step" [class.on]="step() === 'confirm'" [class.is-done]="step() === 'done'">
+      <span class="dot"><span class="dot-num">3</span></span>
+      <span class="step-label">Confirmación</span>
     </div>
   </div>
 
@@ -35,7 +46,13 @@
   } @else if (step() === 'address') {
     <section class="panel">
       <h2>Datos de entrega</h2>
-      <p class="panel-copy">Usaremos esta informacion para registrar tu pedido y mantener el seguimiento claro.</p>
+      <p class="panel-copy">Usaremos esta información para registrar tu pedido y mantener el seguimiento claro.</p>
+      @if (prefilledFromAccount()) {
+        <p class="account-notice" role="status" aria-live="polite">
+          <span class="account-notice__dot" aria-hidden="true"></span>
+          Datos autocompletados desde <a routerLink="/account">Mi cuenta</a>. Puedes ajustarlos solo para este pedido.
+        </p>
+      }
       <form class="form" [formGroup]="addressForm" (ngSubmit)="nextFromAddress()">
         <label class="field">
           <span>Nombre <span class="required-mark">*</span></span>
@@ -46,9 +63,19 @@
         </label>
         <label class="field">
           <span>Telefono <span class="required-mark">*</span></span>
-          <input formControlName="phone" inputmode="tel" placeholder="+57..." [attr.aria-invalid]="fieldInvalid('phone')" />
-          @if (fieldInvalid('phone')) {
-            <span class="field-error">Ingresa un telefono valido para coordinar la entrega.</span>
+          <input
+            formControlName="phone"
+            type="tel"
+            inputmode="numeric"
+            autocomplete="tel"
+            pattern="\+?[0-9]{10,15}"
+            maxlength="16"
+            placeholder="+57 3001234567"
+            (input)="onPhoneInput($event)"
+            [attr.aria-invalid]="fieldInvalid('phone')"
+          />
+          @if (phoneErrorMessage(); as message) {
+            <span class="field-error" role="alert">{{ message }}</span>
           }
         </label>
         <label class="field">
@@ -74,20 +101,28 @@
         <div class="form-actions">
           <button type="submit" class="btn btn-primary btn-lg" [disabled]="addressForm.invalid">Continuar</button>
         </div>
+        <ul class="trust" aria-label="Información de confianza">
+          <li><span class="trust-dot"></span>Tus datos se usan solo para registrar esta orden.</li>
+          <li><span class="trust-dot"></span>Revisarás tu pedido antes de confirmarlo.</li>
+          <li><span class="trust-dot"></span>Conexión protegida, sin compartir con terceros.</li>
+        </ul>
       </form>
     </section>
   } @else if (step() === 'review') {
     <section class="panel">
-      <h2>Revision del pedido</h2>
-      <p class="panel-copy">Confirma que tus datos esten bien antes de pasar a la confirmacion final.</p>
-      <div class="summary">
+      <h2>Revisión del pedido</h2>
+      <p class="panel-copy">Confirma que tus datos estén bien antes de pasar a la confirmación final.</p>
+      <div class="summary summary--review">
+        <p class="summary-label">Datos de contacto</p>
         <div class="row"><span>Cliente</span><strong>{{ addressForm.controls.name.value }}</strong></div>
-        <div class="row"><span>Telefono</span><strong>{{ addressForm.controls.phone.value }}</strong></div>
+        <div class="row"><span>Teléfono</span><strong>{{ addressForm.controls.phone.value }}</strong></div>
+        <p class="summary-label">Entrega</p>
         <div class="row"><span>Ciudad</span><strong>{{ addressForm.controls.city.value }}</strong></div>
-        <div class="row"><span>Direccion</span><strong>{{ addressForm.controls.address1.value }}</strong></div>
+        <div class="row"><span>Dirección</span><strong>{{ addressForm.controls.address1.value }}</strong></div>
         @if (addressForm.controls.notes.value) {
           <div class="row"><span>Notas</span><strong>{{ addressForm.controls.notes.value }}</strong></div>
         }
+        <p class="summary-label">Pedido</p>
         <div class="row"><span>Productos</span><strong>{{ subtotal() | appCurrency }}</strong></div>
         <div class="row total"><span>Total estimado</span><strong>{{ total() | appCurrency }}</strong></div>
       </div>
@@ -98,16 +133,17 @@
     </section>
   } @else if (step() === 'confirm') {
     <section class="panel">
-      <h2>Confirmacion final</h2>
-      <p class="sub">Al confirmar, validamos stock, descontamos inventario y registramos la orden en tu cuenta.</p>
+      <h2>Confirmación final</h2>
+      <p class="panel-copy">Al confirmar, validamos stock, descontamos inventario y registramos la orden en tu cuenta.</p>
 
-      <div class="summary">
+      <div class="summary summary--confirm">
+        <p class="summary-label">Resumen</p>
         <div class="row"><span>Productos</span><strong>{{ subtotal() | appCurrency }}</strong></div>
         <div class="row total"><span>Total final</span><strong>{{ total() | appCurrency }}</strong></div>
       </div>
 
       <div class="nav">
-        <button type="button" class="btn btn-ghost" (click)="back()">Volver</button>
+        <button type="button" class="btn btn-ghost" (click)="back()" [disabled]="placing()">Volver</button>
         <button
           type="button"
           class="btn btn-primary btn-lg"
@@ -119,13 +155,24 @@
           @if (placing()) { Confirmando pedido... } @else { Confirmar compra }
         </button>
       </div>
-      <p class="hint">Tu carrito se convierte en orden y queda disponible en el historial apenas se confirme.</p>
+      <ul class="trust trust--confirm" aria-label="Información de seguridad">
+        <li><span class="trust-dot"></span>Compra segura con conexión protegida.</li>
+        <li><span class="trust-dot"></span>Orden registrada contra inventario real.</li>
+        <li><span class="trust-dot"></span>Recibirás el detalle en tu historial de pedidos.</li>
+      </ul>
     </section>
   } @else {
     <section class="done">
-      <h2>Pedido confirmado</h2>
-      <p class="muted">Tu compra quedo registrada correctamente y ya puedes seguir su estado desde tu cuenta.</p>
-      <p class="oid"><strong>#{{ orderId() }}</strong></p>
+      <div class="done__badge" aria-hidden="true">
+        <span class="done__check"></span>
+      </div>
+      <p class="done__eyebrow">Pedido confirmado</p>
+      <h2>Tu orden ha sido registrada con éxito</h2>
+      <p class="muted">Guardamos el detalle en tu historial para que puedas seguir su estado cuando quieras.</p>
+      <div class="receipt" aria-label="Número de orden">
+        <span class="receipt__label">Número de orden</span>
+        <p class="oid"><strong>#{{ orderId() }}</strong></p>
+      </div>
       <div class="nav">
         <a class="btn btn-ghost" routerLink="/products">Seguir comprando</a>
         <a class="btn btn-primary" routerLink="/orders">Ver mis pedidos</a>

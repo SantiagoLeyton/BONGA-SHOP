@@ -1,29 +1,127 @@
-<footer class="footer">
-  <div class="container footer-grid">
-    <div>
-      <p class="eyebrow">BONGA SHOP</p>
-      <p class="muted">
-        Vapes desechables con estética urbana. Catálogo visual preparado para integración con backend y carrito.
+<footer class="footer" role="contentinfo">
+  <div class="footer__glow footer__glow--a" aria-hidden="true"></div>
+  <div class="footer__glow footer__glow--b" aria-hidden="true"></div>
+
+  <div class="container footer__top">
+    <section class="footer__brand" aria-label="Sobre BONGA SHOP">
+      <a class="footer__mark" routerLink="/" aria-label="BONGA SHOP">
+        <span class="footer__mark-badge" aria-hidden="true">
+          <span>B</span>
+        </span>
+        <span class="footer__mark-text">
+          <strong>BONGA</strong>
+          <em>SHOP</em>
+        </span>
+      </a>
+      <p class="footer__tagline">Marketplace premium de vapes desechables.</p>
+      <p class="footer__copy">
+        Curamos marcas, sabores y experiencias. Checkout rápido, favoritos reales y seguimiento claro de cada pedido.
       </p>
-    </div>
-    <div>
-      <p class="eyebrow">Explorar</p>
-      <ul class="list">
+
+      <div class="footer__ctas">
+        <a class="footer__btn footer__btn--primary" routerLink="/products">
+          <span>Explorar catálogo</span>
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
+            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </a>
+        @if (!isAuthed()) {
+          <button type="button" class="footer__btn footer__btn--ghost" (click)="openRegister()">
+            Crear cuenta
+          </button>
+        } @else {
+          <a class="footer__btn footer__btn--ghost" routerLink="/account">Mi cuenta</a>
+        }
+      </div>
+
+      <ul class="footer__perks" aria-label="Ventajas">
+        <li><span class="footer__dot" aria-hidden="true"></span>Stock real contra inventario</li>
+        <li><span class="footer__dot" aria-hidden="true"></span>Conexión protegida</li>
+        <li><span class="footer__dot" aria-hidden="true"></span>Seguimiento de pedidos</li>
+      </ul>
+    </section>
+
+    <nav class="footer__col" aria-label="Explorar">
+      <p class="footer__eyebrow">Explorar</p>
+      <ul class="footer__list">
         <li><a routerLink="/">Inicio</a></li>
         <li><a routerLink="/products">Productos</a></li>
-        <li><a routerLink="/admin">Panel admin</a></li>
+        @if (isAuthed()) {
+          <li><a routerLink="/wishlist">Favoritos</a></li>
+          <li><a routerLink="/orders">Mis pedidos</a></li>
+        }
+        @if (isAdmin()) {
+          <li><a class="footer__list-admin" routerLink="/admin">Panel admin</a></li>
+        }
       </ul>
-    </div>
-    <div>
-      <p class="eyebrow">Equipo</p>
-      <p class="muted small">Experiencia pensada para comprar, volver a favoritos y seguir tus pedidos con claridad.</p>
+    </nav>
+
+    <nav class="footer__col" aria-label="Tu cuenta">
+      <p class="footer__eyebrow">Tu cuenta</p>
+      <ul class="footer__list">
+        @if (isAuthed()) {
+          <li><a routerLink="/account">Mi cuenta</a></li>
+          <li><a routerLink="/cart">Carrito</a></li>
+          <li><a routerLink="/checkout">Checkout</a></li>
+        } @else {
+          <li>
+            <button type="button" class="footer__list-btn" (click)="openRegister()">
+              Crear cuenta
+            </button>
+          </li>
+          <li><a routerLink="/products">Ver catálogo</a></li>
+        }
+      </ul>
+    </nav>
+
+    <div class="footer__col" aria-label="Información">
+      <p class="footer__eyebrow">Información</p>
+      <ul class="footer__list">
+        <li>
+          <button type="button" class="footer__list-btn" (click)="openInfo()">
+            Sobre el proyecto
+          </button>
+        </li>
+        <li>
+          <button type="button" class="footer__list-btn" (click)="openInfo()">
+            Equipo y créditos
+          </button>
+        </li>
+        <li>
+          <a href="mailto:hola@bonga.shop">Contáctanos</a>
+        </li>
+      </ul>
+      <p class="footer__note">
+        Producto mayor de edad. Verifica tu país y normativas locales.
+      </p>
     </div>
   </div>
-  <div class="container bottom">
-    <span>© {{ year }} BONGA SHOP</span>
-    <span class="muted small"
-      >Proyecto académico / profesional ·
-      <button type="button" class="linkish" (click)="openInfo()">Modal informativo</button></span
+
+  <div class="container footer__bottom">
+    <p class="footer__legal">
+      <span>© {{ year }} <strong>BONGA SHOP</strong></span>
+      <span class="footer__sep" aria-hidden="true"></span>
+      <span>Todos los derechos reservados.</span>
+    </p>
+
+    <div class="footer__meta">
+      <button type="button" class="footer__linkish" (click)="openInfo()">
+        Proyecto académico / profesional
+      </button>
+      <span class="footer__sep" aria-hidden="true"></span>
+      <span class="footer__version">v1.0 · build {{ year }}</span>
+    </div>
+
+    <button
+      type="button"
+      class="footer__top-btn"
+      (click)="scrollToTop()"
+      aria-label="Volver al inicio de la página"
     >
+      <span>Volver arriba</span>
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
+        <path d="M6 14l6-6 6 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
   </div>
 </footer>

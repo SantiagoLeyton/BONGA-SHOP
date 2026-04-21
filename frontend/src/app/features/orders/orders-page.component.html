@@ -1,4 +1,7 @@
 <div class="container orders">
+  <div class="orders__glow orders__glow--a" aria-hidden="true"></div>
+  <div class="orders__glow orders__glow--b" aria-hidden="true"></div>
+
   <div class="head">
     <div>
       <p class="kicker">Mi cuenta</p>
@@ -12,38 +15,146 @@
   </div>
 
   @if (loading()) {
-    <section class="grid" aria-label="Cargando pedidos">
-      @for (item of [1, 2]; track item) {
-        <article class="card loading-card">
-          <span class="loading-line loading-line--short"></span>
-          <span class="loading-line loading-line--mid"></span>
-          <span class="loading-line"></span>
+    <section class="list" aria-label="Cargando pedidos">
+      @for (item of [1, 2, 3]; track item) {
+        <article class="card card--loading" aria-hidden="true">
+          <div class="card__head">
+            <span class="loading-line loading-line--short"></span>
+            <span class="loading-line loading-line--mid"></span>
+            <span class="loading-line loading-line--short"></span>
+          </div>
+          <div class="card__body">
+            <span class="loading-line"></span>
+            <span class="loading-line loading-line--mid"></span>
+          </div>
         </article>
       }
     </section>
   } @else if (!list().length) {
-    <section class="empty empty-state">
-      <h2>Aun no tienes pedidos</h2>
-      <p class="muted">Cuando completes tu primera compra, aqui veras el estado y total de cada orden.</p>
-      <a class="btn btn-primary" routerLink="/products">Explorar catalogo</a>
+    <section class="empty">
+      <div class="empty__icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48" fill="none" width="44" height="44">
+          <path d="M8 16l16-8 16 8-16 8-16-8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M8 16v18l16 8V24" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M40 16v18l-16 8" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M16 12l16 8" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2>Aún no tienes pedidos</h2>
+      <p class="muted">Cuando completes tu primera compra, aquí verás el estado, los productos y el total de cada orden.</p>
+      <a class="btn btn-primary" routerLink="/products">Explorar productos</a>
     </section>
   } @else {
-    <section class="grid" aria-label="Ordenes">
+    <p class="list-caption" role="status">
+      {{ list().length }} {{ list().length === 1 ? 'pedido registrado' : 'pedidos registrados' }}
+    </p>
+    <section class="list" aria-label="Órdenes">
       @for (order of list(); track order.id) {
-        <article class="card">
-          <div class="row">
-            <div>
-              <p class="id">Pedido #{{ order.id }}</p>
-              <p class="muted small">{{ order.createdAt | date : 'medium' }}</p>
+        <article
+          class="card"
+          [class.card--open]="isExpanded(order.id)"
+          [attr.data-status]="order.status"
+        >
+          <button
+            type="button"
+            class="card__head"
+            [attr.aria-expanded]="isExpanded(order.id)"
+            [attr.aria-controls]="'order-' + order.id"
+            (click)="toggleExpanded(order.id)"
+          >
+            <div class="card__lead">
+              <p class="card__id">Pedido <span class="card__id-num">#{{ order.id }}</span></p>
+              <p class="card__date">{{ order.createdAt | date : 'medium' }}</p>
             </div>
-            <span [class]="statusClass(order.status)">{{ statusLabel(order.status) }}</span>
+
+            <div class="card__status">
+              <span [class]="statusClass(order.status)">
+                <span class="pill__dot" aria-hidden="true"></span>
+                {{ statusLabel(order.status) }}
+              </span>
+            </div>
+
+            <div class="card__total">
+              <span class="card__total-label">Total</span>
+              <span class="card__total-value">{{ orderTotal(order) | appCurrency }}</span>
+            </div>
+
+            <span class="card__chevron" aria-hidden="true">
+              <svg viewBox="0 0 16 16" width="14" height="14" fill="none">
+                <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </button>
+
+          <div class="card__summary">
+            <span class="card__count">
+              <svg viewBox="0 0 16 16" width="12" height="12" fill="none" aria-hidden="true">
+                <path d="M2 4h12M2 8h12M2 12h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+              </svg>
+              {{ order.linesCount }} {{ order.linesCount === 1 ? 'producto' : 'productos' }}
+            </span>
+            <span class="card__addr">
+              <svg viewBox="0 0 16 16" width="12" height="12" fill="none" aria-hidden="true">
+                <path d="M8 14s5-4.5 5-8a5 5 0 10-10 0c0 3.5 5 8 5 8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                <circle cx="8" cy="6" r="1.6" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+              {{ order.address.city }} · {{ order.address.address1 }}
+            </span>
           </div>
-          <div class="meta">
-            <span>{{ order.linesCount }} items</span>
-            <span>·</span>
-            <span>{{ orderTotal(order) | appCurrency }}</span>
+
+          <div
+            class="card__details"
+            [id]="'order-' + order.id"
+            [attr.aria-hidden]="!isExpanded(order.id)"
+            [attr.inert]="isExpanded(order.id) ? null : ''"
+          >
+            <div class="card__details-inner">
+              <p class="card__details-title">Productos</p>
+              <ul class="lines">
+                @for (line of order.lines; track trackLine($index, line)) {
+                  <li class="line">
+                    <div class="line__thumb" aria-hidden="true">
+                      <span class="line__thumb-initial">{{ line.productName.charAt(0) }}</span>
+                    </div>
+                    <div class="line__info">
+                      <p class="line__name">{{ line.productName }}</p>
+                      @if (line.variantDescription) {
+                        <p class="line__variant">{{ line.variantDescription }}</p>
+                      }
+                      <p class="line__qty">× {{ line.quantity }}</p>
+                    </div>
+                    <div class="line__price">
+                      <span class="line__unit">{{ line.unitPrice | appCurrency }}</span>
+                      <span class="line__subtotal">{{ line.subtotal | appCurrency }}</span>
+                    </div>
+                  </li>
+                }
+              </ul>
+
+              <div class="card__footer">
+                <dl class="card__facts">
+                  <div>
+                    <dt>Enviar a</dt>
+                    <dd>{{ order.address.name }}</dd>
+                  </div>
+                  <div>
+                    <dt>Dirección</dt>
+                    <dd>{{ order.address.city }} · {{ order.address.address1 }}</dd>
+                  </div>
+                  @if (order.address.notes) {
+                    <div>
+                      <dt>Notas</dt>
+                      <dd>{{ order.address.notes }}</dd>
+                    </div>
+                  }
+                </dl>
+                <div class="card__total-final">
+                  <span class="card__total-label">Total pagado</span>
+                  <span class="card__total-value card__total-value--big">{{ orderTotal(order) | appCurrency }}</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <p class="addr muted small">{{ order.address.city }} · {{ order.address.address1 }}</p>
         </article>
       }
     </section>

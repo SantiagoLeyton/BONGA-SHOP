@@ -15,28 +15,33 @@
         [attr.aria-invalid]="form.controls.email.invalid && (form.controls.email.touched || form.controls.email.dirty)"
       />
       @if (form.controls.email.invalid && (form.controls.email.touched || form.controls.email.dirty)) {
-        <span class="err">Ingresa un correo valido.</span>
+        <span class="err">Ingresa tu correo para iniciar sesión.</span>
       }
     </label>
 
     <label class="field">
-      <span>Contrasena</span>
+      <span>Contraseña</span>
       <div class="pw">
         <input
           [type]="showPassword() ? 'text' : 'password'"
           formControlName="password"
           autocomplete="current-password"
-          placeholder="••••••••"
+          placeholder="Tu contraseña"
           [attr.aria-invalid]="
             form.controls.password.invalid && (form.controls.password.touched || form.controls.password.dirty)
           "
         />
-        <button type="button" class="pw-btn" (click)="togglePassword()">
+        <button
+          type="button"
+          class="pw-btn"
+          (click)="togglePassword()"
+          [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+        >
           {{ showPassword() ? 'Ocultar' : 'Ver' }}
         </button>
       </div>
       @if (form.controls.password.invalid && (form.controls.password.touched || form.controls.password.dirty)) {
-        <span class="err">Minimo 8 caracteres.</span>
+        <span class="err">Ingresa tu contraseña para iniciar sesión.</span>
       }
     </label>
 
@@ -52,7 +57,7 @@
       <p class="alert" role="alert">{{ error() }}</p>
     }
 
-    <button type="submit" class="btn btn-primary" [disabled]="!canSubmit()">
+    <button type="submit" class="btn btn-primary" [disabled]="loading()" [attr.aria-busy]="loading()">
       @if (loading()) {
         Entrando...
       } @else {

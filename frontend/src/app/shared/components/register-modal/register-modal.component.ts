@@ -1,4 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
@@ -43,14 +44,47 @@ export class RegisterModalComponent {
     }),
   });
 
-  readonly strength = computed(() => {
-    const password = this.form.controls.password.value;
+  /**
+   * Valor reactivo del campo contraseña.
+   * Sin esto, `computed()` solo evaluaría una vez porque un FormControl no
+   * emite cambios de forma observable para las signals.
+   */
+  private readonly passwordValue = toSignal(this.form.controls.password.valueChanges, {
+    initialValue: this.form.controls.password.value,
+  });
+
+  /** Requisitos individuales para poder dar feedback contextual. */
+  readonly requirements = computed(() => {
+    const p = this.passwordValue() ?? '';
+    return {
+      length: p.length >= 8,
+      upper: /[A-Z]/.test(p),
+      digit: /[0-9]/.test(p),
+      symbol: /[^A-Za-z0-9]/.test(p),
+    };
+  });
+
+  /** Estado del medidor. -1 = vacío, 0..4 = niveles de fuerza. */
+  readonly strength = computed<number>(() => {
+    const p = this.passwordValue() ?? '';
+    if (!p) return -1;
+    const r = this.requirements();
     let score = 0;
-    if (password.length >= 8) score += 1;
-    if (/[A-Z]/.test(password)) score += 1;
-    if (/[0-9]/.test(password)) score += 1;
-    if (/[^A-Za-z0-9]/.test(password)) score += 1;
+    if (r.length) score += 1;
+    if (r.upper) score += 1;
+    if (r.digit) score += 1;
+    if (r.symbol) score += 1;
     return score;
+  });
+
+  /** Etiqueta de fuerza para lectores de pantalla y copy visual. */
+  readonly strengthLabel = computed<string>(() => {
+    const s = this.strength();
+    if (s < 0) return 'Ingresa una contraseña';
+    if (s <= 1) return 'Débil';
+    if (s === 2) return 'Aceptable';
+    if (s === 3) return 'Fuerte';
+    return 'Muy fuerte';
   });
 
   close(): void {

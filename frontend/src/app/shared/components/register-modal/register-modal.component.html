@@ -34,38 +34,68 @@
     </label>
 
     <label class="field">
-      <span>Contrasena</span>
+      <span>Contraseña</span>
       <div class="pw">
         <input
           [type]="showPassword() ? 'text' : 'password'"
           formControlName="password"
           autocomplete="new-password"
-          placeholder="Minimo 8 caracteres"
+          placeholder="Mínimo 8 caracteres"
           [attr.aria-invalid]="
             form.controls.password.invalid && (form.controls.password.touched || form.controls.password.dirty)
           "
         />
-        <button type="button" class="pw-btn" (click)="togglePassword()">
+        <button
+          type="button"
+          class="pw-btn"
+          (click)="togglePassword()"
+          [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+        >
           {{ showPassword() ? 'Ocultar' : 'Ver' }}
         </button>
       </div>
-      <div class="meter" [attr.data-s]="strength()">
+
+      <div
+        class="meter"
+        [attr.data-s]="strength()"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="4"
+        [attr.aria-valuenow]="strength() < 0 ? 0 : strength()"
+        [attr.aria-valuetext]="strengthLabel()"
+      >
         <span class="bar"></span>
         <span class="bar"></span>
         <span class="bar"></span>
         <span class="bar"></span>
       </div>
-      <p class="meter-hint">
-        @switch (strength()) {
-          @case (0) { Debil }
-          @case (1) { Debil }
-          @case (2) { Aceptable }
-          @case (3) { Fuerte }
-          @default { Muy fuerte }
-        }
+
+      <p class="meter-hint" [attr.data-s]="strength()">
+        <span class="meter-hint__dot" aria-hidden="true"></span>
+        <span>{{ strengthLabel() }}</span>
       </p>
+
+      <ul class="pw-reqs" aria-label="Requisitos de la contraseña">
+        <li [class.ok]="requirements().length">
+          <span class="tick" aria-hidden="true">{{ requirements().length ? '✓' : '•' }}</span>
+          Al menos 8 caracteres
+        </li>
+        <li [class.ok]="requirements().upper">
+          <span class="tick" aria-hidden="true">{{ requirements().upper ? '✓' : '•' }}</span>
+          Una letra mayúscula
+        </li>
+        <li [class.ok]="requirements().digit">
+          <span class="tick" aria-hidden="true">{{ requirements().digit ? '✓' : '•' }}</span>
+          Un número
+        </li>
+        <li [class.ok]="requirements().symbol">
+          <span class="tick" aria-hidden="true">{{ requirements().symbol ? '✓' : '•' }}</span>
+          Un símbolo (! # $ ...)
+        </li>
+      </ul>
+
       @if (form.controls.password.invalid && (form.controls.password.touched || form.controls.password.dirty)) {
-        <span class="err">Minimo 8 caracteres.</span>
+        <span class="err">La contraseña debe tener al menos 8 caracteres.</span>
       }
     </label>
 

@@ -68,7 +68,10 @@ export class AuthService {
   async login(email: string, password: string): Promise<AuthUser> {
     try {
       const response = await firstValueFrom(
-        this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, { email, password }),
+        this.http.post<AuthResponse>(`${this.apiUrl}/auth/login`, {
+          email: email.trim().toLowerCase(),
+          password,
+        }),
       );
       const next = this.normalizeAuthResponse(response);
       this.stored.set(next);
@@ -82,7 +85,11 @@ export class AuthService {
   async register(name: string, email: string, password: string): Promise<AuthUser> {
     try {
       const response = await firstValueFrom(
-        this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, { name, email, password }),
+        this.http.post<AuthResponse>(`${this.apiUrl}/auth/register`, {
+          name: name.trim(),
+          email: email.trim().toLowerCase(),
+          password,
+        }),
       );
       const next = this.normalizeAuthResponse(response);
       this.stored.set(next);
@@ -113,15 +120,54 @@ export class AuthService {
 
   private mapHttpError(error: unknown, fallback: string): Error {
     if (error instanceof HttpErrorResponse) {
-      const message =
+      // Fallo de red (servidor apagado, CORS bloqueado, sin internet).
+      if (error.status === 0) {
+        return new Error(
+          'No logramos conectar con el servidor. Verifica tu conexión e inténtalo de nuevo.',
+        );
+      }
+
+      const backendMessage =
         (typeof error.error?.message === 'string' && error.error.message) ||
         (Array.isArray(error.error?.validationErrors) &&
           typeof error.error.validationErrors[0]?.message === 'string' &&
           error.error.validationErrors[0].message) ||
-        fallback;
-      return new Error(message);
+        '';
+
+      const translated = this.translateBackendMessage(backendMessage, error.status);
+      if (translated) return new Error(translated);
+      if (backendMessage) return new Error(backendMessage);
+      return new Error(fallback);
     }
 
     return error instanceof Error ? error : new Error(fallback);
+  }
+
+  /**
+   * Convierte los mensajes en inglés del backend a algo legible en español.
+   * Si no reconoce el mensaje, devuelve `null` y se usa el original.
+   */
+  private translateBackendMessage(raw: string, status: number): string | null {
+    const message = raw.toLowerCase();
+
+    if (message.includes('invalid email or password')) {
+      return 'Correo o contraseña incorrectos. Revisa tus datos e inténtalo de nuevo.';
+    }
+    if (message.includes('inactive users cannot log in')) {
+      return 'Tu cuenta está inactiva. Contacta soporte para reactivarla.';
+    }
+    if (message.includes('email is already registered')) {
+      return 'Ya existe una cuenta registrada con ese correo. Intenta iniciar sesión.';
+    }
+    if (status === 401) {
+      return 'Correo o contraseña incorrectos. Revisa tus datos e inténtalo de nuevo.';
+    }
+    if (status === 403) {
+      return 'No tienes permisos para realizar esta acción.';
+    }
+    if (status >= 500) {
+      return 'El servidor está teniendo problemas. Inténtalo en unos segundos.';
+    }
+    return null;
   }
 }

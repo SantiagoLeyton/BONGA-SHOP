@@ -60,6 +60,14 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/**
+ * Bloquea el scroll del body cuando el drawer móvil del navbar está abierto.
+ * La clase la gestiona NavbarComponent mediante un effect().
+ */
+body.is-nav-open {
+  overflow: hidden;
+}
+
 /* Better default focus ring (accessibility + premium feel) */
 :focus {
   outline: none;

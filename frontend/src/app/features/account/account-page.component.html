@@ -1,0 +1,208 @@
+<div class="container account">
+  <div class="account__glow account__glow--a" aria-hidden="true"></div>
+  <div class="account__glow account__glow--b" aria-hidden="true"></div>
+
+  <div class="head">
+    <div>
+      <p class="kicker">Mi cuenta</p>
+      <h1 class="title">Tu información personal</h1>
+      <p class="sub">
+        Gestiona los datos que usamos para entregar tus pedidos. Se guardan de forma local y se reutilizan
+        automáticamente cuando pasas al checkout.
+      </p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-ghost" routerLink="/orders">Ver mis pedidos</a>
+      <a class="btn btn-secondary" routerLink="/products">Seguir comprando</a>
+    </div>
+  </div>
+
+  <section class="summary" aria-label="Resumen de tu cuenta">
+    <div class="summary__avatar" aria-hidden="true">
+      <span class="summary__avatar-text">{{ initials() }}</span>
+    </div>
+    <div class="summary__info">
+      @if (user(); as u) {
+        <p class="summary__name">{{ u.name }}</p>
+        <p class="summary__meta">
+          <span>{{ u.email }}</span>
+        </p>
+      } @else {
+        <p class="summary__name">Invitado</p>
+        <p class="summary__meta"><span>Inicia sesión para sincronizar tus datos.</span></p>
+      }
+      @if (hasProfile()) {
+        <p class="summary__badge">
+          <span class="summary__dot" aria-hidden="true"></span>
+          Perfil de entrega listo
+          @if (profile()?.updatedAt) {
+            <span class="summary__updated"> · Actualizado {{ profile()?.updatedAt | date : 'mediumDate' }}</span>
+          }
+        </p>
+      } @else {
+        <p class="summary__badge summary__badge--empty">
+          <span class="summary__dot summary__dot--empty" aria-hidden="true"></span>
+          Completa tus datos para agilizar el checkout
+        </p>
+      }
+    </div>
+    <ul class="summary__perks" aria-label="Beneficios">
+      <li><span class="summary__tick" aria-hidden="true">✓</span>Datos protegidos solo en este dispositivo.</li>
+      <li><span class="summary__tick" aria-hidden="true">✓</span>Checkout precargado al instante.</li>
+      <li><span class="summary__tick" aria-hidden="true">✓</span>Podrás editarlos cuando quieras.</li>
+    </ul>
+  </section>
+
+  <section class="panel">
+    <header class="panel__head">
+      <div>
+        <p class="panel__eyebrow">Datos de entrega</p>
+        <h2 class="panel__title">Completa tu perfil</h2>
+        <p class="panel__copy">Estos datos se usarán para agilizar tu checkout. Podrás editarlos cuando quieras.</p>
+      </div>
+      @if (justSaved()) {
+        <p class="panel__saved" role="status" aria-live="polite">
+          <span class="panel__saved-dot" aria-hidden="true"></span>
+          Guardado con éxito
+        </p>
+      }
+    </header>
+
+    <form class="form" [formGroup]="form" (ngSubmit)="save()" novalidate>
+      <label class="field">
+        <span>Nombre <span class="required-mark">*</span></span>
+        <input
+          formControlName="name"
+          type="text"
+          autocomplete="given-name"
+          placeholder="Tu nombre"
+          [attr.aria-invalid]="fieldInvalid('name')"
+        />
+        @if (fieldInvalid('name')) {
+          <span class="field-error" role="alert">Ingresa el nombre de la persona que recibirá el pedido.</span>
+        }
+      </label>
+
+      <label class="field">
+        <span>Apellido <span class="field-optional">(opcional)</span></span>
+        <input
+          formControlName="lastName"
+          type="text"
+          autocomplete="family-name"
+          placeholder="Tu apellido"
+        />
+      </label>
+
+      <label class="field field--wide">
+        <span>Correo <span class="field-optional">(opcional)</span></span>
+        <input
+          formControlName="email"
+          type="email"
+          autocomplete="email"
+          placeholder="tucorreo@ejemplo.com"
+          [attr.aria-invalid]="fieldInvalid('email')"
+        />
+        @if (emailErrorMessage(); as message) {
+          <span class="field-error" role="alert">{{ message }}</span>
+        }
+      </label>
+
+      <label class="field">
+        <span>Teléfono <span class="required-mark">*</span></span>
+        <input
+          formControlName="phone"
+          type="tel"
+          inputmode="numeric"
+          autocomplete="tel"
+          pattern="\+?[0-9]{10,15}"
+          maxlength="16"
+          placeholder="+57 3001234567"
+          (input)="onPhoneInput($event)"
+          [attr.aria-invalid]="fieldInvalid('phone')"
+        />
+        @if (phoneErrorMessage(); as message) {
+          <span class="field-error" role="alert">{{ message }}</span>
+        }
+      </label>
+
+      <label class="field">
+        <span>Ciudad <span class="required-mark">*</span></span>
+        <input
+          formControlName="city"
+          type="text"
+          autocomplete="address-level2"
+          placeholder="Bogotá"
+          [attr.aria-invalid]="fieldInvalid('city')"
+        />
+        @if (fieldInvalid('city')) {
+          <span class="field-error" role="alert">Selecciona la ciudad donde recibirás tus pedidos.</span>
+        }
+      </label>
+
+      <label class="field field--wide">
+        <span>Dirección <span class="required-mark">*</span></span>
+        <input
+          formControlName="address1"
+          type="text"
+          autocomplete="street-address"
+          placeholder="Calle 123 #45-67, apto 302"
+          [attr.aria-invalid]="fieldInvalid('address1')"
+        />
+        @if (fieldInvalid('address1')) {
+          <span class="field-error" role="alert">Escribe una dirección completa para evitar dudas en la entrega.</span>
+        }
+      </label>
+
+      <label class="field field--wide">
+        <span>Notas de entrega <span class="field-optional">(opcional)</span></span>
+        <textarea
+          formControlName="notes"
+          rows="3"
+          autocomplete="off"
+          placeholder="Ej. Portería, piso, horario sugerido..."
+        ></textarea>
+      </label>
+
+      <div class="form-actions">
+        <div class="form-actions__left">
+          <button
+            type="button"
+            class="btn btn-ghost"
+            (click)="reset()"
+            [disabled]="saving() || form.pristine"
+          >
+            Descartar cambios
+          </button>
+          @if (hasProfile()) {
+            <button
+              type="button"
+              class="btn btn-text danger"
+              (click)="clearAll()"
+              [disabled]="saving()"
+            >
+              Borrar datos guardados
+            </button>
+          }
+        </div>
+        <button
+          type="submit"
+          class="btn btn-primary btn-lg"
+          [class.is-loading]="saving()"
+          [attr.aria-busy]="saving()"
+          [disabled]="saving() || form.invalid"
+        >
+          @if (saving()) {
+            Guardando...
+          } @else {
+            Guardar cambios
+          }
+        </button>
+      </div>
+
+      <p class="form-hint">
+        <span class="form-hint__dot" aria-hidden="true"></span>
+        Tus datos se usarán para completar entregas más rápido. Los guardamos solo en este dispositivo.
+      </p>
+    </form>
+  </section>
+</div>
