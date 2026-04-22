@@ -71,15 +71,34 @@ public class UserService {
 
     @Transactional
     public void ensureBootstrapAdmin(BootstrapAdminProperties properties, PasswordEncoder passwordEncoder) {
-        if (!properties.adminEnabled() || userRepository.existsByEmailIgnoreCase(properties.adminEmail())) {
+        if (!properties.adminEnabled()) {
             return;
         }
-        User admin = new User();
-        admin.setName(properties.adminName());
-        admin.setEmail(properties.adminEmail().trim().toLowerCase());
-        admin.setPassword(passwordEncoder.encode(properties.adminPassword()));
-        admin.setRole(roleService.getRole(RoleName.ROLE_ADMIN));
-        admin.setActive(true);
-        userRepository.save(admin);
+        String normalizedEmail = properties.adminEmail().trim().toLowerCase();
+        var adminRole = roleService.getRole(RoleName.ROLE_ADMIN);
+
+        User admin = userRepository.findByEmailIgnoreCase(normalizedEmail)
+                .orElseGet(User::new);
+
+        boolean needsSave = admin.getId() == null;
+
+        if (admin.getId() == null) {
+            admin.setEmail(normalizedEmail);
+            admin.setName(properties.adminName());
+            admin.setActive(true);
+            admin.setPassword(passwordEncoder.encode(properties.adminPassword()));
+        }
+        if (admin.getRole() == null || admin.getRole().getName() != RoleName.ROLE_ADMIN) {
+            admin.setRole(adminRole);
+            needsSave = true;
+        }
+        if (!admin.isActive()) {
+            admin.setActive(true);
+            needsSave = true;
+        }
+
+        if (needsSave) {
+            userRepository.save(admin);
+        }
     }
 }

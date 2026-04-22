@@ -38,7 +38,7 @@ services:
       APP_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD:-Admin123!}
       LOW_STOCK_THRESHOLD: ${LOW_STOCK_THRESHOLD:-5}
     ports:
-      - "${BACKEND_PORT:-8080}:8080"
+      - "${BACKEND_PORT:-8081}:8080"
 
 volumes:
   bonga_shop_postgres_data:
