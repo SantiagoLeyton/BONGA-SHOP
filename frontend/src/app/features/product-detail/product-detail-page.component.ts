@@ -1,4 +1,3 @@
-import { DecimalPipe } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { Meta, Title } from '@angular/platform-browser';
@@ -18,13 +17,14 @@ import { ProductBadgeComponent } from '../../shared/components/product-badge/pro
 import { ProductCardComponent } from '../../shared/components/product-card/product-card.component';
 import { VaporFrameScrubComponent } from '../../shared/components/vapor-frame-scrub/vapor-frame-scrub.component';
 import { RevealScrollDirective } from '../../shared/directives/reveal-scroll.directive';
+import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
 
 @Component({
   selector: 'app-product-detail-page',
   standalone: true,
   imports: [
     RouterLink,
-    DecimalPipe,
+    AppCurrencyPipe,
     ProductBadgeComponent,
     RevealScrollDirective,
     VaporFrameScrubComponent,

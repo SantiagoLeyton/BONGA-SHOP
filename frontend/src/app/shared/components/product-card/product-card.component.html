@@ -33,7 +33,7 @@
       <span class="pill muted">{{ nicotineRange() }}</span>
     </div>
     <div class="row">
-      <p class="price">Desde <strong>{{ minPrice() | number : '1.2-2' }} €</strong></p>
+      <p class="price">Desde <strong>{{ minPrice() | appCurrency }}</strong></p>
       <div class="row-actions">
         @if (showQuickView && variant !== 'spotlight') {
           <button type="button" class="btn btn-secondary btn-sm" (click)="openQuickView($event)">

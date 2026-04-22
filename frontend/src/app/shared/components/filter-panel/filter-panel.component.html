@@ -102,7 +102,7 @@
   </section>
 
   <section class="block">
-    <h3 class="sub">Precio (€)</h3>
+    <h3 class="sub">Precio (COP)</h3>
     <div class="grid2">
       <label class="mini">
         <span>Mín</span>
@@ -112,7 +112,7 @@
           min="0"
           step="0.5"
           placeholder="—"
-          [value]="value.priceMin ?? ''"
+          [value]="priceInputMin()"
           (input)="updatePriceMin($any($event.target).value)"
         />
       </label>
@@ -124,7 +124,7 @@
           min="0"
           step="0.5"
           placeholder="—"
-          [value]="value.priceMax ?? ''"
+          [value]="priceInputMax()"
           (input)="updatePriceMax($any($event.target).value)"
         />
       </label>

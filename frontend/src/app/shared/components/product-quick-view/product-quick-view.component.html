@@ -16,7 +16,7 @@
         <p class="desc">{{ p.description }}</p>
 
         <div class="meta">
-          <span class="pill">Desde {{ minPrice() | number : '1.2-2' }} €</span>
+          <span class="pill">Desde {{ minPrice() | appCurrency }}</span>
           <span class="pill muted">{{ p.variants.length }} variantes</span>
         </div>
 

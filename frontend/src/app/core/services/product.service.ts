@@ -236,7 +236,7 @@ export class ProductService {
         slug: this.slugify(response.brand),
         active: true,
       },
-      imageUrl: `/assets/products/${slug}.svg`,
+      imageUrl: this.resolveProductImage(slug),
       badge: this.resolveBadge(totalStock, index),
       featured: index < 4,
       active: response.active,
@@ -246,13 +246,16 @@ export class ProductService {
 
   private toVariant(variant: ProductVariantApiResponse): ProductVariant {
     const nicotineMg = this.parseNicotineLevel(variant.nicotineLevel);
+    const rawPrice = Number(variant.price);
+    // Fallback defensivo: si llega un precio legacy en rango 10-20, normaliza a COP.
+    const normalizedPrice = rawPrice > 0 && rawPrice < 1000 ? rawPrice * 4000 : rawPrice;
     return {
       id: String(variant.id),
       productId: String(variant.productId),
       sku: `variant-${variant.id}`,
       flavor: variant.flavor,
       nicotineMg,
-      price: Number(variant.price),
+      price: normalizedPrice,
       stock: variant.stock,
       active: variant.active,
       label: `${variant.flavor} · ${nicotineMg} mg`,
@@ -285,6 +288,11 @@ export class ProductService {
       .replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '-')
       .replace(/(^-|-$)/g, '');
+  }
+
+  private resolveProductImage(slug: string): string {
+    // Prioriza las nuevas fotos reales en PNG; fallback a SVG legacy.
+    return `/assets/products/${slug}.png`;
   }
 
   private mapHttpError(error: unknown, fallback: string): Error {

@@ -3,17 +3,12 @@ import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import gsap from 'gsap';
 import { map } from 'rxjs';
-import { MOCK_PRODUCTS } from '../../core/data/mock-products';
 import type { Product } from '../../core/models/product.model';
 import { AuthService } from '../../core/services/auth.service';
 import { ProductService } from '../../core/services/product.service';
 import { ModalService } from '../../core/services/modal.service';
 import { prefersReducedMotion, registerGsap } from '../../shared/animation/register-gsap';
 import { RevealScrollDirective } from '../../shared/directives/reveal-scroll.directive';
-
-function countVariants(products: typeof MOCK_PRODUCTS): number {
-  return products.reduce((n, p) => n + p.variants.length, 0);
-}
 
 @Component({
   selector: 'app-home-page',
@@ -30,9 +25,8 @@ export class HomePageComponent {
   readonly user = this.auth.user;
   readonly isAdmin = () => this.auth.user()?.role === 'admin';
 
-  /** Dos frases del titular — “Sabor urbano.” / “Sin ruido.” */
-  readonly heroLine1 = ['Sabor', 'urbano.'];
-  readonly heroLine2 = ['Sin', 'ruido.'];
+
+  readonly allProducts = toSignal(this.products.getProducts(), { initialValue: [] as Product[] });
 
   readonly featuredPicks = toSignal(
     this.products.getFeaturedProducts().pipe(map((list) => list.slice(0, 8))),
@@ -51,10 +45,12 @@ export class HomePageComponent {
   readonly heroImageReady = signal(false);
   readonly featuredActive = signal(0);
 
-  readonly statTargets = {
-    products: MOCK_PRODUCTS.length,
-    variants: countVariants(MOCK_PRODUCTS),
-  };
+  readonly statTargets = computed(() => {
+    const list = this.allProducts();
+    const products = list.length;
+    const variants = list.reduce((n, product) => n + product.variants.length, 0);
+    return { products, variants };
+  });
 
   private readonly heroSection = viewChild.required<ElementRef<HTMLElement>>('heroSection');
   private readonly featuredTrack = viewChild<ElementRef<HTMLElement>>('featuredTrack');
@@ -241,6 +237,7 @@ export class HomePageComponent {
   }
 
   private animateStatCounters(): void {
+    const targets = this.statTargets();
     if (prefersReducedMotion()) {
       this.applyStatValuesImmediate();
       return;
@@ -252,7 +249,7 @@ export class HomePageComponent {
 
     if (pEl) {
       gsap.to(products, {
-        n: this.statTargets.products,
+        n: targets.products,
         duration: 1.85,
         ease: 'power2.out',
         onUpdate: () => {
@@ -262,7 +259,7 @@ export class HomePageComponent {
     }
     if (vEl) {
       gsap.to(variants, {
-        n: this.statTargets.variants,
+        n: targets.variants,
         duration: 2.1,
         ease: 'power2.out',
         delay: 0.12,
@@ -274,13 +271,14 @@ export class HomePageComponent {
   }
 
   private applyStatValuesImmediate(): void {
+    const targets = this.statTargets();
     const pEl = this.statProductsEl()?.nativeElement;
     const vEl = this.statVariantsEl()?.nativeElement;
     if (pEl) {
-      pEl.textContent = String(this.statTargets.products);
+      pEl.textContent = String(targets.products);
     }
     if (vEl) {
-      vEl.textContent = String(this.statTargets.variants);
+      vEl.textContent = String(targets.variants);
     }
   }
 }

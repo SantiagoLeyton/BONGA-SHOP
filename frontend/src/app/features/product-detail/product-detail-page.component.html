@@ -68,7 +68,7 @@
                 (click)="pickVariant(variant.id)"
               >
                 <span class="chip-title">{{ variant.flavor }}</span>
-                <span class="chip-meta">{{ variant.nicotineMg }} mg · {{ variant.price | number : '1.2-2' }} EUR</span>
+                <span class="chip-meta">{{ variant.nicotineMg }} mg · {{ variant.price | appCurrency }}</span>
               </button>
             }
           </div>
@@ -78,7 +78,7 @@
               <div class="price-row">
                 <div>
                   <p class="eyebrow">Variante seleccionada</p>
-                  <p class="price">{{ variant.price | number : '1.2-2' }} EUR</p>
+                  <p class="price">{{ variant.price | appCurrency }}</p>
                 </div>
                 <p
                   class="stock"
@@ -124,7 +124,7 @@
                 <ul class="list">
                   <li><strong>Marca:</strong> {{ product.brand.name }}</li>
                   <li><strong>Opciones disponibles:</strong> {{ product.variants.length }} variantes</li>
-                  <li><strong>Precio base:</strong> desde {{ product.variants[0].price | number : '1.2-2' }} EUR</li>
+                  <li><strong>Precio base:</strong> desde {{ product.variants[0].price | appCurrency }}</li>
                 </ul>
               } @else if (tab() === 'specs') {
                 @if (selectedVariant(); as selected) {

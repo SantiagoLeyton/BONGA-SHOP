@@ -1,15 +1,15 @@
-import { DecimalPipe } from '@angular/common';
 import { Component, EventEmitter, Input, Output, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import type { Product } from '../../../core/models/product.model';
 import { ToastService } from '../../../core/services/toast.service';
 import { WishlistService } from '../../../core/services/wishlist.service';
+import { AppCurrencyPipe } from '../../pipes/app-currency.pipe';
 import { ProductBadgeComponent } from '../product-badge/product-badge.component';
 
 @Component({
   selector: 'app-product-card',
   standalone: true,
-  imports: [RouterLink, ProductBadgeComponent, DecimalPipe],
+  imports: [RouterLink, ProductBadgeComponent, AppCurrencyPipe],
   templateUrl: './product-card.component.html',
   styleUrl: './product-card.component.scss',
 })

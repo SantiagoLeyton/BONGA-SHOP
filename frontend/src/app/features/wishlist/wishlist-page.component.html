@@ -129,7 +129,7 @@
             <div class="wcard__price-row">
               <p class="wcard__price">
                 <span class="wcard__price-label">Desde</span>
-                <strong>{{ minPrice(product) | number : '1.2-2' }} €</strong>
+                <strong>{{ minPrice(product) | appCurrency }}</strong>
               </p>
             </div>
 
@@ -276,7 +276,7 @@
               <h3 class="cmp__col-name">{{ p.name }}</h3>
               <p class="cmp__col-price">
                 <span>Desde</span>
-                <strong>{{ minPrice(p) | number : '1.2-2' }} €</strong>
+                <strong>{{ minPrice(p) | appCurrency }}</strong>
               </p>
               <div class="cmp__col-actions">
                 <button
@@ -336,7 +336,7 @@
           <div class="cmp__row cmp__row--highlight">
             <dt>Precio desde</dt>
             @for (p of compareProducts(); track p.id) {
-              <dd><strong>{{ minPrice(p) | number : '1.2-2' }} €</strong></dd>
+              <dd><strong>{{ minPrice(p) | appCurrency }}</strong></dd>
             }
           </div>
           <div class="cmp__row">

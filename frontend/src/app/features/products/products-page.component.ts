@@ -76,8 +76,8 @@ export class ProductsPageComponent {
     f.flavors.forEach((flavor) => chips.push({ key: `flavor:${flavor}`, label: `Sabor: ${flavor}`, type: 'flavor', value: flavor }));
     if (f.nicotineMin != null) chips.push({ key: 'nicMin', label: `Nicotina ≥ ${f.nicotineMin} mg`, type: 'nicMin' });
     if (f.nicotineMax != null) chips.push({ key: 'nicMax', label: `Nicotina ≤ ${f.nicotineMax} mg`, type: 'nicMax' });
-    if (f.priceMin != null) chips.push({ key: 'pMin', label: `Precio ≥ ${f.priceMin} €`, type: 'pMin' });
-    if (f.priceMax != null) chips.push({ key: 'pMax', label: `Precio ≤ ${f.priceMax} €`, type: 'pMax' });
+    if (f.priceMin != null) chips.push({ key: 'pMin', label: `Precio ≥ ${this.formatPriceFilterValue(f.priceMin)}`, type: 'pMin' });
+    if (f.priceMax != null) chips.push({ key: 'pMax', label: `Precio ≤ ${this.formatPriceFilterValue(f.priceMax)}`, type: 'pMax' });
 
     return chips;
   });
@@ -127,5 +127,18 @@ export class ProductsPageComponent {
 
   closeQuickView(): void {
     this.quickViewOpen.set(false);
+  }
+
+  private formatPriceFilterValue(copValue: number): string {
+    const currency = 'COP';
+    const converted = copValue;
+    const locale = 'es-CO';
+    const digits = 0;
+    return new Intl.NumberFormat(locale, {
+      style: 'currency',
+      currency,
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    }).format(converted);
   }
 }

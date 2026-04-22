@@ -117,6 +117,14 @@ export class FilterPanelComponent {
     this.valueChange.emit(next);
   }
 
+  priceInputMin(): string {
+    return this.value.priceMin == null ? '' : String(this.value.priceMin);
+  }
+
+  priceInputMax(): string {
+    return this.value.priceMax == null ? '' : String(this.value.priceMax);
+  }
+
   brandChecked(slug: string): boolean {
     return this.value.brandSlugs.includes(slug);
   }

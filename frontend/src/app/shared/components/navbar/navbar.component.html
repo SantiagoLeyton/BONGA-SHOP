@@ -56,11 +56,11 @@
         <button
           type="button"
           class="nav__pref"
-          (click)="setCurrency(currency() === 'EUR' ? 'COP' : 'EUR')"
+          disabled
           [attr.aria-label]="'Cambiar moneda'"
-          [attr.title]="'Moneda: ' + currency()"
+          [attr.title]="'Moneda fija: COP'"
         >
-          {{ currency() }}
+          COP
         </button>
       </div>
 
@@ -327,10 +327,10 @@
     <button
       type="button"
       class="nav__drawer-chip"
-      (click)="setCurrency(currency() === 'EUR' ? 'COP' : 'EUR')"
+      disabled
     >
       <span class="nav__drawer-chip-label">Moneda</span>
-      <strong>{{ currency() }}</strong>
+      <strong>COP</strong>
     </button>
   </div>
 

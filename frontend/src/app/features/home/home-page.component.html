@@ -1,4 +1,5 @@
-<section class="hero hero--photo" #heroSection>
+<section class="hero" #heroSection>
+  <!-- Imagen de fondo (NO se toca) -->
   <div class="hero-media" [class.hero-media--ready]="heroImageReady()" aria-hidden="true">
     <img
       class="hero-bg"
@@ -13,93 +14,60 @@
     />
   </div>
 
+  <!-- Ambient (grain + humo) — decoración, no afecta el layout -->
   <div class="hero-grain" aria-hidden="true"></div>
   <div class="hero-smoke" aria-hidden="true"></div>
-  <div class="hero-smoke hero-smoke--mobile" aria-hidden="true"></div>
 
-  <div class="hero-scrim" aria-hidden="true"></div>
-  <div class="hero-vignette" aria-hidden="true"></div>
-  <div class="hero-glow" aria-hidden="true"></div>
-  <div class="hero-readability" aria-hidden="true"></div>
+  <!-- Overlay único a la izquierda -->
+  <div class="hero-overlay" aria-hidden="true"></div>
 
-  <div class="container hero-inner">
-    <div class="hero-copy">
-      <p class="kicker hero-kicker">BONGA SHOP — vapes desechables</p>
+  <!-- Grid principal: 3 columnas -->
+  <div class="hero-grid">
 
-      <div class="hero-badge hero-badge--pulse" aria-label="Promoción activa">
-        <span class="hero-badge__dot" aria-hidden="true"></span>
-        <span class="hero-badge__text">Nuevos sabores y envíos nacionales</span>
-      </div>
+    <!-- LEFT -->
+    <div class="hero-left">
+      <span class="hero-badge">BONGA SHOP — VAPES DESECHABLES</span>
 
-      <h1 class="title hero-title">
-        <span class="hero-title__phrase">
-          @for (w of heroLine1; track $index) {
-            <span class="title-word">{{ w }}</span>
-            @if ($index < heroLine1.length - 1) {
-              <span class="title-space">&nbsp;</span>
-            }
-          }
-        </span>
-        <span class="hero-title__break" aria-hidden="true"></span>
-        <span class="hero-title__phrase">
-          @for (w of heroLine2; track $index) {
-            <span class="title-word">{{ w }}</span>
-            @if ($index < heroLine2.length - 1) {
-              <span class="title-space">&nbsp;</span>
-            }
-          }
-        </span>
+      <h1 class="hero-title">
+        Más sabor.<br>
+        Más estilo. <span>Sin límites.</span>
       </h1>
 
-      <p class="lead hero-lead">Vapes desechables, envío directo. Tú eliges el sabor</p>
+      <p class="hero-desc">
+        Vapes desechables, envío directo. Tú eliges el sabor.
+      </p>
+
+      <p class="hero-fine">
+        +18 · <button type="button" class="hero-fine__link" (click)="openLegalInfo()">Aviso legal</button> · Consume con responsabilidad
+      </p>
     </div>
 
-    <div class="hero-actions">
-      <div class="cta hero-cta">
-        <a class="btn btn-primary btn-lg hero-btn-primary" routerLink="/products">Ver colección</a>
-        <button type="button" class="btn btn-secondary btn-lg hero-btn-secondary" (click)="openBuyingInfo()">
-          Cómo comprar
-        </button>
-        @if (isAdmin()) {
-          <a class="btn btn-secondary btn-lg" routerLink="/admin">Panel admin</a>
-        } @else if (user()) {
-          <a class="btn btn-ghost btn-lg" routerLink="/orders">Mis pedidos</a>
-        }
-      </div>
-    </div>
-
+    <!-- CENTER TOP: stats en glass pill -->
     <div class="hero-stats" aria-label="Datos del catálogo">
-      <div class="hero-stat">
-        <span class="hero-stat__value" #statProducts>0</span>
-        <span class="hero-stat__label">Productos</span>
-      </div>
-      <div class="hero-stat">
-        <span class="hero-stat__value" #statVariants>0</span>
-        <span class="hero-stat__label">Combinaciones sabor y mg</span>
-      </div>
-      <div class="hero-stat">
-        <span class="hero-stat__value hero-stat__value--text">24/7</span>
-        <span class="hero-stat__label">Compra online</span>
-      </div>
+      <div><strong #statProducts>0</strong> <span>Productos</span></div>
+      <div><strong #statVariants>0</strong> <span>Combinaciones</span></div>
+      <div><strong>24/7</strong> <span>Online</span></div>
     </div>
 
-    <p class="fineprint hero-fine">
-      <span class="hero-fine__row">
-        <svg class="hero-fine__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-        </svg>
-        <span>Solo +18</span>
-        <button type="button" class="hero-fine__link" (click)="openLegalInfo()">Aviso legal</button>
-      </span>
-      <span class="hero-fine__sep" aria-hidden="true"> </span>
-      <span>Consume con responsabilidad</span>
-    </p>
+    <!-- RIGHT: botones -->
+    <div class="hero-actions">
+      <a class="btn primary" routerLink="/products">Ver colección</a>
+      <button type="button" class="btn secondary" (click)="openBuyingInfo()">Cómo comprar</button>
+      @if (isAdmin()) {
+        <a class="btn ghost" routerLink="/admin">Panel admin</a>
+      } @else if (user()) {
+        <a class="btn ghost" routerLink="/orders">Mis pedidos</a>
+      }
+    </div>
+
   </div>
 
+  <!-- Indicador scroll minimal (abajo-centro) -->
   <button type="button" class="hero-scroll-min" (click)="scrollToDestacados()" aria-label="Ir a destacados">
     <span class="hero-scroll-min__line" aria-hidden="true"></span>
   </button>
 
+  <!-- Línea neón inferior -->
   <div class="hero-edge" aria-hidden="true"></div>
 </section>
 

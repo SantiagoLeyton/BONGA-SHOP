@@ -1,7 +1,7 @@
 import { Injectable, computed, signal } from '@angular/core';
 
 export type AppLang = 'es' | 'en';
-export type AppCurrency = 'EUR' | 'COP' | 'USD';
+export type AppCurrency = 'COP';
 
 const STORAGE_LANG = 'bonga.lang.v1';
 const STORAGE_CUR = 'bonga.currency.v1';
@@ -25,7 +25,7 @@ function safeWrite(key: string, value: string): void {
 @Injectable({ providedIn: 'root' })
 export class AppSettingsService {
   private readonly _lang = signal<AppLang>((safeRead(STORAGE_LANG, 'es') as AppLang) || 'es');
-  private readonly _currency = signal<AppCurrency>((safeRead(STORAGE_CUR, 'EUR') as AppCurrency) || 'EUR');
+  private readonly _currency = signal<AppCurrency>('COP');
 
   readonly lang = computed(() => this._lang());
   readonly currency = computed(() => this._currency());
@@ -36,8 +36,8 @@ export class AppSettingsService {
   }
 
   setCurrency(next: AppCurrency): void {
-    this._currency.set(next);
-    safeWrite(STORAGE_CUR, next);
+    this._currency.set('COP');
+    safeWrite(STORAGE_CUR, 'COP');
   }
 }
 
