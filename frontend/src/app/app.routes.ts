@@ -55,12 +55,55 @@ export const routes: Routes = [
           import('./features/account/account-page.component').then((m) => m.AccountPageComponent),
       },
       {
+        path: 'restablecer',
+        loadComponent: () =>
+          import('./features/auth/reset-password-page.component').then(
+            (m) => m.ResetPasswordPageComponent,
+          ),
+      },
+      {
         path: 'admin',
         canActivate: [adminGuard],
         loadComponent: () =>
-          import('./features/admin-shell/admin-dashboard-page.component').then(
-            (m) => m.AdminDashboardPageComponent,
-          ),
+          import('./features/admin-shell/admin-shell.component').then((m) => m.AdminShellComponent),
+        children: [
+          { path: '', pathMatch: 'full', redirectTo: 'resumen' },
+          {
+            path: 'resumen',
+            loadComponent: () =>
+              import('./features/admin-shell/pages/admin-overview-page.component').then(
+                (m) => m.AdminOverviewPageComponent,
+              ),
+          },
+          {
+            path: 'productos',
+            loadComponent: () =>
+              import('./features/admin-shell/pages/admin-products-page.component').then(
+                (m) => m.AdminProductsPageComponent,
+              ),
+          },
+          {
+            path: 'marcas',
+            loadComponent: () =>
+              import('./features/admin-shell/pages/admin-brands-page.component').then(
+                (m) => m.AdminBrandsPageComponent,
+              ),
+          },
+          {
+            path: 'inventario',
+            loadComponent: () =>
+              import('./features/admin-shell/pages/admin-inventory-page.component').then(
+                (m) => m.AdminInventoryPageComponent,
+              ),
+          },
+          {
+            path: 'pedidos',
+            loadComponent: () =>
+              import('./features/admin-shell/pages/admin-orders-page.component').then(
+                (m) => m.AdminOrdersPageComponent,
+              ),
+          },
+        ],
       },
     ],
   },

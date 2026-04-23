@@ -1,0 +1,93 @@
+<header class="admin-page-head">
+  <div>
+    <p class="admin-page-head__eyebrow">Admin · pedidos</p>
+    <h1>Gestión de pedidos</h1>
+    <p class="admin-page-head__sub">
+      Filtra pedidos reales, revisa totales y actualiza el estado operativo de cada orden.
+    </p>
+  </div>
+</header>
+
+<section class="admin-surface">
+  <header class="admin-surface__head">
+    <div>
+      <h2>Pedidos ({{ filtered().length }})</h2>
+      <p class="admin-surface__sub">Filtra por estado o por usuario.</p>
+    </div>
+    <div class="admin-row-actions">
+      <select
+        class="admin-select"
+        [value]="statusFilter()"
+        (change)="setStatusFilter($any($event.target).value)"
+      >
+        <option value="all">Todos los estados</option>
+        @for (status of orderStatuses; track status) {
+          <option [value]="status">{{ statusLabel(status) }}</option>
+        }
+      </select>
+      <input
+        class="admin-input"
+        type="text"
+        placeholder="Filtrar por User ID"
+        [value]="userFilter()"
+        (input)="setUserFilter($any($event.target).value)"
+      />
+    </div>
+  </header>
+
+  <div class="admin-table-wrap" tabindex="0">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Pedido</th>
+          <th>Cliente</th>
+          <th>Usuario</th>
+          <th>Total</th>
+          <th>Fecha</th>
+          <th>Estado</th>
+          <th class="right">Aplicar</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (order of filtered(); track order.id) {
+          <tr>
+            <td><strong>#{{ order.id }}</strong></td>
+            <td>{{ order.customerName }}</td>
+            <td>
+              <p class="admin-cell-sub" style="margin: 0">{{ order.userId }}</p>
+            </td>
+            <td>{{ order.total | appCurrency }}</td>
+            <td>{{ order.placedAt | date : 'medium' }}</td>
+            <td>
+              <select
+                class="admin-select"
+                [value]="statusValue(order)"
+                (change)="setStatusDraft(order.id, $any($event.target).value)"
+              >
+                @for (status of orderStatuses; track status) {
+                  <option [value]="status">{{ statusLabel(status) }}</option>
+                }
+              </select>
+            </td>
+            <td class="right">
+              <button
+                type="button"
+                class="admin-btn admin-btn--sm"
+                [disabled]="savingOrderId() === order.id"
+                (click)="saveOrderStatus(order)"
+              >
+                {{ savingOrderId() === order.id ? 'Actualizando...' : 'Actualizar' }}
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="7">
+              <p class="admin-empty">No hay pedidos que coincidan con esos filtros.</p>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

@@ -11,6 +11,7 @@ import { FooterComponent } from '../../shared/components/footer/footer.component
 import { InfoModalComponent } from '../../shared/components/info-modal/info-modal.component';
 import { IntroOverlayComponent } from '../../shared/components/intro-overlay/intro-overlay.component';
 import { LoginModalComponent } from '../../shared/components/login-modal/login-modal.component';
+import { ForgotPasswordModalComponent } from '../../shared/components/forgot-password-modal/forgot-password-modal.component';
 import { NavbarComponent } from '../../shared/components/navbar/navbar.component';
 import { RegisterModalComponent } from '../../shared/components/register-modal/register-modal.component';
 import { ToastContainerComponent } from '../../shared/components/toast-container/toast-container.component';
@@ -25,6 +26,7 @@ import { ToastContainerComponent } from '../../shared/components/toast-container
     FooterComponent,
     LoginModalComponent,
     RegisterModalComponent,
+    ForgotPasswordModalComponent,
     InfoModalComponent,
     ToastContainerComponent,
     CartDrawerComponent,

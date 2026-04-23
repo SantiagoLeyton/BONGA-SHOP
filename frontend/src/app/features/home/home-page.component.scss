@@ -11,7 +11,7 @@
 .hero {
   position: relative;
   min-height: min(100svh, 960px);
-  padding: clamp(6.5rem, 11vw, 7.5rem) clamp(1.25rem, 5vw, 5rem) clamp(2.5rem, 6vw, 3.5rem);
+  padding: clamp(4.75rem, 6vw, 5.5rem) clamp(1.25rem, 5vw, 5rem) clamp(2.5rem, 6vw, 3.5rem);
   display: flex;
   align-items: flex-start;
   overflow: hidden;
@@ -501,7 +501,7 @@
 /* Móvil / tablet chica: todo apilado */
 @media (max-width: 900px) {
   .hero {
-    padding: clamp(5rem, 14vw, 7rem) clamp(1.1rem, 5vw, 2rem) clamp(2rem, 6vw, 3rem);
+    padding: clamp(4.25rem, 7vw, 5rem) clamp(1.1rem, 5vw, 2rem) clamp(2rem, 6vw, 3rem);
   }
 
   .hero-grid {
@@ -667,6 +667,12 @@
   justify-content: flex-end;
   gap: 0.55rem;
   margin: 0 0 0.65rem;
+  transition: opacity 200ms ease;
+
+  &.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+  }
 }
 
 .featured-showcase__ctrl {
@@ -699,6 +705,16 @@
   &:focus-visible {
     outline: 2px solid rgba(94, 234, 212, 0.62);
     outline-offset: 2px;
+  }
+
+  &:disabled,
+  &[disabled] {
+    opacity: 0.38;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    border-color: rgba(148, 163, 184, 0.14);
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.45), rgba(8, 11, 22, 0.32));
   }
 }
 

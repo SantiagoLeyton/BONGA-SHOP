@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 
@@ -24,11 +25,18 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final BrandService brandService;
     private final ProductMapper productMapper;
+    private final ProductImageStorageService imageStorage;
 
-    public ProductService(ProductRepository productRepository, BrandService brandService, ProductMapper productMapper) {
+    public ProductService(
+            ProductRepository productRepository,
+            BrandService brandService,
+            ProductMapper productMapper,
+            ProductImageStorageService imageStorage
+    ) {
         this.productRepository = productRepository;
         this.brandService = brandService;
         this.productMapper = productMapper;
+        this.imageStorage = imageStorage;
     }
 
     @Transactional(readOnly = true)
@@ -89,6 +97,23 @@ public class ProductService {
             product.setActive(request.active());
         }
         return productMapper.toDetail(productRepository.save(product), true);
+    }
+
+    /**
+     * Carga (o reemplaza) la imagen principal del producto. Guarda el archivo en disco,
+     * actualiza la entidad con la nueva ruta relativa y borra el archivo previo si existía.
+     */
+    @Transactional
+    public ProductDetailResponse updateImage(Long id, MultipartFile file) {
+        Product product = getProductEntity(id);
+        String previousPath = product.getImagePath();
+        String storedPath = imageStorage.store(file);
+        product.setImagePath(storedPath);
+        Product saved = productRepository.save(product);
+        if (previousPath != null && !previousPath.equals(storedPath)) {
+            imageStorage.deleteQuietly(previousPath);
+        }
+        return productMapper.toDetail(saved, true);
     }
 
     @Transactional

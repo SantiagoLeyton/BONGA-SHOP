@@ -7,6 +7,7 @@ public record ProductCardResponse(
         String name,
         String description,
         String brand,
+        String imageUrl,
         BigDecimal minPrice,
         BigDecimal maxPrice,
         boolean hasStock

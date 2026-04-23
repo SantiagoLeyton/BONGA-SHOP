@@ -105,6 +105,35 @@ export class AuthService {
     safeWrite(null);
   }
 
+  /**
+   * Solicita un correo de restablecimiento. El backend siempre responde 202
+   * aunque el correo no exista; aquí solo traducimos errores de red/validación.
+   */
+  async requestPasswordReset(email: string): Promise<void> {
+    try {
+      await firstValueFrom(
+        this.http.post<void>(`${this.apiUrl}/auth/password-reset/request`, {
+          email: email.trim().toLowerCase(),
+        }),
+      );
+    } catch (error) {
+      throw this.mapHttpError(error, 'No se pudo iniciar la recuperación de contraseña.');
+    }
+  }
+
+  async confirmPasswordReset(token: string, newPassword: string): Promise<void> {
+    try {
+      await firstValueFrom(
+        this.http.post<void>(`${this.apiUrl}/auth/password-reset/confirm`, {
+          token: token.trim(),
+          newPassword,
+        }),
+      );
+    } catch (error) {
+      throw this.mapHttpError(error, 'No se pudo restablecer la contraseña.');
+    }
+  }
+
   private normalizeAuthResponse(response: AuthResponse): StoredAuth {
     return {
       token: response.token,
@@ -156,8 +185,17 @@ export class AuthService {
     if (message.includes('inactive users cannot log in')) {
       return 'Tu cuenta está inactiva. Contacta soporte para reactivarla.';
     }
+    if (message.includes('inactive users cannot reset')) {
+      return 'Tu cuenta está inactiva. Contacta soporte para reactivarla antes de cambiar la contraseña.';
+    }
     if (message.includes('email is already registered')) {
       return 'Ya existe una cuenta registrada con ese correo. Intenta iniciar sesión.';
+    }
+    if (message.includes('invalid or expired reset token')) {
+      return 'El enlace de recuperación no es válido o ya expiró. Solicita uno nuevo.';
+    }
+    if (message.includes('password must be at least')) {
+      return 'La nueva contraseña debe tener al menos 8 caracteres.';
     }
     if (status === 401) {
       return 'Correo o contraseña incorrectos. Revisa tus datos e inténtalo de nuevo.';

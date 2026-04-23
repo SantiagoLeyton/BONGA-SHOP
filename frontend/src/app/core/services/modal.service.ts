@@ -1,6 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 
-export type ModalId = 'login' | 'register' | 'info';
+export type ModalId = 'login' | 'register' | 'info' | 'forgot-password';
 
 @Injectable({ providedIn: 'root' })
 export class ModalService {
@@ -15,6 +15,10 @@ export class ModalService {
   openRegister(redirectTo?: string | null): void {
     this.authRedirect.set(redirectTo ?? null);
     this.active.set('register');
+  }
+
+  openForgotPassword(): void {
+    this.active.set('forgot-password');
   }
 
   openInfo(): void {

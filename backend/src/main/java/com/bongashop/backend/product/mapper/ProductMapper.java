@@ -7,6 +7,7 @@ import com.bongashop.backend.productvariant.dto.ProductVariantResponse;
 import com.bongashop.backend.productvariant.entity.ProductVariant;
 import com.bongashop.backend.productvariant.mapper.ProductVariantMapper;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.math.BigDecimal;
 import java.util.Comparator;
@@ -33,6 +34,7 @@ public class ProductMapper {
                 product.getName(),
                 product.getDescription(),
                 product.getBrand().getName(),
+                resolveImageUrl(product.getImagePath()),
                 minPrice,
                 maxPrice,
                 hasStock
@@ -51,7 +53,27 @@ public class ProductMapper {
                 product.isActive(),
                 product.getBrand().getId(),
                 product.getBrand().getName(),
+                resolveImageUrl(product.getImagePath()),
                 variants
         );
+    }
+
+    /**
+     * Arma una URL absoluta pública para la imagen a partir del path relativo guardado en BD.
+     * Devuelve {@code null} cuando el producto todavía no tiene imagen cargada.
+     */
+    private String resolveImageUrl(String imagePath) {
+        if (imagePath == null || imagePath.isBlank()) {
+            return null;
+        }
+        try {
+            return ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/uploads/")
+                    .path(imagePath)
+                    .toUriString();
+        } catch (IllegalStateException ex) {
+            // Fuera de un request (p. ej. tests): devolvemos el path relativo como fallback.
+            return "/uploads/" + imagePath;
+        }
     }
 }

@@ -36,6 +36,13 @@ public class Product {
     @Column(nullable = false)
     private boolean active = true;
 
+    /**
+     * Ruta relativa del archivo cargado bajo el directorio configurado en {@code app.uploads.dir}.
+     * Por ejemplo: {@code products/uuid.png}. La URL pública se construye al mapear a DTO.
+     */
+    @Column(name = "image_path", length = 255)
+    private String imagePath;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "brand_id", nullable = false)
     private Brand brand;
@@ -98,5 +105,13 @@ public class Product {
 
     public List<ProductVariant> getVariants() {
         return variants;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 }

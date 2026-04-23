@@ -26,6 +26,7 @@ type ProductDetailApiResponse = {
   active: boolean;
   brandId: number;
   brand: string;
+  imageUrl?: string | null;
   variants: ProductVariantApiResponse[];
 };
 
@@ -120,7 +121,9 @@ export class ProductService {
     return this.getProducts().pipe(
       map((list) => {
         const featured = list.filter((product) => product.featured);
-        return (featured.length ? featured : list).slice(0, 4);
+        const rest = list.filter((product) => !product.featured);
+        const combined = [...featured, ...rest];
+        return combined.slice(0, 8);
       }),
     );
   }
@@ -194,6 +197,26 @@ export class ProductService {
     }
   }
 
+  async uploadProductImage(productId: string, file: File): Promise<Product> {
+    if (!file) {
+      throw new Error('Selecciona una imagen antes de subirla.');
+    }
+    try {
+      const formData = new FormData();
+      formData.append('file', file, file.name);
+      const response = await firstValueFrom(
+        this.http.post<ProductDetailApiResponse>(
+          `${environment.apiUrl}/products/${productId}/image`,
+          formData,
+        ),
+      );
+      this.refresh();
+      return this.toProduct(response, 0);
+    } catch (error) {
+      throw this.mapHttpError(error, 'No se pudo subir la imagen del producto.');
+    }
+  }
+
   refresh(): void {
     this.refresh$.next();
   }
@@ -236,7 +259,9 @@ export class ProductService {
         slug: this.slugify(response.brand),
         active: true,
       },
-      imageUrl: this.resolveProductImage(slug),
+      imageUrl: response.imageUrl && response.imageUrl.trim().length
+        ? response.imageUrl
+        : this.resolveProductImage(slug),
       badge: this.resolveBadge(totalStock, index),
       featured: index < 4,
       active: response.active,

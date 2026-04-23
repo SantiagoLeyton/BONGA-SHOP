@@ -54,8 +54,17 @@ html {
 body {
   margin: 0;
   font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  /* Keep background ultra-clean to avoid visible seams */
-  background: linear-gradient(180deg, #070a12 0%, #060812 100%);
+  /**
+   * Fondo global premium:
+   * - Dos tintes neón (cyan arriba-izq / violeta abajo-der) MUY suaves
+   *   alineados con la identidad BONGA.
+   * - Base dark casi negra con tono azulado para que no se vea plano.
+   */
+  background:
+    radial-gradient(1200px 620px at 8% -6%, rgba(94, 234, 212, 0.05), transparent 62%),
+    radial-gradient(1000px 600px at 104% 108%, rgba(167, 139, 250, 0.045), transparent 62%),
+    linear-gradient(180deg, #070a12 0%, #05080f 100%);
+  background-attachment: fixed;
   color: var(--color-text);
   text-rendering: optimizeLegibility;
 }
@@ -87,19 +96,41 @@ a {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Subtle noise to avoid visible gradient seams/banding */
+/**
+ * Texturizado global — capa 1: grano fino tipo papel (fractal noise SVG).
+ * Ultra leve, aporta materialidad sin competir con el contenido.
+ */
 body::before {
   content: '';
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.08;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.35'/%3E%3C/svg%3E");
-  background-size: 420px 420px;
-  mix-blend-mode: overlay;
-  filter: blur(0.8px);
+  opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.95' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='.7'/%3E%3C/svg%3E");
+  background-size: 260px 260px;
   transform: translateZ(0);
+}
+
+/**
+ * Texturizado global — capa 2: líneas diagonales finas (1px c/18px).
+ * Inclinación 135° para que acompañe la lectura sin llamar la atención.
+ * Se desvanecen hacia los bordes con una máscara radial suave.
+ */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.9;
+  background-image: repeating-linear-gradient(
+    135deg,
+    transparent 0 17px,
+    rgba(148, 163, 184, 0.055) 17px 18px
+  );
+  mask-image: radial-gradient(ellipse at center, #000 60%, transparent 96%);
+  -webkit-mask-image: radial-gradient(ellipse at center, #000 60%, transparent 96%);
 }
 
 app-root {

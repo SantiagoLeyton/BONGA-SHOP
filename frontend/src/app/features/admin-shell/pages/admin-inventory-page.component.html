@@ -1,0 +1,100 @@
+<header class="admin-page-head">
+  <div>
+    <p class="admin-page-head__eyebrow">Admin · inventario</p>
+    <h1>Stock por variante</h1>
+    <p class="admin-page-head__sub">
+      Ajusta el stock real de cada variante y detecta rápidamente los faltantes.
+    </p>
+  </div>
+  <div class="admin-page-head__actions">
+    <button type="button" class="admin-btn" (click)="toggleLowStock()">
+      @if (lowStockOnly()) {
+        Ver todo
+      } @else {
+        Solo stock bajo
+      }
+    </button>
+  </div>
+</header>
+
+<section class="admin-surface">
+  <header class="admin-surface__head">
+    <div>
+      <h2>Inventario ({{ filtered().length }})</h2>
+      <p class="admin-surface__sub">Edita el stock y guarda los cambios por variante.</p>
+    </div>
+    <div>
+      <label class="sr-only" for="inventory-search">Buscar</label>
+      <input
+        id="inventory-search"
+        class="admin-input"
+        type="search"
+        placeholder="Buscar por producto, marca o sabor"
+        [value]="query()"
+        (input)="setQuery($any($event.target).value)"
+      />
+    </div>
+  </header>
+
+  <div class="admin-table-wrap" tabindex="0">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Variante</th>
+          <th>Estado</th>
+          <th class="right">Stock</th>
+          <th class="right">Guardar</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of filtered(); track item.variantId) {
+          <tr>
+            <td>
+              <div class="admin-cell-title">
+                <span class="admin-dot admin-dot--b" aria-hidden="true"></span>
+                {{ item.productName }}
+              </div>
+              <p class="admin-cell-sub">{{ item.brandName }}</p>
+            </td>
+            <td>{{ item.flavor }} · {{ item.nicotineLevel }}</td>
+            <td>
+              @if (!item.active) {
+                <span class="admin-pill warn">Inactiva</span>
+              } @else if (item.lowStock) {
+                <span class="admin-pill bad">Stock bajo</span>
+              } @else {
+                <span class="admin-pill ok">Activa</span>
+              }
+            </td>
+            <td class="right">
+              <input
+                class="admin-input admin-input--sm admin-input--stock"
+                type="number"
+                min="0"
+                [value]="stockValue(item)"
+                (input)="setStockDraft(item.variantId, $any($event.target).value)"
+              />
+            </td>
+            <td class="right">
+              <button
+                type="button"
+                class="admin-btn admin-btn--sm"
+                [disabled]="savingStockId() === item.variantId"
+                (click)="saveStock(item)"
+              >
+                {{ savingStockId() === item.variantId ? 'Guardando...' : 'Guardar' }}
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5">
+              <p class="admin-empty">No hay registros de inventario para mostrar.</p>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

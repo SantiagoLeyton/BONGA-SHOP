@@ -2,6 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { ModalService } from '../../../core/services/modal.service';
+import { scrollWindowToTop } from '../../utils/scroll.util';
 
 @Component({
   selector: 'app-footer',
@@ -28,8 +29,6 @@ export class FooterComponent {
   }
 
   scrollToTop(): void {
-    if (typeof window === 'undefined') return;
-    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+    scrollWindowToTop();
   }
 }

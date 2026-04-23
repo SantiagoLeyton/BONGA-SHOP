@@ -22,6 +22,7 @@ import {
 import { ToastService } from '../../../core/services/toast.service';
 import { WishlistService } from '../../../core/services/wishlist.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
+import { scrollWindowToTop } from '../../utils/scroll.util';
 
 /** Umbral de scroll (px) a partir del cual el header toma el modo compacto. */
 const SCROLL_THRESHOLD = 18;
@@ -131,9 +132,7 @@ export class NavbarComponent {
   }
 
   scrollToTop(): void {
-    if (typeof window === 'undefined') return;
-    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-    window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' });
+    scrollWindowToTop();
   }
 
   @HostListener('window:keydown.escape')

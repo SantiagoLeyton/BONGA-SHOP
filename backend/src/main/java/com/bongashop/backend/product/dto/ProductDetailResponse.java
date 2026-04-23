@@ -11,6 +11,7 @@ public record ProductDetailResponse(
         boolean active,
         Long brandId,
         String brand,
+        String imageUrl,
         List<ProductVariantResponse> variants
 ) {
 }

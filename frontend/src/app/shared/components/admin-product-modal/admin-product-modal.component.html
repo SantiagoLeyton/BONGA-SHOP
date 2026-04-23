@@ -43,6 +43,60 @@
       </label>
     </div>
 
+    <section class="image-card">
+      <div class="image-head">
+        <div>
+          <p class="muted small">Imagen principal</p>
+          <h3>Foto del producto</h3>
+        </div>
+        @if (imageFile || imagePreview) {
+          <button type="button" class="btn btn-text btn-sm" (click)="clearImage()">Quitar</button>
+        }
+      </div>
+
+      <div
+        class="image-dropzone"
+        [class.has-preview]="!!imagePreview"
+        (click)="triggerImagePicker()"
+        (dragover)="onDragOver($event)"
+        (drop)="onImageDropped($event)"
+        role="button"
+        tabindex="0"
+        (keydown.enter)="triggerImagePicker()"
+        (keydown.space)="triggerImagePicker()"
+      >
+        @if (imagePreview) {
+          <img [src]="imagePreview" alt="Vista previa del producto" class="image-preview" />
+          <div class="image-overlay">
+            <span>Click o arrastra para reemplazar</span>
+          </div>
+        } @else {
+          <div class="image-placeholder">
+            <span class="image-icon" aria-hidden="true">📷</span>
+            <p class="image-title">Sube una imagen del producto</p>
+            <p class="image-hint">JPG, PNG o WEBP · máx. 5 MB</p>
+            <span class="btn btn-secondary btn-sm">Seleccionar archivo</span>
+          </div>
+        }
+      </div>
+
+      <input
+        #imageInput
+        type="file"
+        accept="image/jpeg,image/jpg,image/png,image/webp"
+        (change)="onImageSelected($event)"
+        hidden
+      />
+
+      @if (imageError) {
+        <p class="image-error">{{ imageError }}</p>
+      } @else if (imageFile) {
+        <p class="image-note">Nuevo archivo: {{ imageFile.name }}</p>
+      } @else if (product && imagePreview) {
+        <p class="image-note muted">Se mantendrá la imagen actual si no eliges una nueva.</p>
+      }
+    </section>
+
     <section class="variants-card">
       <div class="variants-head">
         <div>
@@ -91,6 +145,10 @@
       </div>
     </div>
 
+    @if (getBlocker(); as blocker) {
+      <p class="blocker" role="status">{{ blocker }}</p>
+    }
+
     <div class="actions">
       <button type="button" class="btn btn-ghost" (click)="close()" [disabled]="saving">Cancelar</button>
       <button
@@ -98,7 +156,7 @@
         class="btn btn-primary"
         [class.is-loading]="saving"
         [attr.aria-busy]="saving"
-        [disabled]="saving || form.invalid || !brands.length || !variants.length"
+        [disabled]="saving"
       >
         {{ saving ? 'Guardando cambios...' : 'Guardar cambios' }}
       </button>

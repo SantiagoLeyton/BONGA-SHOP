@@ -1,0 +1,114 @@
+<div class="admin-shell">
+  <aside class="admin-sidebar" aria-label="Navegación del panel">
+    <header class="admin-sidebar__head">
+      <p class="admin-sidebar__eyebrow">BONGA SHOP</p>
+      <h1 class="admin-sidebar__title">Panel admin</h1>
+    </header>
+
+    <nav class="admin-nav" aria-label="Secciones">
+      <ul>
+        @for (item of navItems; track item.id) {
+          <li>
+            <a
+              class="admin-nav__link"
+              [routerLink]="[item.path]"
+              routerLinkActive="is-active"
+              [routerLinkActiveOptions]="{ exact: !!item.exact }"
+            >
+              <span class="admin-nav__icon" aria-hidden="true">
+                @switch (item.icon) {
+                  @case ('dashboard') {
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M4 13h7V4H4v9Zm0 7h7v-5H4v5Zm9 0h7v-9h-7v9Zm0-16v5h7V4h-7Z"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  }
+                  @case ('box') {
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M3 7.5 12 3l9 4.5M3 7.5 12 12m-9-4.5V17l9 4m0-9v9m0-9 9-4.5V17l-9 4"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                        stroke-linejoin="round"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                  }
+                  @case ('tag') {
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="m4 13 9 9 8-8-9-9H4v8Z"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                        stroke-linejoin="round"
+                      />
+                      <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" />
+                    </svg>
+                  }
+                  @case ('layers') {
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M12 3 3 7.5 12 12l9-4.5L12 3Zm-9 9 9 4.5L21 12m-18 4.5L12 21l9-4.5"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                        stroke-linejoin="round"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                  }
+                  @case ('receipt') {
+                    <svg viewBox="0 0 24 24" fill="none">
+                      <path
+                        d="M6 3h12v18l-3-2-3 2-3-2-3 2V3Zm3 5h6m-6 4h6m-6 4h4"
+                        stroke="currentColor"
+                        stroke-width="1.6"
+                        stroke-linejoin="round"
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                  }
+                }
+              </span>
+              <span class="admin-nav__body">
+                <span class="admin-nav__label">{{ item.label }}</span>
+                <span class="admin-nav__caption">{{ item.caption }}</span>
+              </span>
+              @if (item.id !== 'overview') {
+                <span class="admin-nav__badge">{{ countFor(item.id) }}</span>
+              }
+            </a>
+          </li>
+        }
+      </ul>
+    </nav>
+
+    <div class="admin-sidebar__sep" aria-hidden="true"></div>
+
+    <div class="admin-sidebar__alert" [class.is-warn]="lowStockCount() > 0">
+      <p class="admin-sidebar__alert-label">Stock crítico</p>
+      <p class="admin-sidebar__alert-value">{{ lowStockCount() }}</p>
+      <p class="admin-sidebar__alert-hint">variantes requieren atención</p>
+    </div>
+
+    <a class="admin-sidebar__back" routerLink="/">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="m15 6-6 6 6 6"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      Volver a la tienda
+    </a>
+  </aside>
+
+  <main class="admin-main">
+    <router-outlet />
+  </main>
+</div>

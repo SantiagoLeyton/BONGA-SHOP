@@ -95,11 +95,15 @@
     </header>
 
     <div class="featured-showcase" appRevealScroll>
-      <div class="featured-showcase__controls">
+      <div
+        class="featured-showcase__controls"
+        [class.is-hidden]="!canScrollPrev() && !canScrollNext()"
+      >
         <button
           type="button"
           class="featured-showcase__ctrl"
           (click)="scrollFeatured(-1)"
+          [disabled]="!canScrollPrev()"
           aria-label="Ver destacados anteriores"
         >
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -110,6 +114,7 @@
           type="button"
           class="featured-showcase__ctrl"
           (click)="scrollFeatured(1)"
+          [disabled]="!canScrollNext()"
           aria-label="Ver más destacados"
         >
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">

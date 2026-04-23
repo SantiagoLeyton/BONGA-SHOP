@@ -1,0 +1,127 @@
+<header class="admin-page-head">
+  <div>
+    <p class="admin-page-head__eyebrow">Admin · fabricantes</p>
+    <h1>Marcas</h1>
+    <p class="admin-page-head__sub">
+      Gestiona las marcas disponibles para asignar a cada producto del catálogo.
+    </p>
+  </div>
+</header>
+
+<section class="admin-surface">
+  <header class="admin-surface__head">
+    <div>
+      <h2>Crear marca</h2>
+      <p class="admin-surface__sub">Añade una nueva marca al sistema.</p>
+    </div>
+    <div class="admin-row-actions">
+      <input
+        class="admin-input"
+        type="text"
+        placeholder="Nombre de la marca"
+        [value]="brandDraft()"
+        (input)="setBrandDraft($any($event.target).value)"
+      />
+      <button
+        type="button"
+        class="admin-btn admin-btn--primary"
+        [disabled]="brandSaving() || !brandDraft().trim()"
+        (click)="createBrand()"
+      >
+        {{ brandSaving() ? 'Guardando...' : 'Crear marca' }}
+      </button>
+    </div>
+  </header>
+</section>
+
+<section class="admin-surface" style="margin-top: 1rem">
+  <header class="admin-surface__head">
+    <div>
+      <h2>Listado ({{ filtered().length }})</h2>
+      <p class="admin-surface__sub">Edita o elimina marcas registradas.</p>
+    </div>
+    <div>
+      <label class="sr-only" for="brands-search">Buscar</label>
+      <input
+        id="brands-search"
+        class="admin-input"
+        type="search"
+        placeholder="Buscar marca"
+        [value]="query()"
+        (input)="setQuery($any($event.target).value)"
+      />
+    </div>
+  </header>
+
+  <div class="admin-table-wrap" tabindex="0">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Marca</th>
+          <th>Slug</th>
+          <th>Productos</th>
+          <th class="right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (brand of filtered(); track brand.id) {
+          <tr>
+            <td>
+              @if (editingBrand() === brand.id) {
+                <input
+                  class="admin-input admin-input--sm"
+                  [value]="brandEditValue()"
+                  (input)="setBrandEditValue($any($event.target).value)"
+                />
+              } @else {
+                <div class="admin-cell-title">
+                  <span class="admin-dot admin-dot--c" aria-hidden="true"></span>
+                  {{ brand.name }}
+                </div>
+              }
+            </td>
+            <td>
+              <p class="admin-cell-sub" style="margin: 0">{{ brand.slug }}</p>
+            </td>
+            <td>{{ productCount(brand.id) }}</td>
+            <td class="right">
+              <div class="admin-row-actions">
+                @if (editingBrand() === brand.id) {
+                  <button
+                    type="button"
+                    class="admin-btn admin-btn--sm admin-btn--primary"
+                    [disabled]="brandSaving()"
+                    (click)="saveBrand(brand)"
+                  >
+                    {{ brandSaving() ? 'Guardando...' : 'Guardar' }}
+                  </button>
+                  <button type="button" class="admin-btn admin-btn--sm" (click)="cancelBrandEdit()">
+                    Cancelar
+                  </button>
+                } @else {
+                  <button type="button" class="admin-btn admin-btn--sm" (click)="startBrandEdit(brand)">
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    class="admin-btn admin-btn--sm admin-btn--danger"
+                    [disabled]="deletingBrandId() === brand.id"
+                    (click)="deleteBrand(brand)"
+                  >
+                    {{ deletingBrandId() === brand.id ? 'Eliminando...' : 'Eliminar' }}
+                  </button>
+                }
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4">
+              <p class="admin-empty">Todavía no hay marcas registradas.</p>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</section>

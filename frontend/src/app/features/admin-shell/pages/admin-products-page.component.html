@@ -1,0 +1,115 @@
+<header class="admin-page-head">
+  <div>
+    <p class="admin-page-head__eyebrow">Admin · catálogo</p>
+    <h1>Productos</h1>
+    <p class="admin-page-head__sub">
+      Crea, edita o desactiva productos y variantes desde una sola vista.
+    </p>
+  </div>
+  <div class="admin-page-head__actions">
+    <button
+      type="button"
+      class="admin-btn admin-btn--primary"
+      (click)="openCreate()"
+      [disabled]="!brands().length"
+    >
+      + Nuevo producto
+    </button>
+  </div>
+</header>
+
+<section class="admin-surface">
+  <header class="admin-surface__head">
+    <div>
+      <h2>Catálogo ({{ filtered().length }})</h2>
+      <p class="admin-surface__sub">Busca por nombre, marca o sabor.</p>
+    </div>
+    <div>
+      <label class="sr-only" for="products-search">Buscar</label>
+      <input
+        id="products-search"
+        class="admin-input"
+        type="search"
+        placeholder="Buscar producto, marca o sabor"
+        [value]="query()"
+        (input)="setQuery($any($event.target).value)"
+      />
+    </div>
+  </header>
+
+  <div class="admin-table-wrap" tabindex="0">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Marca</th>
+          <th>Variantes</th>
+          <th>Stock</th>
+          <th class="right">Precio desde</th>
+          <th class="right">Estado</th>
+          <th class="right">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (product of view(); track product.id) {
+          <tr>
+            <td>
+              <div class="admin-cell-title">
+                <span class="admin-dot admin-dot--a" aria-hidden="true"></span>
+                {{ product.name }}
+              </div>
+              <p class="admin-cell-sub">{{ product.slug }}</p>
+            </td>
+            <td>{{ product.brand.name }}</td>
+            <td>{{ product.variants.length }}</td>
+            <td>{{ stockTotal(product) }}</td>
+            <td class="right">{{ minPrice(product) | appCurrency }}</td>
+            <td class="right">
+              @if (product.active === false) {
+                <span class="admin-pill warn">Inactivo</span>
+              } @else if (stockTotal(product) <= 5) {
+                <span class="admin-pill bad">Stock bajo</span>
+              } @else {
+                <span class="admin-pill ok">Activo</span>
+              }
+            </td>
+            <td class="right">
+              <div class="admin-row-actions">
+                <button type="button" class="admin-btn admin-btn--sm" (click)="openEdit(product)">Editar</button>
+                <button
+                  type="button"
+                  class="admin-btn admin-btn--sm admin-btn--danger"
+                  [disabled]="deletingProductId() === product.id"
+                  (click)="deleteProduct(product)"
+                >
+                  {{ deletingProductId() === product.id ? 'Desactivando...' : 'Desactivar' }}
+                </button>
+              </div>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="7">
+              <p class="admin-empty">No hay resultados para esa búsqueda.</p>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="admin-pager">
+    <button type="button" class="admin-btn admin-btn--sm" (click)="prev()">Anterior</button>
+    <p class="admin-pager__info">Página {{ page() }} / {{ totalPages() }}</p>
+    <button type="button" class="admin-btn admin-btn--sm" (click)="next()">Siguiente</button>
+  </div>
+</section>
+
+<app-admin-product-modal
+  [isOpen]="modalOpen()"
+  [product]="editing()"
+  [brands]="brands()"
+  [saving]="productSaving()"
+  (closed)="closeModal()"
+  (saved)="saveProduct($event)"
+/>

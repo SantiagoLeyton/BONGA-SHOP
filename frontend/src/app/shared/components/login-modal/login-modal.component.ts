@@ -88,6 +88,7 @@ export class LoginModalComponent {
   }
 
   forgotPassword(): void {
-    this.toasts.show('La recuperación de contraseña estará disponible en una próxima etapa.', 'info', 'Ayuda');
+    this.modal.openForgotPassword();
+    this.error.set(null);
   }
 }

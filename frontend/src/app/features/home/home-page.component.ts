@@ -1,4 +1,4 @@
-import { afterNextRender, Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { afterNextRender, Component, computed, ElementRef, HostListener, inject, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import gsap from 'gsap';
@@ -44,6 +44,8 @@ export class HomePageComponent {
 
   readonly heroImageReady = signal(false);
   readonly featuredActive = signal(0);
+  readonly canScrollPrev = signal(false);
+  readonly canScrollNext = signal(false);
 
   readonly statTargets = computed(() => {
     const list = this.allProducts();
@@ -61,8 +63,17 @@ export class HomePageComponent {
     afterNextRender(() => {
       this.runHeroIntro();
       this.runHeroMicroMotion();
-      this.updateFeaturedActive();
+      requestAnimationFrame(() => {
+        this.updateFeaturedActive();
+        this.updateFeaturedScrollFlags();
+      });
     });
+  }
+
+  @HostListener('window:resize')
+  onWindowResize(): void {
+    this.updateFeaturedScrollFlags();
+    this.updateFeaturedActive();
   }
 
   onHeroImageLoad(): void {
@@ -103,7 +114,17 @@ export class HomePageComponent {
   scrollFeatured(direction: 1 | -1): void {
     const track = this.featuredTrack()?.nativeElement;
     if (!track) return;
-    const step = Math.max(track.clientWidth * 0.82, 280);
+    const cards = Array.from(track.querySelectorAll<HTMLElement>('.featured-showcase__item'));
+    if (!cards.length) return;
+
+    const maxScroll = track.scrollWidth - track.clientWidth;
+    if (maxScroll <= 1) return;
+
+    const firstCard = cards[0];
+    const cardWidth = firstCard?.offsetWidth ?? track.clientWidth * 0.3;
+    const gap = cards[1] ? cards[1].offsetLeft - (firstCard!.offsetLeft + firstCard!.offsetWidth) : 16;
+    const step = Math.max(cardWidth + gap, 260);
+
     track.scrollBy({
       left: step * direction,
       behavior: prefersReducedMotion() ? 'auto' : 'smooth',
@@ -117,14 +138,16 @@ export class HomePageComponent {
     const card = cards[index];
     if (!card) return;
     const left = card.offsetLeft - (track.clientWidth - card.offsetWidth) / 2;
+    const maxScroll = Math.max(0, track.scrollWidth - track.clientWidth);
     track.scrollTo({
-      left: Math.max(0, left),
+      left: Math.min(maxScroll, Math.max(0, left)),
       behavior: prefersReducedMotion() ? 'auto' : 'smooth',
     });
   }
 
   onFeaturedScroll(): void {
     this.updateFeaturedActive();
+    this.updateFeaturedScrollFlags();
   }
 
   private updateFeaturedActive(): void {
@@ -146,6 +169,19 @@ export class HomePageComponent {
     if (closestIndex !== this.featuredActive()) {
       this.featuredActive.set(closestIndex);
     }
+  }
+
+  private updateFeaturedScrollFlags(): void {
+    const track = this.featuredTrack()?.nativeElement;
+    if (!track) {
+      this.canScrollPrev.set(false);
+      this.canScrollNext.set(false);
+      return;
+    }
+    const maxScroll = track.scrollWidth - track.clientWidth;
+    const left = track.scrollLeft;
+    this.canScrollPrev.set(left > 2);
+    this.canScrollNext.set(maxScroll > 2 && left < maxScroll - 2);
   }
 
   private runHeroIntro(): void {

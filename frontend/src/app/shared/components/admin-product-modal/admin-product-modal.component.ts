@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, DestroyRef, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild, inject } from '@angular/core';
 import { FormArray, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import type { Brand } from '../../../core/models/brand.model';
 import type { Product } from '../../../core/models/product.model';
@@ -14,6 +14,14 @@ type VariantFormGroup = FormGroup<{
   active: FormControl<boolean>;
 }>;
 
+export type AdminProductSavedEvent = {
+  draft: AdminProductDraft;
+  imageFile: File | null;
+};
+
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+
 @Component({
   selector: 'app-admin-product-modal',
   standalone: true,
@@ -27,7 +35,11 @@ export class AdminProductModalComponent implements OnChanges {
   @Input() brands: Brand[] = [];
   @Input() saving = false;
   @Output() closed = new EventEmitter<void>();
-  @Output() saved = new EventEmitter<AdminProductDraft>();
+  @Output() saved = new EventEmitter<AdminProductSavedEvent>();
+
+  @ViewChild('imageInput') imageInput?: ElementRef<HTMLInputElement>;
+
+  private readonly destroyRef = inject(DestroyRef);
 
   readonly form = new FormGroup({
     name: new FormControl('', { nonNullable: true, validators: [Validators.required, Validators.minLength(2)] }),
@@ -39,6 +51,18 @@ export class AdminProductModalComponent implements OnChanges {
     active: new FormControl(true, { nonNullable: true }),
     variants: new FormArray<VariantFormGroup>([]),
   });
+
+  imagePreview: string | null = null;
+  imageError: string | null = null;
+  imageFile: File | null = null;
+  /** URL de imagen actual del producto cuando se está editando (cuando no se eligió nueva). */
+  private existingImageUrl: string | null = null;
+  /** ObjectURL temporal que debemos revocar al reemplazar o cerrar. */
+  private localPreviewUrl: string | null = null;
+
+  constructor() {
+    this.destroyRef.onDestroy(() => this.revokeLocalPreview());
+  }
 
   get variants(): FormArray<VariantFormGroup> {
     return this.form.controls.variants;
@@ -86,6 +110,36 @@ export class AdminProductModalComponent implements OnChanges {
     this.variants.removeAt(index);
   }
 
+  onImageSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0] ?? null;
+    this.setImageFile(file);
+  }
+
+  onImageDropped(event: DragEvent): void {
+    event.preventDefault();
+    const file = event.dataTransfer?.files?.[0] ?? null;
+    this.setImageFile(file);
+  }
+
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+  }
+
+  clearImage(): void {
+    this.revokeLocalPreview();
+    this.imageFile = null;
+    this.imagePreview = this.existingImageUrl;
+    this.imageError = null;
+    if (this.imageInput?.nativeElement) {
+      this.imageInput.nativeElement.value = '';
+    }
+  }
+
+  triggerImagePicker(): void {
+    this.imageInput?.nativeElement.click();
+  }
+
   save(): void {
     if (this.form.invalid || !this.variants.length) {
       this.form.markAllAsTouched();
@@ -94,19 +148,22 @@ export class AdminProductModalComponent implements OnChanges {
 
     const raw = this.form.getRawValue();
     this.saved.emit({
-      id: this.product?.id,
-      name: raw.name.trim(),
-      brandId: raw.brandId,
-      description: raw.description.trim(),
-      active: raw.active,
-      variants: raw.variants.map((variant) => ({
-        id: variant.id || undefined,
-        flavor: variant.flavor.trim(),
-        nicotineMg: Number(variant.nicotineMg),
-        price: Number(variant.price),
-        stock: Math.max(0, Math.floor(Number(variant.stock))),
-        active: variant.active,
-      })),
+      draft: {
+        id: this.product?.id,
+        name: raw.name.trim(),
+        brandId: raw.brandId,
+        description: raw.description.trim(),
+        active: raw.active,
+        variants: raw.variants.map((variant) => ({
+          id: variant.id || undefined,
+          flavor: variant.flavor.trim(),
+          nicotineMg: Number(variant.nicotineMg),
+          price: Number(variant.price),
+          stock: Math.max(0, Math.floor(Number(variant.stock))),
+          active: variant.active,
+        })),
+      },
+      imageFile: this.imageFile,
     });
   }
 
@@ -123,11 +180,92 @@ export class AdminProductModalComponent implements OnChanges {
     return control.invalid && (control.touched || control.dirty);
   }
 
+  /**
+   * Devuelve un mensaje claro explicando por qué el formulario todavía no se puede guardar.
+   * Si está completo y válido retorna {@code null}.
+   */
+  getBlocker(): string | null {
+    if (!this.brands.length) {
+      return 'No hay marcas activas. Crea al menos una marca antes de registrar productos.';
+    }
+
+    const name = this.form.controls.name.value.trim();
+    if (name.length < 2) {
+      return 'Ingresa un nombre de producto de al menos 2 caracteres.';
+    }
+
+    if (!this.form.controls.brandId.value) {
+      return 'Selecciona una marca para el producto.';
+    }
+
+    const description = this.form.controls.description.value.trim();
+    if (description.length < 10) {
+      return 'La descripción debe tener al menos 10 caracteres.';
+    }
+    if (description.length > 1000) {
+      return 'La descripción no puede superar los 1000 caracteres.';
+    }
+
+    if (!this.variants.length) {
+      return 'Agrega al menos una variante.';
+    }
+
+    for (let i = 0; i < this.variants.length; i++) {
+      const variant = this.variants.at(i);
+      const flavor = (variant.controls.flavor.value ?? '').trim();
+      if (flavor.length < 2) {
+        return `Completa el sabor de la variante #${i + 1}.`;
+      }
+      if (Number(variant.controls.nicotineMg.value) < 0) {
+        return `La nicotina de la variante #${i + 1} no puede ser negativa.`;
+      }
+      if (Number(variant.controls.price.value) < 0.01) {
+        return `Ingresa un precio válido para la variante #${i + 1}.`;
+      }
+      if (Number(variant.controls.stock.value) < 0) {
+        return `El stock de la variante #${i + 1} no puede ser negativo.`;
+      }
+    }
+
+    return null;
+  }
+
+  private setImageFile(file: File | null): void {
+    if (!file) {
+      return;
+    }
+    if (!ACCEPTED_IMAGE_TYPES.includes(file.type.toLowerCase())) {
+      this.imageError = 'Formato no soportado. Usa JPG, PNG o WEBP.';
+      return;
+    }
+    if (file.size > MAX_IMAGE_BYTES) {
+      this.imageError = 'La imagen supera el tamaño máximo de 5 MB.';
+      return;
+    }
+    this.revokeLocalPreview();
+    this.imageFile = file;
+    this.imageError = null;
+    this.localPreviewUrl = URL.createObjectURL(file);
+    this.imagePreview = this.localPreviewUrl;
+  }
+
+  private revokeLocalPreview(): void {
+    if (this.localPreviewUrl) {
+      URL.revokeObjectURL(this.localPreviewUrl);
+      this.localPreviewUrl = null;
+    }
+  }
+
   private resetForm(): void {
     this.variants.clear();
+    this.revokeLocalPreview();
+    this.imageFile = null;
+    this.imageError = null;
 
     const product = this.product;
     const firstBrandId = this.brands[0]?.id ?? '';
+    this.existingImageUrl = product?.imageUrl ?? null;
+    this.imagePreview = this.existingImageUrl;
 
     if (!product) {
       this.form.reset({
