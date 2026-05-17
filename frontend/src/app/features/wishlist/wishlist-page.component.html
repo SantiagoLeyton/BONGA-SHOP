@@ -1,0 +1,363 @@
+<div class="container wish">
+  <div class="wish__glow wish__glow--a" aria-hidden="true"></div>
+  <div class="wish__glow wish__glow--b" aria-hidden="true"></div>
+
+  <div class="head">
+    <div>
+      <p class="kicker">Tu selección</p>
+      <h1 class="title">
+        {{ 'wishlist' | t }}
+        @if (wishlistLoaded() && count() > 0) {
+          <span class="title__count" [attr.aria-label]="count() + ' productos guardados'">({{ count() }})</span>
+        }
+      </h1>
+      <p class="sub">Guarda los productos que te llaman, compáralos y vuelve a ellos cuando quieras.</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-ghost" routerLink="/products">{{ 'exploreProducts' | t }}</a>
+      <button
+        type="button"
+        class="btn btn-secondary"
+        [class.is-loading]="clearing()"
+        [attr.aria-busy]="clearing()"
+        (click)="clear()"
+        [disabled]="!items().length || clearing() || !wishlistLoaded()"
+      >
+        {{ clearing() ? ('clearing' | t) : ('clearWishlist' | t) }}
+      </button>
+    </div>
+  </div>
+
+  @if (!wishlistLoaded()) {
+    <section class="grid" aria-label="Cargando favoritos">
+      @for (item of [1, 2, 3]; track item) {
+        <article class="wcard wcard--loading" aria-hidden="true">
+          <div class="wcard__media-sk"></div>
+          <div class="wcard__body">
+            <span class="loading-line loading-line--short"></span>
+            <span class="loading-line"></span>
+            <span class="loading-line loading-line--mid"></span>
+          </div>
+        </article>
+      }
+    </section>
+  } @else if (items().length) {
+    <div class="toolbar">
+      <p class="toolbar__caption">
+        {{ count() === 1 ? '1 producto guardado' : count() + ' productos guardados' }}
+        @if (selectedCount() > 0) {
+          <span class="toolbar__selected"> · {{ selectedCount() }}/{{ maxCompare }} para comparar</span>
+        }
+      </p>
+      <label class="toolbar__sort">
+        <span class="sr-only">Ordenar favoritos</span>
+        <select [value]="sort()" (change)="onSortChange($event)">
+          <option value="recent">Más recientes</option>
+          <option value="price-asc">Precio: menor a mayor</option>
+          <option value="price-desc">Precio: mayor a menor</option>
+          <option value="name">Nombre (A–Z)</option>
+        </select>
+        <span class="toolbar__chevron" aria-hidden="true">
+          <svg viewBox="0 0 16 16" width="12" height="12" fill="none">
+            <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </label>
+    </div>
+
+    <section class="grid" aria-label="Productos guardados">
+      @for (product of items(); track product.id) {
+        <article
+          class="wcard"
+          [class.wcard--removing]="isRemoving(product.id)"
+          [class.wcard--selected]="isSelected(product.id)"
+          [attr.data-badge]="product.badge"
+          [attr.aria-selected]="isSelected(product.id)"
+        >
+          <a class="wcard__media" [routerLink]="['/products', product.slug]">
+            <img [src]="product.imageUrl" [alt]="'Ilustración de ' + product.name" loading="lazy" />
+            <button
+              type="button"
+              class="wcard__heart"
+              (click)="remove(product); $event.preventDefault(); $event.stopPropagation()"
+              aria-label="Quitar de favoritos"
+              title="Quitar de favoritos"
+            >
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path
+                  d="M12 21s-7.5-4.6-10-9.2C.4 8.4 2 4.7 5.3 4.1c2-.3 3.9.7 4.9 2.4l.9 1.5.9-1.5c1-1.7 2.9-2.7 4.9-2.4 3.3.6 4.9 4.3 3.3 7.7C19.5 16.4 12 21 12 21z"
+                  fill="currentColor"
+                />
+              </svg>
+            </button>
+            @if (product.badge) {
+              <div class="wcard__badge-wrap">
+                <app-product-badge [badge]="product.badge" />
+              </div>
+            }
+            <div class="wcard__media-glow" aria-hidden="true"></div>
+
+            <button
+              type="button"
+              class="wcard__compare"
+              [class.wcard__compare--on]="isSelected(product.id)"
+              (click)="toggleSelected(product); $event.preventDefault(); $event.stopPropagation()"
+              [attr.aria-pressed]="isSelected(product.id)"
+              [attr.aria-label]="isSelected(product.id) ? 'Quitar de comparación' : 'Agregar a comparación'"
+            >
+              <span class="wcard__compare-box" aria-hidden="true">
+                <svg viewBox="0 0 16 16" width="11" height="11" fill="none">
+                  <path d="M3 8.2L6.2 11.4 13 4.6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
+              <span class="wcard__compare-label">
+                {{ isSelected(product.id) ? 'Seleccionado' : 'Comparar' }}
+              </span>
+            </button>
+          </a>
+
+          <div class="wcard__body">
+            <p class="wcard__brand">{{ product.brand.name }}</p>
+            <h3 class="wcard__title">
+              <a [routerLink]="['/products', product.slug]">{{ product.name }}</a>
+            </h3>
+            <div class="wcard__meta">
+              <span class="pill">{{ primaryFlavor(product) }}</span>
+              <span class="pill pill--muted">{{ nicotineRange(product) }}</span>
+            </div>
+
+            <div class="wcard__price-row">
+              <p class="wcard__price">
+                <span class="wcard__price-label">Desde</span>
+                <strong>{{ minPrice(product) | appCurrency }}</strong>
+              </p>
+            </div>
+
+            <div class="wcard__actions">
+              <button
+                type="button"
+                class="btn btn-primary btn-sm wcard__add"
+                [class.is-loading]="isAdding(product.id)"
+                [attr.aria-busy]="isAdding(product.id)"
+                [disabled]="isAdding(product.id)"
+                (click)="addToCart(product)"
+              >
+                @if (isAdding(product.id)) {
+                  {{ 'adding' | t }}
+                } @else {
+                  <svg viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true">
+                    <path d="M2 3h2l1.5 8.5a1 1 0 001 .8h5.9a1 1 0 001-.8L15 6H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    <circle cx="6.5" cy="14" r="1" fill="currentColor"/>
+                    <circle cx="12.5" cy="14" r="1" fill="currentColor"/>
+                  </svg>
+                  {{ 'add' | t }}
+                }
+              </button>
+              <button
+                type="button"
+                class="btn btn-ghost btn-sm wcard__remove"
+                (click)="remove(product)"
+                [disabled]="isRemoving(product.id)"
+              >
+                {{ 'remove' | t }}
+              </button>
+            </div>
+          </div>
+        </article>
+      }
+    </section>
+  } @else {
+    <section class="empty">
+      <div class="empty__icon" aria-hidden="true">
+        <svg viewBox="0 0 48 48" width="40" height="40">
+          <path
+            d="M24 42s-15-9-15-19a9 9 0 0115-6.7A9 9 0 0139 23c0 10-15 19-15 19z"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+      <p class="empty__eyebrow">Aún no tienes favoritos</p>
+      <h2>Tu lista personal está vacía</h2>
+      <p class="muted">Marca los productos que te interesen con el corazón y aparecerán aquí para compararlos y decidir con calma.</p>
+      <a class="btn btn-primary" routerLink="/products">{{ 'exploreProducts' | t }}</a>
+    </section>
+  }
+</div>
+
+<!-- Compare floating bar -->
+@if (selectedCount() > 0) {
+  <div
+    class="cbar"
+    role="region"
+    aria-label="Comparación de productos"
+    [style.--cbar-offset.px]="cbarOffset()"
+  >
+    <div class="cbar__inner">
+      <div class="cbar__left">
+        <span class="cbar__icon" aria-hidden="true">
+          <svg viewBox="0 0 16 16" width="14" height="14" fill="none">
+            <path d="M2 4h5M9 4h5M2 8h12M2 12h5M9 12h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="cbar__label">
+          Comparar <strong>({{ selectedCount() }}/{{ maxCompare }})</strong>
+        </span>
+        <ul class="cbar__thumbs" aria-hidden="true">
+          @for (p of compareProducts(); track p.id) {
+            <li class="cbar__thumb">
+              <img [src]="p.imageUrl" [alt]="p.name" />
+            </li>
+          }
+        </ul>
+      </div>
+      <div class="cbar__right">
+        <button type="button" class="btn btn-ghost btn-sm" (click)="clearSelection()">
+          Limpiar selección
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary btn-sm cbar__compare-btn"
+          (click)="openCompare()"
+          [disabled]="selectedCount() < 2"
+        >
+          Comparar ahora
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Compare modal -->
+@if (compareOpen() && compareProducts().length >= 2) {
+  <div class="cmp-overlay" role="dialog" aria-modal="true" aria-labelledby="cmp-title" (click)="closeCompare()">
+    <div class="cmp" (click)="$event.stopPropagation()">
+      <header class="cmp__head">
+        <div>
+          <p class="cmp__eyebrow">Comparación</p>
+          <h2 class="cmp__title" id="cmp-title">Compara tus favoritos</h2>
+          <p class="cmp__sub">Revisa las diferencias clave para decidir con calma.</p>
+        </div>
+        <button type="button" class="cmp__close" (click)="closeCompare()" aria-label="Cerrar comparación">
+          <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
+            <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </header>
+
+      <div class="cmp__scroll">
+        <div class="cmp__grid" [attr.data-cols]="compareProducts().length">
+          <!-- Column headers (product cards) -->
+          @for (p of compareProducts(); track p.id) {
+            <article class="cmp__col">
+              <div class="cmp__col-media">
+                <img [src]="p.imageUrl" [alt]="p.name" />
+                @if (p.badge) {
+                  <div class="cmp__col-badge">
+                    <app-product-badge [badge]="p.badge" />
+                  </div>
+                }
+                <button
+                  type="button"
+                  class="cmp__col-remove"
+                  (click)="toggleSelected(p)"
+                  aria-label="Quitar de comparación"
+                  title="Quitar de comparación"
+                >
+                  <svg viewBox="0 0 16 16" width="12" height="12" fill="none">
+                    <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/>
+                  </svg>
+                </button>
+              </div>
+              <p class="cmp__col-brand">{{ p.brand.name }}</p>
+              <h3 class="cmp__col-name">{{ p.name }}</h3>
+              <p class="cmp__col-price">
+                <span>Desde</span>
+                <strong>{{ minPrice(p) | appCurrency }}</strong>
+              </p>
+              <div class="cmp__col-actions">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  [class.is-loading]="isAdding(p.id)"
+                  [attr.aria-busy]="isAdding(p.id)"
+                  [disabled]="isAdding(p.id)"
+                  (click)="addToCartFromCompare(p)"
+                >
+                  {{ isAdding(p.id) ? ('adding' | t) : ('addToCart' | t) }}
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-ghost btn-sm"
+                  (click)="goToDetail(p)"
+                >
+                  {{ 'viewDetail' | t }}
+                </button>
+              </div>
+            </article>
+          }
+        </div>
+
+        <!-- Spec rows -->
+        <dl class="cmp__specs" [attr.data-cols]="compareProducts().length">
+          <div class="cmp__row">
+            <dt>Marca</dt>
+            @for (p of compareProducts(); track p.id) {
+              <dd>{{ p.brand.name }}</dd>
+            }
+          </div>
+          <div class="cmp__row">
+            <dt>Sabor principal</dt>
+            @for (p of compareProducts(); track p.id) {
+              <dd>{{ primaryFlavor(p) }}</dd>
+            }
+          </div>
+          <div class="cmp__row">
+            <dt>Todos los sabores</dt>
+            @for (p of compareProducts(); track p.id) {
+              <dd>{{ flavorsList(p) }}</dd>
+            }
+          </div>
+          <div class="cmp__row">
+            <dt>Nicotina</dt>
+            @for (p of compareProducts(); track p.id) {
+              <dd>{{ nicotineRange(p) }}</dd>
+            }
+          </div>
+          <div class="cmp__row">
+            <dt>Variantes</dt>
+            @for (p of compareProducts(); track p.id) {
+              <dd>{{ totalVariants(p) }}</dd>
+            }
+          </div>
+          <div class="cmp__row cmp__row--highlight">
+            <dt>Precio desde</dt>
+            @for (p of compareProducts(); track p.id) {
+              <dd><strong>{{ minPrice(p) | appCurrency }}</strong></dd>
+            }
+          </div>
+          <div class="cmp__row">
+            <dt>Disponibilidad</dt>
+            @for (p of compareProducts(); track p.id) {
+              <dd>
+                <span class="cmp__stock" [class.cmp__stock--ok]="inStock(p)" [class.cmp__stock--out]="!inStock(p)">
+                  <span class="cmp__stock-dot" aria-hidden="true"></span>
+                  {{ inStock(p) ? 'En stock' : 'Sin stock' }}
+                </span>
+              </dd>
+            }
+          </div>
+        </dl>
+      </div>
+    </div>
+  </div>
+}
+
+<app-product-quick-view
+  [isOpen]="quickViewOpen()"
+  [product]="quickViewProduct()"
+  (closed)="closeQuickView()"
+/>

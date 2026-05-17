@@ -1,0 +1,21 @@
+<app-modal-shell [isOpen]="isOpen()" title="Información BONGA" (closed)="close()">
+  <div class="info-body">
+    <p class="info-lead">
+      <strong>BONGA SHOP</strong> comercializa productos de vapeo solo para mayores de edad. Verifica tu edad antes de
+      comprar y usa estos dispositivos de forma responsable.
+    </p>
+    <h3 class="info-sub">Cómo comprar</h3>
+    <ol class="info-list">
+      <li>Explora el catálogo y elige sabor y concentración de nicotina.</li>
+      <li>Añade al carrito y revisa tu pedido en el checkout.</li>
+      <li>Completa tus datos; el pago conectará cuando el backend esté activo.</li>
+    </ol>
+    <h3 class="info-sub">Aviso legal</h3>
+    <p>
+      Los productos de nicotina están sujetos a regulación local. Prohibida la venta a menores de 18 años. El contenido
+      de este sitio es informativo; la disponibilidad y condiciones finales pueden variar según integración con
+      backend y normativa aplicable.
+    </p>
+    <button type="button" class="btn btn-secondary" (click)="close()">Entendido</button>
+  </div>
+</app-modal-shell>

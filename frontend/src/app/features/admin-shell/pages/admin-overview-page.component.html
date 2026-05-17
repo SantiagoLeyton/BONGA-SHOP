@@ -1,0 +1,80 @@
+<header class="admin-page-head">
+  <div>
+    <p class="admin-page-head__eyebrow">Admin · resumen</p>
+    <h1>Hola, bienvenido de nuevo</h1>
+    <p class="admin-page-head__sub">
+      Vista general de la operación diaria: ingresos, catálogo y pedidos pendientes de revisar.
+    </p>
+  </div>
+</header>
+
+<section class="admin-cards">
+  <article class="admin-card admin-card--accent">
+    <p class="admin-card__label">Ingresos visibles</p>
+    <p class="admin-card__value">{{ metrics().revenue | appCurrency }}</p>
+    <p class="admin-card__sub">Acumulado de los pedidos cargados.</p>
+  </article>
+  <article class="admin-card">
+    <p class="admin-card__label">Pedidos</p>
+    <p class="admin-card__value">{{ metrics().orders }}</p>
+    <p class="admin-card__sub">Disponibles para seguimiento.</p>
+  </article>
+  <article class="admin-card" [class.admin-card--danger]="metrics().lowStock > 0">
+    <p class="admin-card__label">Stock crítico</p>
+    <p class="admin-card__value">{{ metrics().lowStock }}</p>
+    <p class="admin-card__sub">Variantes con reposición urgente.</p>
+  </article>
+</section>
+
+<section class="admin-grid-2">
+  <article class="admin-surface">
+    <header class="admin-surface__head">
+      <div>
+        <h2>Catálogo</h2>
+        <p class="admin-surface__sub">Resumen del inventario y marcas.</p>
+      </div>
+    </header>
+    <ul class="admin-kpi-list">
+      <li>
+        <span>Productos publicados</span>
+        <strong>{{ metrics().products }}</strong>
+      </li>
+      <li>
+        <span>Marcas activas</span>
+        <strong>{{ metrics().brands }}</strong>
+      </li>
+      <li>
+        <span>Variantes en inventario</span>
+        <strong>{{ metrics().inventoryItems }}</strong>
+      </li>
+    </ul>
+    <div class="admin-surface__actions">
+      <a class="admin-btn admin-btn--ghost" routerLink="/admin/productos">Ir a productos</a>
+      <a class="admin-btn admin-btn--ghost" routerLink="/admin/marcas">Ir a marcas</a>
+    </div>
+  </article>
+
+  <article class="admin-surface">
+    <header class="admin-surface__head">
+      <div>
+        <h2>Últimos pedidos</h2>
+        <p class="admin-surface__sub">Los 5 más recientes.</p>
+      </div>
+      <a class="admin-btn admin-btn--ghost" routerLink="/admin/pedidos">Ver todos</a>
+    </header>
+
+    <ul class="admin-orders-mini">
+      @for (order of recentOrders(); track order.id) {
+        <li>
+          <div>
+            <p class="admin-orders-mini__id">#{{ order.id }}</p>
+            <p class="admin-orders-mini__customer">{{ order.customerName }}</p>
+          </div>
+          <p class="admin-orders-mini__total">{{ order.total | appCurrency }}</p>
+        </li>
+      } @empty {
+        <li class="admin-orders-mini__empty">Aún no hay pedidos.</li>
+      }
+    </ul>
+  </article>
+</section>

@@ -1,0 +1,65 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: bonga-shop-postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME:-bonga_shop}
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    volumes:
+      - bonga_shop_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres} -d ${DB_NAME:-bonga_shop}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # SMTP de desarrollo. UI web en http://localhost:8025 para ver los correos
+  # que el backend envía (recuperación de contraseña, etc.).
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: bonga-shop-mailhog
+    ports:
+      - "${MAILHOG_SMTP_PORT:-1025}:1025"
+      - "${MAILHOG_UI_PORT:-8025}:8025"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: bonga-shop-backend
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mailhog:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-prod}
+      SERVER_PORT: 8080
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-bonga_shop}
+      DB_USERNAME: ${DB_USERNAME:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      JWT_SECRET: ${JWT_SECRET:-change-this-secret-key-for-bonga-shop-please-2026}
+      JWT_EXPIRATION_MINUTES: ${JWT_EXPIRATION_MINUTES:-1440}
+      APP_ADMIN_ENABLED: ${APP_ADMIN_ENABLED:-true}
+      APP_ADMIN_NAME: ${APP_ADMIN_NAME:-Bonga Admin}
+      APP_ADMIN_EMAIL: ${APP_ADMIN_EMAIL:-admin@bonga.shop}
+      APP_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD:-Admin123!}
+      LOW_STOCK_THRESHOLD: ${LOW_STOCK_THRESHOLD:-5}
+      OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
+      OLLAMA_MODEL: ${OLLAMA_MODEL:-gemma:2b}
+      APP_FRONTEND_URL: ${APP_FRONTEND_URL:-http://localhost:4200}
+      APP_MAIL_FROM: ${APP_MAIL_FROM:-no-reply@bonga.shop}
+      MAIL_HOST: ${MAIL_HOST:-mailhog}
+      MAIL_PORT: ${MAIL_PORT:-1025}
+      APP_UPLOADS_DIR: /app/uploads
+    ports:
+      - "${BACKEND_PORT:-8081}:8080"
+    volumes:
+      - bonga_shop_backend_uploads:/app/uploads
+
+volumes:
+  bonga_shop_postgres_data:
+  bonga_shop_backend_uploads:

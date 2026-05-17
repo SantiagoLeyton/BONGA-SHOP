@@ -1,0 +1,55 @@
+<article
+  class="card"
+  [class.card--spotlight]="variant === 'spotlight'"
+  [class.card--highlight]="highlight && variant === 'spotlight'"
+  [class.card--catalog-featured]="catalogFeatured && variant !== 'spotlight'"
+>
+  <a class="media" [routerLink]="['/products', product.slug]">
+    <img [src]="product.imageUrl" [alt]="'Ilustración de ' + product.name" loading="lazy" />
+    <button
+      type="button"
+      class="wish"
+      [class.wish--on]="wished()"
+      (click)="toggleWish($event)"
+      [attr.aria-pressed]="wished()"
+      aria-label="Guardar en favoritos"
+      title="Favoritos"
+    >
+      <span aria-hidden="true">♥</span>
+    </button>
+    @if (product.badge) {
+      <div class="badge-wrap">
+        <app-product-badge [badge]="product.badge" />
+      </div>
+    }
+  </a>
+  <div class="body">
+    <p class="brand">{{ product.brand.name }}</p>
+    <h3 class="title">
+      <a [routerLink]="['/products', product.slug]">{{ product.name }}</a>
+    </h3>
+    <div class="meta">
+      <span class="pill">{{ primaryFlavor() }}</span>
+      <span class="pill muted">{{ nicotineRange() }}</span>
+    </div>
+    <div class="row">
+      <p class="price">{{ 'from' | t }} <strong>{{ minPrice() | appCurrency }}</strong></p>
+      <div class="row-actions">
+        @if (showQuickView && variant !== 'spotlight') {
+          <button type="button" class="btn btn-secondary btn-sm" (click)="openQuickView($event)">
+            {{ 'quickViewButton' | t }}
+          </button>
+        }
+        <a
+          class="btn btn-sm"
+          [class.btn-ghost]="variant !== 'spotlight'"
+          [class.btn-secondary]="variant === 'spotlight'"
+          [class.btn-spotlight-cta]="variant === 'spotlight'"
+          [routerLink]="['/products', product.slug]"
+        >
+          {{ variant === 'spotlight' ? ('viewProduct' | t) : ('viewDetail' | t) }}
+        </a>
+      </div>
+    </div>
+  </div>
+</article>

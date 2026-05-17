@@ -1,0 +1,124 @@
+.auth-form {
+  display: grid;
+  gap: 0.875rem;
+}
+
+.intro {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.intro-title {
+  margin: 0;
+  font-weight: 850;
+  letter-spacing: -0.02em;
+}
+
+.intro-copy {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.field {
+  display: grid;
+  gap: 0.35rem;
+  font-size: 0.875rem;
+  color: var(--color-muted);
+
+  input {
+    border-radius: var(--radius-md);
+    border: 1px solid var(--color-border);
+    background: rgba(15, 23, 42, 0.55);
+    color: var(--color-text);
+    padding: 0.65rem 0.75rem;
+    outline: none;
+    transition: border-color 160ms ease, box-shadow 160ms ease;
+
+    &:focus {
+      border-color: rgba(94, 234, 212, 0.55);
+      box-shadow: 0 0 0 3px rgba(94, 234, 212, 0.12);
+    }
+  }
+}
+
+.pw {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.pw-btn {
+  height: 44px;
+  padding: 0 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(2, 6, 23, 0.35);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.check {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.875rem;
+  color: var(--color-muted);
+
+  input {
+    accent-color: var(--color-accent);
+  }
+}
+
+.err {
+  font-size: 0.8125rem;
+  color: rgba(251, 113, 133, 0.95);
+}
+
+.alert {
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(251, 113, 133, 0.22);
+  background: rgba(251, 113, 133, 0.08);
+  color: rgba(251, 113, 133, 0.95);
+  font-size: 0.875rem;
+}
+
+.hint {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--color-muted);
+  line-height: 1.45;
+
+  code {
+    font-size: 0.85em;
+    color: var(--color-accent);
+  }
+}
+
+.switch {
+  margin: 0;
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+
+.linkish {
+  border: 0;
+  background: transparent;
+  color: var(--color-accent);
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}

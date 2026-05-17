@@ -1,0 +1,183 @@
+<section class="hero" #heroSection>
+  <!-- Imagen de fondo (NO se toca) -->
+  <div class="hero-media" [class.hero-media--ready]="heroImageReady()" aria-hidden="true">
+    <img
+      class="hero-bg"
+      src="/assets/home-hero-bonga-vape.png"
+      width="1536"
+      height="1024"
+      alt=""
+      decoding="async"
+      fetchpriority="high"
+      (load)="onHeroImageLoad()"
+      (error)="onHeroImageLoad()"
+    />
+  </div>
+
+  <!-- Ambient (grain + humo) — decoración, no afecta el layout -->
+  <div class="hero-grain" aria-hidden="true"></div>
+  <div class="hero-smoke" aria-hidden="true"></div>
+
+  <!-- Overlay único a la izquierda -->
+  <div class="hero-overlay" aria-hidden="true"></div>
+
+  <!-- Grid principal: 3 columnas -->
+  <div class="hero-grid">
+
+    <!-- LEFT -->
+    <div class="hero-left">
+      <span class="hero-badge">{{ 'homeBadge' | t }}</span>
+
+      <h1 class="hero-title">
+        {{ 'homeTitle1' | t }}<br>
+        {{ 'homeTitle2' | t }} <span>{{ 'homeTitle3' | t }}</span>
+      </h1>
+
+      <p class="hero-desc">
+        {{ 'homeDesc' | t }}
+      </p>
+
+      <p class="hero-fine">
+        +18 · <button type="button" class="hero-fine__link" (click)="openLegalInfo()">{{ 'legalNotice' | t }}</button> · {{ 'responsibleUse' | t }}
+      </p>
+    </div>
+
+    <!-- CENTER TOP: stats en glass pill -->
+    <div class="hero-stats" aria-label="Datos del catálogo">
+      <div><strong #statProducts>0</strong> <span>{{ 'productsStat' | t }}</span></div>
+      <div><strong #statVariants>0</strong> <span>{{ 'combinations' | t }}</span></div>
+      <div><strong>24/7</strong> <span>Online</span></div>
+    </div>
+
+    <!-- RIGHT: botones -->
+    <div class="hero-actions">
+      <a class="btn primary" routerLink="/products">{{ 'viewCollection' | t }}</a>
+      <button type="button" class="btn secondary" (click)="openBuyingInfo()">{{ 'howToBuy' | t }}</button>
+      @if (isAdmin()) {
+        <a class="btn ghost" routerLink="/admin">{{ 'adminPanel' | t }}</a>
+      } @else if (user()) {
+        <a class="btn ghost" routerLink="/orders">{{ 'myOrders' | t }}</a>
+      }
+    </div>
+
+  </div>
+
+  <!-- Indicador scroll minimal (abajo-centro) -->
+  <button type="button" class="hero-scroll-min" (click)="scrollToDestacados()" aria-label="Ir a destacados">
+    <span class="hero-scroll-min__line" aria-hidden="true"></span>
+  </button>
+
+  <!-- Línea neón inferior -->
+  <div class="hero-edge" aria-hidden="true"></div>
+</section>
+
+<!-- Franja de confianza — puente visual hacia la tienda -->
+<div class="trust-strip">
+  <div class="container trust-strip__inner">
+    <span>+18</span>
+    <span class="trust-strip__sep" aria-hidden="true">·</span>
+    <span>{{ 'nationalShipping' | t }}</span>
+    <span class="trust-strip__sep" aria-hidden="true">·</span>
+    <span>{{ 'securePurchase' | t }}</span>
+    <span class="trust-strip__sep" aria-hidden="true">·</span>
+    <span>{{ 'premiumFlavors' | t }}</span>
+  </div>
+</div>
+
+<section id="destacados" class="section section--featured">
+  <div class="section--featured__bridge" aria-hidden="true"></div>
+  <div class="container section--featured__wrap">
+    <header class="featured-head" appRevealScroll>
+      <h2 class="featured-head__title">{{ 'featured' | t }}</h2>
+      <p class="featured-head__sub">
+        {{ 'featuredSub' | t }}
+      </p>
+    </header>
+
+    <div class="featured-showcase" appRevealScroll>
+      <div
+        class="featured-showcase__controls"
+        [class.is-hidden]="!canScrollPrev() && !canScrollNext()"
+      >
+        <button
+          type="button"
+          class="featured-showcase__ctrl"
+          (click)="scrollFeatured(-1)"
+          [disabled]="!canScrollPrev()"
+          aria-label="Ver destacados anteriores"
+        >
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+        <button
+          type="button"
+          class="featured-showcase__ctrl"
+          (click)="scrollFeatured(1)"
+          [disabled]="!canScrollNext()"
+          aria-label="Ver más destacados"
+        >
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </button>
+      </div>
+
+      <div
+        class="featured-showcase__track"
+        #featuredTrack
+        (scroll)="onFeaturedScroll()"
+        tabindex="0"
+        aria-label="Colecciones destacadas"
+      >
+        @for (p of featuredPicks(); track p.id; let i = $index) {
+          <article class="featured-showcase__item" [class.is-active]="featuredActive() === i">
+            <a class="featured-showcase__media" [routerLink]="['/products', p.slug]" [attr.aria-label]="'Explorar ' + p.name">
+              <span class="featured-showcase__halo" aria-hidden="true"></span>
+              <img [src]="p.imageUrl" [alt]="p.name" loading="lazy" />
+            </a>
+            <div class="featured-showcase__body">
+              <p class="featured-showcase__tag">{{ featuredTag(p) }}</p>
+              <h3 class="featured-showcase__name">{{ p.name }}</h3>
+              <p class="featured-showcase__meta">{{ p.brand.name }} · {{ featuredFlavor(p) }}</p>
+              <a class="featured-showcase__cta" [routerLink]="['/products', p.slug]">{{ 'explore' | t }}</a>
+            </div>
+          </article>
+        }
+      </div>
+
+      <div class="featured-showcase__dots" role="tablist" aria-label="Navegar destacados">
+        @for (p of featuredPicks(); track p.id; let i = $index) {
+          <button
+            type="button"
+            class="featured-showcase__dot"
+            [class.is-active]="featuredActive() === i"
+            [attr.aria-label]="'Ir al destacado ' + (i + 1)"
+            [attr.aria-selected]="featuredActive() === i"
+            (click)="scrollFeaturedTo(i)"
+          ></button>
+        }
+      </div>
+    </div>
+
+    <p class="featured-more" appRevealScroll>
+      <a class="featured-more__link" routerLink="/products">{{ 'exploreFullCatalog' | t }}</a>
+    </p>
+  </div>
+</section>
+
+<section class="section section--brand">
+  <div class="container split" appRevealScroll>
+    <div>
+      <h2>{{ 'cityAttitude' | t }}</h2>
+      <p class="muted">
+        {{ 'cityCopy' | t }}
+      </p>
+    </div>
+    <ul class="ticks">
+      <li>{{ 'homeTick1' | t }}</li>
+      <li>{{ 'homeTick2' | t }}</li>
+      <li>{{ 'homeTick3' | t }}</li>
+    </ul>
+  </div>
+</section>

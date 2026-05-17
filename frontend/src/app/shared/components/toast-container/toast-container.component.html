@@ -1,0 +1,17 @@
+<div class="toasts" aria-live="polite" aria-relevant="additions removals">
+  @for (t of toast.toasts(); track t.id) {
+    <div class="toast" [class]="'toast toast--' + t.tone">
+      <div class="toast-accent" aria-hidden="true"></div>
+      <div class="toast-body">
+        @if (t.title) {
+          <p class="toast-title">{{ t.title }}</p>
+        }
+        <p class="toast-msg">{{ t.message }}</p>
+      </div>
+      <button type="button" class="toast-x" (click)="toast.dismiss(t.id)" aria-label="Cerrar notificación">
+        ×
+      </button>
+    </div>
+  }
+</div>
+

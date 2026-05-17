@@ -1,0 +1,99 @@
+<div class="products-page">
+  <div class="products-page__glow products-page__glow--a" aria-hidden="true"></div>
+  <div class="products-page__glow products-page__glow--b" aria-hidden="true"></div>
+
+  <header class="page-head container" appRevealScroll>
+    <div class="page-head__copy">
+      <p class="page-head__eyebrow">Marketplace</p>
+      <h1 class="title">{{ 'catalogTitle' | t }}</h1>
+      <p class="muted page-head__lede">{{ 'catalogLede' | t }}</p>
+    </div>
+  </header>
+
+  <div class="container layout">
+    <aside class="aside" [attr.aria-label]="'filters' | t" appRevealScroll [appRevealDelay]="0.05">
+      <app-filter-panel
+        [brands]="brands()"
+        [flavors]="flavors()"
+        [value]="filters()"
+        (valueChange)="onFiltersChange($event)"
+      />
+    </aside>
+
+    <section class="catalog" [attr.aria-label]="'results' | t">
+      <div class="toolbar" appRevealScroll [appRevealDelay]="0.06">
+        <div class="toolbar-left">
+          <p class="count" role="status">
+            <span class="count__value">{{ filtered().length }}</span>
+            <span class="count__rest">
+              <span class="count__label">{{ 'results' | t }}</span>
+              <span class="count__hint">{{ 'exploreHint' | t }}</span>
+            </span>
+          </p>
+
+          @if (activeChips().length) {
+            <div class="chips" [attr.aria-label]="'activeFilters' | t">
+              @for (chip of activeChips(); track chip.key) {
+                <button type="button" class="chip" (click)="removeChip(chip.type, chip.value)" [title]="'Quitar: ' + chip.label">
+                  <span class="chip-label">{{ chip.label }}</span>
+                  <span class="chip-x" aria-hidden="true">×</span>
+                </button>
+              }
+              <button type="button" class="btn btn-text btn-sm chips-clear" (click)="clearAll()">{{ 'clearAll' | t }}</button>
+            </div>
+          }
+        </div>
+
+        <div class="toolbar-right" [attr.aria-label]="'search' | t">
+          <label class="search">
+            <span class="sr-only">{{ 'search' | t }}</span>
+            <span class="search__icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="7" />
+                <path d="M20 20l-3.5-3.5" stroke-linecap="round" />
+              </svg>
+            </span>
+            <input
+              type="search"
+              class="search-input"
+              [placeholder]="'searchPlaceholder' | t"
+              [value]="query()"
+              (input)="setQuery($any($event.target).value)"
+            />
+          </label>
+        </div>
+      </div>
+
+      <div class="grid">
+        @if (initialLoading()) {
+          @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+            <app-product-card-skeleton />
+          }
+        } @else {
+          @for (product of filtered(); track product.id; let i = $index) {
+            <div class="grid__cell" appRevealScroll [appRevealDelay]="0.03 * i">
+              <app-product-card
+                [product]="product"
+                [showQuickView]="true"
+                [catalogFeatured]="i === 0"
+                (quickView)="openQuickView($event)"
+              />
+            </div>
+          } @empty {
+            <div class="empty">
+              <h2 class="empty__title">{{ 'emptyCatalogTitle' | t }}</h2>
+              <p class="muted empty__text">{{ 'emptyCatalogText' | t }}</p>
+              <button type="button" class="btn btn-secondary empty__btn" (click)="clearAll()">{{ 'showAll' | t }}</button>
+            </div>
+          }
+        }
+      </div>
+    </section>
+  </div>
+</div>
+
+<app-product-quick-view
+  [isOpen]="quickViewOpen()"
+  [product]="quickViewProduct()"
+  (closed)="closeQuickView()"
+/>

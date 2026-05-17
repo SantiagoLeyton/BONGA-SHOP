@@ -1,0 +1,41 @@
+<app-modal-shell [isOpen]="isOpen" [title]="'quickView' | t" (closed)="close()">
+  @if (product; as p) {
+    <div class="qv">
+      <div class="media">
+        <img [src]="p.imageUrl" [alt]="'Ilustracion de ' + p.name" loading="lazy" />
+        @if (p.badge) {
+          <div class="badge">
+            <app-product-badge [badge]="p.badge" />
+          </div>
+        }
+      </div>
+
+      <div class="copy">
+        <p class="brand">{{ p.brand.name }}</p>
+        <h3 class="name">{{ p.name }}</h3>
+        <p class="desc">{{ p.description }}</p>
+
+        <div class="meta">
+          <span class="pill">{{ 'from' | t }} {{ minPrice() | appCurrency }}</span>
+          <span class="pill muted">{{ p.variants.length }} {{ 'variants' | t }}</span>
+        </div>
+
+        <div class="actions">
+          <button
+            type="button"
+            class="btn btn-primary"
+            [class.is-loading]="adding()"
+            [attr.aria-busy]="adding()"
+            [disabled]="adding()"
+            (click)="addToCart()"
+          >
+            {{ adding() ? ('addingToCart' | t) : ('addToCart' | t) }}
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="close()">{{ 'close' | t }}</button>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <p class="muted">{{ 'noData' | t }}</p>
+  }
+</app-modal-shell>

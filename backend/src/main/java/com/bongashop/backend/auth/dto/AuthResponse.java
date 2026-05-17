@@ -1,4 +1,8 @@
 package com.bongashop.backend.auth.dto;
 
-public class AuthResponse {
+public record AuthResponse(
+        String token,
+        String type,
+        AuthenticatedUserResponse user
+) {
 }

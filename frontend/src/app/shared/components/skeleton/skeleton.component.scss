@@ -1,0 +1,32 @@
+.sk {
+  display: block;
+  background: linear-gradient(
+    90deg,
+    rgba(148, 163, 184, 0.08) 0%,
+    rgba(148, 163, 184, 0.16) 35%,
+    rgba(148, 163, 184, 0.08) 70%
+  );
+  background-size: 220% 100%;
+  animation: sk 1200ms ease-in-out infinite;
+  border: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.sk--box {
+  border-radius: var(--radius-lg);
+}
+
+@keyframes sk {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 100% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sk {
+    animation: none;
+  }
+}
+

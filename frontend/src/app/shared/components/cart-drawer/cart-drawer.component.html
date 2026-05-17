@@ -1,0 +1,90 @@
+@if (isOpen()) {
+  <div class="root">
+    <button type="button" class="backdrop" (click)="close()" [attr.aria-label]="'close' | t"></button>
+    <aside class="panel" role="dialog" aria-modal="true" [attr.aria-label]="'cart' | t">
+      <header class="head">
+        <div>
+          <p class="kicker">{{ 'cart' | t }}</p>
+          <p class="count">{{ count() }} {{ count() === 1 ? ('savedItem' | t) : ('savedItems' | t) }}</p>
+        </div>
+        <button type="button" class="icon" (click)="close()" [attr.aria-label]="'close' | t">×</button>
+      </header>
+
+      <div class="body">
+        @if (!loading()) {
+          <div class="loading-grid" [attr.aria-label]="'loadingCart' | t">
+            @for (item of [1, 2]; track item) {
+              <article class="line line--loading">
+                <div class="thumb thumb--loading"></div>
+                <div class="loading-stack">
+                  <span class="loading-line loading-line--mid"></span>
+                  <span class="loading-line loading-line--short"></span>
+                  <span class="loading-line"></span>
+                </div>
+              </article>
+            }
+          </div>
+        } @else if (!viewLines().length) {
+          <div class="empty empty-state">
+            <h3>{{ 'emptyCartTitle' | t }}</h3>
+            <p class="muted">{{ 'emptyCartText' | t }}</p>
+            <a class="btn btn-primary" routerLink="/products" (click)="close()">{{ 'exploreProducts' | t }}</a>
+          </div>
+        } @else {
+          <ul class="lines" [attr.aria-label]="'cartItems' | t">
+            @for (line of viewLines(); track line.key) {
+              <li class="line">
+                <img class="thumb" [src]="line.product.imageUrl" [alt]="line.product.name" loading="lazy" />
+                <div class="info">
+                  <p class="name">{{ line.product.name }}</p>
+                  <p class="meta">{{ line.flavor }} · {{ line.nicotineMg }} mg</p>
+                  <label class="sel">
+                    <span class="sr-only">{{ 'variant' | t }}</span>
+                    <select [value]="line.variantId" [disabled]="isBusy(line)" (change)="changeVariant(line, $any($event.target).value)">
+                      @for (variant of line.product.variants; track variant.id) {
+                        <option [value]="variant.id">{{ variant.flavor }} · {{ variant.nicotineMg }} mg</option>
+                      }
+                    </select>
+                  </label>
+                  <div class="qty">
+                    <button type="button" class="qbtn" (click)="dec(line)" [disabled]="line.qty <= 1 || isBusy(line)">−</button>
+                    <span class="q">{{ line.qty }}</span>
+                    <button type="button" class="qbtn" (click)="inc(line)" [disabled]="isBusy(line)">+</button>
+                  </div>
+                </div>
+                <div class="price">
+                  <p class="p">{{ line.lineTotal | appCurrency }}</p>
+                  <div class="acts">
+                    <button type="button" class="rm" (click)="remove(line)" [disabled]="isBusy(line)">{{ 'remove' | t }}</button>
+                  </div>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </div>
+
+      <footer class="foot">
+        <div class="sum">
+          <span>{{ 'subtotal' | t }}</span>
+          <strong>{{ subtotal() | appCurrency }}</strong>
+        </div>
+        <p class="foot-copy">{{ 'cartSavedText' | t }}</p>
+        <div class="actions">
+          <button
+            type="button"
+            class="btn btn-ghost"
+            [class.is-loading]="clearing()"
+            [disabled]="!viewLines().length || clearing() || !loading()"
+            (click)="clear()"
+          >
+            {{ clearing() ? ('clearing' | t) : ('clear' | t) }}
+          </button>
+          <a class="btn btn-primary" routerLink="/cart" (click)="close()" [class.is-disabled]="!viewLines().length">
+            {{ 'viewCart' | t }}
+          </a>
+        </div>
+      </footer>
+    </aside>
+  </div>
+}

@@ -1,0 +1,125 @@
+<app-modal-shell [isOpen]="isOpen()" title="Crear cuenta" (closed)="close()">
+  <form class="auth-form" [formGroup]="form" (ngSubmit)="submit()">
+    <div class="intro">
+      <p class="intro-title">Empieza tu experiencia BONGA</p>
+      <p class="intro-copy">Crea tu cuenta para guardar productos, recuperar tu carrito y seguir tus pedidos.</p>
+    </div>
+
+    <label class="field">
+      <span>Nombre</span>
+      <input
+        type="text"
+        formControlName="name"
+        autocomplete="name"
+        placeholder="Tu nombre"
+        [attr.aria-invalid]="form.controls.name.invalid && (form.controls.name.touched || form.controls.name.dirty)"
+      />
+      @if (form.controls.name.invalid && (form.controls.name.touched || form.controls.name.dirty)) {
+        <span class="err">Tu nombre debe tener al menos 2 caracteres.</span>
+      }
+    </label>
+
+    <label class="field">
+      <span>Correo</span>
+      <input
+        type="email"
+        formControlName="email"
+        autocomplete="email"
+        placeholder="tu@correo.com"
+        [attr.aria-invalid]="form.controls.email.invalid && (form.controls.email.touched || form.controls.email.dirty)"
+      />
+      @if (form.controls.email.invalid && (form.controls.email.touched || form.controls.email.dirty)) {
+        <span class="err">Ingresa un correo valido.</span>
+      }
+    </label>
+
+    <label class="field">
+      <span>Contraseña</span>
+      <div class="pw">
+        <input
+          [type]="showPassword() ? 'text' : 'password'"
+          formControlName="password"
+          autocomplete="new-password"
+          placeholder="Mínimo 8 caracteres"
+          [attr.aria-invalid]="
+            form.controls.password.invalid && (form.controls.password.touched || form.controls.password.dirty)
+          "
+        />
+        <button
+          type="button"
+          class="pw-btn"
+          (click)="togglePassword()"
+          [attr.aria-label]="showPassword() ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+        >
+          {{ showPassword() ? 'Ocultar' : 'Ver' }}
+        </button>
+      </div>
+
+      <div
+        class="meter"
+        [attr.data-s]="strength()"
+        role="progressbar"
+        aria-valuemin="0"
+        aria-valuemax="4"
+        [attr.aria-valuenow]="strength() < 0 ? 0 : strength()"
+        [attr.aria-valuetext]="strengthLabel()"
+      >
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+        <span class="bar"></span>
+      </div>
+
+      <p class="meter-hint" [attr.data-s]="strength()">
+        <span class="meter-hint__dot" aria-hidden="true"></span>
+        <span>{{ strengthLabel() }}</span>
+      </p>
+
+      <ul class="pw-reqs" aria-label="Requisitos de la contraseña">
+        <li [class.ok]="requirements().length">
+          <span class="tick" aria-hidden="true">{{ requirements().length ? '✓' : '•' }}</span>
+          Al menos 8 caracteres
+        </li>
+        <li [class.ok]="requirements().upper">
+          <span class="tick" aria-hidden="true">{{ requirements().upper ? '✓' : '•' }}</span>
+          Una letra mayúscula
+        </li>
+        <li [class.ok]="requirements().digit">
+          <span class="tick" aria-hidden="true">{{ requirements().digit ? '✓' : '•' }}</span>
+          Un número
+        </li>
+        <li [class.ok]="requirements().symbol">
+          <span class="tick" aria-hidden="true">{{ requirements().symbol ? '✓' : '•' }}</span>
+          Un símbolo (! # $ ...)
+        </li>
+      </ul>
+
+      @if (form.controls.password.invalid && (form.controls.password.touched || form.controls.password.dirty)) {
+        <span class="err">La contraseña debe tener al menos 8 caracteres.</span>
+      }
+    </label>
+
+    <label class="check">
+      <input type="checkbox" formControlName="accept" />
+      <span>Acepto los terminos de uso y confirmo que soy mayor de edad.</span>
+    </label>
+
+    @if (error()) {
+      <p class="alert" role="alert">{{ error() }}</p>
+    }
+
+    <button type="submit" class="btn btn-primary" [disabled]="!canSubmit()">
+      @if (loading()) {
+        Creando cuenta...
+      } @else {
+        Crear mi cuenta
+      }
+    </button>
+
+    <p class="hint">Tu cuenta se crea en el backend y la sesion queda lista para comprar al instante.</p>
+    <p class="switch">
+      Ya tienes cuenta?
+      <button type="button" class="linkish" (click)="openLogin()">Iniciar sesion</button>
+    </p>
+  </form>
+</app-modal-shell>

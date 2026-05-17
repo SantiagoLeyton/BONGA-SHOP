@@ -1,0 +1,99 @@
+<div class="container cart">
+  <div class="head">
+    <div>
+      <p class="kicker">{{ 'cartKicker' | t }}</p>
+      <h1 class="title">{{ 'cart' | t }}</h1>
+      <p class="sub">{{ 'cartSub' | t }}</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-ghost" routerLink="/products">{{ 'keepShopping' | t }}</a>
+      <button
+        type="button"
+        class="btn btn-secondary"
+        [class.is-loading]="clearing()"
+        [attr.aria-busy]="clearing()"
+        (click)="clear()"
+        [disabled]="!lines().length || clearing() || isLoading()"
+      >
+        {{ clearing() ? ('clearing' | t) : ('clearCart' | t) }}
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <section class="loading-grid" [attr.aria-label]="'loadingCart' | t">
+      @for (item of [1, 2, 3]; track item) {
+        <article class="item item--loading">
+          <div class="thumb thumb--loading"></div>
+          <div class="info loading-stack">
+            <span class="loading-line loading-line--mid"></span>
+            <span class="loading-line loading-line--short"></span>
+            <span class="loading-line"></span>
+          </div>
+          <div class="side loading-stack">
+            <span class="loading-line loading-line--short"></span>
+            <span class="loading-line loading-line--short"></span>
+          </div>
+        </article>
+      }
+    </section>
+  } @else if (!lines().length) {
+    <section class="empty empty-state">
+      <h2>{{ 'emptyCartTitle' | t }}</h2>
+      <p class="muted">{{ 'emptyCartText' | t }}</p>
+      <a class="btn btn-primary" routerLink="/products">{{ 'exploreProducts' | t }}</a>
+    </section>
+  } @else {
+    <div class="grid">
+      <section class="list" aria-label="Items del carrito">
+        @for (line of lines(); track line.key) {
+          <article class="item">
+            <img class="thumb" [src]="line.product.imageUrl" [alt]="line.product.name" loading="lazy" />
+            <div class="info">
+              <h3 class="name">{{ line.product.name }}</h3>
+              <p class="meta">{{ line.flavor }} · {{ line.nicotineMg }} mg</p>
+              <label class="sel">
+                <span class="sr-only">Variante</span>
+                <select
+                  [value]="line.variantId"
+                  [disabled]="isBusy(line)"
+                  (change)="changeVariant(line, $any($event.target).value)"
+                >
+                  @for (variant of line.product.variants; track variant.id) {
+                    <option [value]="variant.id">{{ variant.flavor }} · {{ variant.nicotineMg }} mg</option>
+                  }
+                </select>
+              </label>
+              <div class="qty">
+                <button type="button" class="qbtn" (click)="dec(line)" [disabled]="line.qty <= 1 || isBusy(line)">−</button>
+                <span class="q">{{ line.qty }}</span>
+                <button type="button" class="qbtn" (click)="inc(line)" [disabled]="isBusy(line)">+</button>
+              </div>
+              @if (isBusy(line)) {
+              <p class="field-note">{{ 'updatingLine' | t }}</p>
+              }
+            </div>
+            <div class="side">
+              <p class="p">{{ line.lineTotal | appCurrency }}</p>
+              <div class="acts">
+                <button type="button" class="rm" (click)="remove(line)" [disabled]="isBusy(line)">{{ 'remove' | t }}</button>
+              </div>
+            </div>
+          </article>
+        }
+      </section>
+
+      <aside class="summary" aria-label="Resumen">
+        <h2 class="sum-title">{{ 'orderSummary' | t }}</h2>
+        <div class="row"><span>{{ 'subtotal' | t }}</span><strong>{{ subtotal() | appCurrency }}</strong></div>
+        <div class="row"><span>{{ 'shipping' | t }}</span><strong>{{ 'shippingCheckout' | t }}</strong></div>
+        <div class="row total">
+          <span>{{ 'estimatedTotal' | t }}</span><strong>{{ total() | appCurrency }}</strong>
+        </div>
+
+        <a class="btn btn-primary btn-lg" routerLink="/checkout">{{ 'checkoutContinue' | t }}</a>
+        <p class="hint">Antes de confirmar, revisaras tu direccion, el total final y el stock validado en tiempo real.</p>
+      </aside>
+    </div>
+  }
+</div>

@@ -1,0 +1,182 @@
+<div class="container checkout">
+  <div class="head">
+    <div>
+      <p class="kicker">Checkout</p>
+      <h1 class="title">{{ 'checkoutTitle' | t }}</h1>
+      <p class="sub">{{ 'checkoutSub' | t }}</p>
+    </div>
+    <div class="actions">
+      <a class="btn btn-ghost" routerLink="/cart">{{ 'backCart' | t }}</a>
+    </div>
+  </div>
+
+  <div class="steps" aria-label="Progreso">
+    <div
+      class="step"
+      [class.on]="step() === 'address'"
+      [class.is-done]="step() === 'review' || step() === 'confirm' || step() === 'done'"
+    >
+      <span class="dot"><span class="dot-num">1</span></span>
+      <span class="step-label">{{ 'delivery' | t }}</span>
+    </div>
+    <div class="line" [class.line--on]="step() === 'review' || step() === 'confirm' || step() === 'done'"></div>
+    <div
+      class="step"
+      [class.on]="step() === 'review'"
+      [class.is-done]="step() === 'confirm' || step() === 'done'"
+    >
+      <span class="dot"><span class="dot-num">2</span></span>
+      <span class="step-label">{{ 'review' | t }}</span>
+    </div>
+    <div class="line" [class.line--on]="step() === 'confirm' || step() === 'done'"></div>
+    <div class="step" [class.on]="step() === 'confirm'" [class.is-done]="step() === 'done'">
+      <span class="dot"><span class="dot-num">3</span></span>
+      <span class="step-label">{{ 'confirmation' | t }}</span>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <section class="panel loading-grid" [attr.aria-label]="'preparingCheckout' | t">
+      <span class="loading-line loading-line--short"></span>
+      <span class="loading-line"></span>
+      <span class="loading-line loading-line--mid"></span>
+      <span class="loading-line"></span>
+      <span class="loading-line loading-line--mid"></span>
+    </section>
+  } @else if (step() === 'address') {
+    <section class="panel">
+      <h2>{{ 'deliveryData' | t }}</h2>
+      <p class="panel-copy">{{ 'deliveryPanelCopy' | t }}</p>
+      @if (prefilledFromAccount()) {
+        <p class="account-notice" role="status" aria-live="polite">
+          <span class="account-notice__dot" aria-hidden="true"></span>
+          {{ 'accountPrefill' | t }} <a routerLink="/account">{{ 'myAccount' | t }}</a>. {{ 'adjustForOrder' | t }}
+        </p>
+      }
+      <form class="form" [formGroup]="addressForm" (ngSubmit)="nextFromAddress()">
+        <label class="field">
+          <span>{{ 'name' | t }} <span class="required-mark">*</span></span>
+          <input formControlName="name" [placeholder]="'yourName' | t" [attr.aria-invalid]="fieldInvalid('name')" />
+          @if (fieldInvalid('name')) {
+            <span class="field-error">{{ 'nameRequired' | t }}</span>
+          }
+        </label>
+        <label class="field">
+          <span>{{ 'phone' | t }} <span class="required-mark">*</span></span>
+          <input
+            formControlName="phone"
+            type="tel"
+            inputmode="numeric"
+            autocomplete="tel"
+            pattern="\+?[0-9]{10,15}"
+            maxlength="16"
+            placeholder="+57 3001234567"
+            (input)="onPhoneInput($event)"
+            [attr.aria-invalid]="fieldInvalid('phone')"
+          />
+          @if (phoneErrorMessage(); as message) {
+            <span class="field-error" role="alert">{{ message }}</span>
+          }
+        </label>
+        <label class="field">
+          <span>{{ 'city' | t }} <span class="required-mark">*</span></span>
+          <input formControlName="city" placeholder="Bogota" [attr.aria-invalid]="fieldInvalid('city')" />
+          @if (fieldInvalid('city')) {
+            <span class="field-error">{{ 'cityRequired' | t }}</span>
+          }
+        </label>
+        <label class="field field--wide">
+          <span>{{ 'address' | t }} <span class="required-mark">*</span></span>
+          <input formControlName="address1" placeholder="Calle 123 #45-67" [attr.aria-invalid]="fieldInvalid('address1')" />
+          @if (fieldInvalid('address1')) {
+            <span class="field-error">{{ 'addressRequired' | t }}</span>
+          }
+        </label>
+        <label class="field field--wide">
+          <span>{{ 'notesDelivery' | t }}</span>
+          <textarea formControlName="notes" rows="3" placeholder="Ej. Porteria, piso, horario sugerido..."></textarea>
+          <span class="field-note">{{ 'deliveryNotesHelp' | t }}</span>
+        </label>
+
+        <div class="form-actions">
+        <button type="submit" class="btn btn-primary btn-lg" [disabled]="addressForm.invalid">{{ 'continue' | t }}</button>
+        </div>
+        <ul class="trust" aria-label="Información de confianza">
+          <li><span class="trust-dot"></span>{{ 'dataUseOnly' | t }}</li>
+          <li><span class="trust-dot"></span>{{ 'reviewBeforeConfirm' | t }}</li>
+          <li><span class="trust-dot"></span>{{ 'protectedNoShare' | t }}</li>
+        </ul>
+      </form>
+    </section>
+  } @else if (step() === 'review') {
+    <section class="panel">
+      <h2>{{ 'orderReview' | t }}</h2>
+      <p class="panel-copy">{{ 'reviewPanelCopy' | t }}</p>
+      <div class="summary summary--review">
+        <p class="summary-label">{{ 'contactData' | t }}</p>
+        <div class="row"><span>{{ 'name' | t }}</span><strong>{{ addressForm.controls.name.value }}</strong></div>
+        <div class="row"><span>{{ 'phone' | t }}</span><strong>{{ addressForm.controls.phone.value }}</strong></div>
+        <p class="summary-label">{{ 'delivery' | t }}</p>
+        <div class="row"><span>{{ 'city' | t }}</span><strong>{{ addressForm.controls.city.value }}</strong></div>
+        <div class="row"><span>{{ 'address' | t }}</span><strong>{{ addressForm.controls.address1.value }}</strong></div>
+        @if (addressForm.controls.notes.value) {
+          <div class="row"><span>{{ 'notesDelivery' | t }}</span><strong>{{ addressForm.controls.notes.value }}</strong></div>
+        }
+        <p class="summary-label">{{ 'order' | t }}</p>
+        <div class="row"><span>{{ 'products' | t }}</span><strong>{{ subtotal() | appCurrency }}</strong></div>
+        <div class="row total"><span>{{ 'estimatedTotal' | t }}</span><strong>{{ total() | appCurrency }}</strong></div>
+      </div>
+      <div class="nav">
+        <button type="button" class="btn btn-ghost" (click)="back()">{{ 'back' | t }}</button>
+        <button type="button" class="btn btn-primary btn-lg" (click)="nextFromReview()">{{ 'continue' | t }}</button>
+      </div>
+    </section>
+  } @else if (step() === 'confirm') {
+    <section class="panel">
+      <h2>{{ 'finalConfirmation' | t }}</h2>
+      <p class="panel-copy">{{ 'finalPanelCopy' | t }}</p>
+
+      <div class="summary summary--confirm">
+        <p class="summary-label">{{ 'orderSummary' | t }}</p>
+        <div class="row"><span>{{ 'products' | t }}</span><strong>{{ subtotal() | appCurrency }}</strong></div>
+        <div class="row total"><span>{{ 'finalTotal' | t }}</span><strong>{{ total() | appCurrency }}</strong></div>
+      </div>
+
+      <div class="nav">
+        <button type="button" class="btn btn-ghost" (click)="back()" [disabled]="placing()">{{ 'back' | t }}</button>
+        <button
+          type="button"
+          class="btn btn-primary btn-lg"
+          [class.is-loading]="placing()"
+          [attr.aria-busy]="placing()"
+          (click)="placeOrder()"
+          [disabled]="placing()"
+        >
+          @if (placing()) { {{ 'confirmingOrder' | t }} } @else { {{ 'confirmBuy' | t }} }
+        </button>
+      </div>
+      <ul class="trust trust--confirm" aria-label="Información de seguridad">
+        <li><span class="trust-dot"></span>{{ 'securePurchase' | t }}.</li>
+        <li><span class="trust-dot"></span>{{ 'realStock' | t }}.</li>
+        <li><span class="trust-dot"></span>{{ 'orderHistoryText' | t }}</li>
+      </ul>
+    </section>
+  } @else {
+    <section class="done">
+      <div class="done__badge" aria-hidden="true">
+        <span class="done__check"></span>
+      </div>
+      <p class="done__eyebrow">{{ 'orderConfirmed' | t }}</p>
+      <h2>{{ 'orderDoneTitle' | t }}</h2>
+      <p class="muted">{{ 'orderDoneText' | t }}</p>
+      <div class="receipt" [attr.aria-label]="'orderNumber' | t">
+        <span class="receipt__label">{{ 'orderNumber' | t }}</span>
+        <p class="oid"><strong>#{{ orderId() }}</strong></p>
+      </div>
+      <div class="nav">
+        <a class="btn btn-ghost" routerLink="/products">{{ 'keepShopping' | t }}</a>
+        <a class="btn btn-primary" routerLink="/orders">{{ 'viewOrders' | t }}</a>
+      </div>
+    </section>
+  }
+</div>

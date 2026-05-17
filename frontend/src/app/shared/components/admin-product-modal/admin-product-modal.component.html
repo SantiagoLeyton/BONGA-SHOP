@@ -1,0 +1,165 @@
+<app-modal-shell [isOpen]="isOpen" [title]="product ? 'Editar producto' : 'Nuevo producto'" (closed)="close()">
+  <form class="form" [formGroup]="form" (ngSubmit)="save()">
+    <div class="intro">
+      <p class="intro-title">{{ product ? 'Actualiza la ficha del producto' : 'Crea un nuevo producto para el catalogo' }}</p>
+      <p class="intro-copy">Define la informacion principal, sus variantes y el stock inicial sin salir del panel.</p>
+    </div>
+
+    <div class="grid">
+      <label class="field">
+        <span>Nombre <span class="required-mark">*</span></span>
+        <input formControlName="name" placeholder="Nombre del producto" [attr.aria-invalid]="fieldInvalid('name')" />
+        @if (fieldInvalid('name')) {
+          <span class="field-error">Usa un nombre claro y reconocible para el catalogo.</span>
+        }
+      </label>
+
+      <label class="field">
+        <span>Marca <span class="required-mark">*</span></span>
+        <select formControlName="brandId" [attr.aria-invalid]="fieldInvalid('brandId')">
+          <option value="" disabled>Selecciona una marca</option>
+          @for (brand of brands; track brand.id) {
+            <option [value]="brand.id">{{ brand.name }}</option>
+          }
+        </select>
+        @if (fieldInvalid('brandId')) {
+          <span class="field-error">Selecciona una marca antes de guardar.</span>
+        }
+      </label>
+
+      <label class="field field--wide">
+        <span>Descripcion <span class="required-mark">*</span></span>
+        <textarea formControlName="description" rows="3" placeholder="Describe el producto, el perfil de sabor o su propuesta."></textarea>
+        @if (fieldInvalid('description')) {
+          <span class="field-error">La descripcion debe ayudar a entender el producto rapidamente.</span>
+        } @else {
+          <span class="field-note">Procura explicar el perfil general del producto y sus puntos fuertes.</span>
+        }
+      </label>
+
+      <label class="check field--wide">
+        <input type="checkbox" formControlName="active" />
+        <span>Producto visible en el catalogo</span>
+      </label>
+    </div>
+
+    <section class="image-card">
+      <div class="image-head">
+        <div>
+          <p class="muted small">Imagen principal</p>
+          <h3>Foto del producto</h3>
+        </div>
+        @if (imageFile || imagePreview) {
+          <button type="button" class="btn btn-text btn-sm" (click)="clearImage()">Quitar</button>
+        }
+      </div>
+
+      <div
+        class="image-dropzone"
+        [class.has-preview]="!!imagePreview"
+        (click)="triggerImagePicker()"
+        (dragover)="onDragOver($event)"
+        (drop)="onImageDropped($event)"
+        role="button"
+        tabindex="0"
+        (keydown.enter)="triggerImagePicker()"
+        (keydown.space)="triggerImagePicker()"
+      >
+        @if (imagePreview) {
+          <img [src]="imagePreview" alt="Vista previa del producto" class="image-preview" />
+          <div class="image-overlay">
+            <span>Click o arrastra para reemplazar</span>
+          </div>
+        } @else {
+          <div class="image-placeholder">
+            <span class="image-icon" aria-hidden="true">📷</span>
+            <p class="image-title">Sube una imagen del producto</p>
+            <p class="image-hint">JPG, PNG o WEBP · máx. 5 MB</p>
+            <span class="btn btn-secondary btn-sm">Seleccionar archivo</span>
+          </div>
+        }
+      </div>
+
+      <input
+        #imageInput
+        type="file"
+        accept="image/jpeg,image/jpg,image/png,image/webp"
+        (change)="onImageSelected($event)"
+        hidden
+      />
+
+      @if (imageError) {
+        <p class="image-error">{{ imageError }}</p>
+      } @else if (imageFile) {
+        <p class="image-note">Nuevo archivo: {{ imageFile.name }}</p>
+      } @else if (product && imagePreview) {
+        <p class="image-note muted">Se mantendrá la imagen actual si no eliges una nueva.</p>
+      }
+    </section>
+
+    <section class="variants-card">
+      <div class="variants-head">
+        <div>
+          <p class="muted small">Variantes</p>
+          <h3>Sabores y niveles de nicotina</h3>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" (click)="addVariant()">Agregar variante</button>
+      </div>
+
+      <div class="variants-list" formArrayName="variants">
+        @for (variant of variants.controls; track trackVariant($index, variant); let i = $index) {
+          <div class="variant-row" [formGroup]="variant">
+            <input type="hidden" formControlName="id" />
+            <label class="field">
+              <span>Sabor</span>
+              <input formControlName="flavor" placeholder="Menta" />
+            </label>
+            <label class="field">
+              <span>Nicotina (mg)</span>
+              <input type="number" min="0" formControlName="nicotineMg" />
+            </label>
+            <label class="field">
+              <span>Precio (COP)</span>
+              <input type="number" min="0.01" step="0.01" formControlName="price" />
+            </label>
+            <label class="field">
+              <span>Stock</span>
+              <input type="number" min="0" step="1" formControlName="stock" />
+            </label>
+            <label class="check">
+              <input type="checkbox" formControlName="active" />
+              <span>Activa</span>
+            </label>
+            <button type="button" class="btn btn-text btn-sm" (click)="removeVariant(i)">Eliminar</button>
+          </div>
+        }
+      </div>
+    </section>
+
+    <div class="preview">
+      <p class="muted small">Resumen rapido</p>
+      <div class="summary-grid">
+        <p><strong>Marca:</strong> {{ selectedBrandName() }}</p>
+        <p><strong>Variantes:</strong> {{ variants.length }}</p>
+        <p><strong>Estado:</strong> {{ form.controls.active.value ? 'Activo' : 'Inactivo' }}</p>
+      </div>
+    </div>
+
+    @if (getBlocker(); as blocker) {
+      <p class="blocker" role="status">{{ blocker }}</p>
+    }
+
+    <div class="actions">
+      <button type="button" class="btn btn-ghost" (click)="close()" [disabled]="saving">Cancelar</button>
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [class.is-loading]="saving"
+        [attr.aria-busy]="saving"
+        [disabled]="saving"
+      >
+        {{ saving ? 'Guardando cambios...' : 'Guardar cambios' }}
+      </button>
+    </div>
+  </form>
+</app-modal-shell>

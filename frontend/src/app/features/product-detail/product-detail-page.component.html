@@ -1,0 +1,173 @@
+@if (loading()) {
+  <div class="container detail">
+    <nav class="crumbs" aria-label="Migas de pan">
+      <a routerLink="/">{{ 'home' | t }}</a>
+      <span aria-hidden="true">/</span>
+      <a routerLink="/products">{{ 'products' | t }}</a>
+      <span aria-hidden="true">/</span>
+      <span class="current">{{ 'loading' | t }}</span>
+    </nav>
+
+    <div class="grid">
+      <div class="media" appRevealScroll>
+        <app-vapor-frame-scrub interaction="drag" [pxPerFrame]="12" [loop]="true" />
+      </div>
+
+      <div class="copy" appRevealScroll [appRevealDelay]="0.1">
+        <p class="brand">-</p>
+        <h1 class="title">{{ 'loadingProduct' | t }}</h1>
+        <p class="desc">{{ 'productLoadingText' | t }}</p>
+      </div>
+    </div>
+  </div>
+} @else {
+  @if (product(); as product) {
+    <div class="container detail">
+      <nav class="crumbs" aria-label="Migas de pan">
+        <a routerLink="/">{{ 'home' | t }}</a>
+        <span aria-hidden="true">/</span>
+        <a routerLink="/products">{{ 'products' | t }}</a>
+        <span aria-hidden="true">/</span>
+        <span class="current">{{ product.name }}</span>
+      </nav>
+
+      <div class="grid">
+        <div class="media" appRevealScroll>
+          <app-vapor-frame-scrub interaction="drag" [pxPerFrame]="10" [loop]="true" />
+          @if (product.badge) {
+            <div class="badge-float">
+              <app-product-badge [badge]="product.badge" />
+            </div>
+          }
+        </div>
+
+        <div class="copy" appRevealScroll [appRevealDelay]="0.1">
+          <p class="brand">{{ product.brand.name }}</p>
+          <div class="title-row">
+            <h1 class="title">{{ product.name }}</h1>
+            <button
+              type="button"
+              class="wish"
+              [class.wish--on]="wished()"
+              (click)="toggleWish()"
+              [attr.aria-pressed]="wished()"
+              aria-label="Guardar en favoritos"
+              title="Favoritos"
+            >
+              <span aria-hidden="true">♥</span>
+            </button>
+          </div>
+          <p class="desc">{{ product.description }}</p>
+
+          <div class="variants" role="radiogroup" aria-label="Variantes">
+            @for (variant of product.variants; track variant.id) {
+              <button
+                type="button"
+                class="chip"
+                [class.chip--active]="selectedVariant()?.id === variant.id"
+                (click)="pickVariant(variant.id)"
+              >
+                <span class="chip-title">{{ variant.flavor }}</span>
+                <span class="chip-meta">{{ variant.nicotineMg }} mg · {{ variant.price | appCurrency }}</span>
+              </button>
+            }
+          </div>
+
+          @if (selectedVariant(); as variant) {
+            <div class="buy">
+              <div class="price-row">
+                <div>
+                  <p class="eyebrow">{{ 'selectedVariant' | t }}</p>
+                  <p class="price">{{ variant.price | appCurrency }}</p>
+                </div>
+                <p
+                  class="stock"
+                  [class.stock--bad]="variant.stock === 0"
+                  [class.stock--warn]="variant.stock > 0 && variant.stock <= 5"
+                >
+                  {{ stockLabel(variant.stock) }}
+                </p>
+              </div>
+              <div class="cta">
+                <button
+                  type="button"
+                  class="btn btn-primary btn-lg"
+                  (click)="addToCart()"
+                  [disabled]="variant.stock === 0"
+                >
+                  @if (variant.stock === 0) {
+                    {{ 'unavailable' | t }}
+                  } @else {
+                    {{ 'addToCart' | t }}
+                  }
+                </button>
+                <p class="hint">{{ 'cartVariantHint' | t }}</p>
+              </div>
+            </div>
+          }
+
+          <section class="tabs" aria-label="Informacion">
+            <div class="tab-head" role="tablist" aria-label="Secciones de producto">
+              <button type="button" class="tab" [class.tab--on]="tab() === 'details'" (click)="tab.set('details')">
+                {{ 'details' | t }}
+              </button>
+              <button type="button" class="tab" [class.tab--on]="tab() === 'specs'" (click)="tab.set('specs')">
+                {{ 'variant' | t }}
+              </button>
+              <button type="button" class="tab" [class.tab--on]="tab() === 'shipping'" (click)="tab.set('shipping')">
+                {{ 'purchase' | t }}
+              </button>
+            </div>
+
+            <div class="tab-body">
+              @if (tab() === 'details') {
+                <ul class="list">
+                  <li><strong>{{ 'brand' | t }}:</strong> {{ product.brand.name }}</li>
+                  <li><strong>{{ 'availability' | t }}:</strong> {{ product.variants.length }} {{ 'variants' | t }}</li>
+                  <li><strong>{{ 'basePrice' | t }}:</strong> {{ 'from' | t }} {{ product.variants[0].price | appCurrency }}</li>
+                </ul>
+              } @else if (tab() === 'specs') {
+                @if (selectedVariant(); as selected) {
+                  <div class="specs">
+                    <div class="spec"><span>{{ 'flavor' | t }}</span><strong>{{ selected.flavor }}</strong></div>
+                    <div class="spec"><span>{{ 'nicotine' | t }}</span><strong>{{ selected.nicotineMg }} mg</strong></div>
+                    <div class="spec"><span>{{ 'stock' | t }}</span><strong>{{ selected.stock }}</strong></div>
+                    <div class="spec"><span>{{ 'reference' | t }}</span><strong>#{{ selected.id }}</strong></div>
+                  </div>
+                } @else {
+                  <p class="muted">{{ 'selectVariantHint' | t }}</p>
+                }
+              } @else {
+                <ul class="list">
+                  <li><strong>Checkout:</strong> {{ 'checkoutProductText' | t }}</li>
+                  <li><strong>{{ 'stock' | t }}:</strong> {{ 'stockValidationText' | t }}</li>
+                  <li><strong>{{ 'orderTracking' | t }}:</strong> {{ 'orderHistoryText' | t }}</li>
+                </ul>
+              }
+            </div>
+          </section>
+        </div>
+      </div>
+
+      @if (related().length) {
+        <section class="related" appRevealScroll [appRevealDelay]="0.05">
+          <div class="related-head">
+            <h2>{{ 'related' | t }}</h2>
+            <a class="btn btn-text btn-sm" routerLink="/products">{{ 'viewAll' | t }}</a>
+          </div>
+          <div class="related-grid">
+            @for (relatedProduct of related(); track relatedProduct.id) {
+              <app-product-card [product]="relatedProduct" />
+            }
+          </div>
+        </section>
+      }
+    </div>
+  } @else {
+    <div class="container empty">
+      <h1>{{ 'productNotFound' | t }}</h1>
+      <p class="muted">{{ 'productNotFoundText' | t }}</p>
+      <a class="btn btn-secondary" routerLink="/products">{{ 'backProducts' | t }}</a>
+    </div>
+  }
+}

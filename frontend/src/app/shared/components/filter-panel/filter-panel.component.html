@@ -1,0 +1,133 @@
+<div class="filters">
+  <div class="filters-head">
+    <h2 class="h">{{ 'filters' | t }}</h2>
+    <button type="button" class="btn btn-text btn-sm" (click)="reset()">{{ 'clearAll' | t }}</button>
+  </div>
+
+  <section class="block">
+    <h3 class="sub">{{ 'sort' | t }}</h3>
+    <div class="sort" data-sort-root>
+      <button
+        type="button"
+        class="sort-btn"
+        (click)="toggleSortMenu()"
+        [attr.aria-expanded]="sortOpen()"
+        aria-haspopup="listbox"
+      >
+        <span class="sort-btn__label">{{ sortLabel() }}</span>
+        <span class="sort-btn__chev" aria-hidden="true"></span>
+      </button>
+
+      @if (sortOpen()) {
+        <ul class="sort-menu" role="listbox" aria-label="Ordenar por">
+          <li>
+            <button type="button" class="sort-item" (click)="updateSort('featured')">Destacados</button>
+          </li>
+          <li>
+            <button type="button" class="sort-item" (click)="updateSort('price-asc')">Precio: menor a mayor</button>
+          </li>
+          <li>
+            <button type="button" class="sort-item" (click)="updateSort('price-desc')">Precio: mayor a menor</button>
+          </li>
+          <li>
+            <button type="button" class="sort-item" (click)="updateSort('name')">Nombre (A–Z)</button>
+          </li>
+        </ul>
+      }
+    </div>
+  </section>
+
+  <section class="block">
+    <h3 class="sub">{{ 'brand' | t }}</h3>
+    <ul class="checks">
+      @for (b of brands; track b.id) {
+        <li>
+          <label class="check">
+            <input
+              type="checkbox"
+              [checked]="brandChecked(b.slug)"
+              (change)="toggleBrand(b.slug, $any($event.target).checked)"
+            />
+            <span>{{ b.name }}</span>
+          </label>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <section class="block">
+    <h3 class="sub">{{ 'flavor' | t }}</h3>
+    <ul class="checks">
+      @for (f of flavors; track f) {
+        <li>
+          <label class="check">
+            <input
+              type="checkbox"
+              [checked]="flavorChecked(f)"
+              (change)="toggleFlavor(f, $any($event.target).checked)"
+            />
+            <span>{{ f }}</span>
+          </label>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <section class="block">
+    <h3 class="sub">{{ 'nicotine' | t }}</h3>
+    <div class="grid2">
+      <label class="mini">
+        <span>Mín</span>
+        <input
+          type="number"
+          inputmode="numeric"
+          min="0"
+          placeholder="—"
+          [value]="value.nicotineMin ?? ''"
+          (input)="updateNicotineMin($any($event.target).value)"
+        />
+      </label>
+      <label class="mini">
+        <span>Máx</span>
+        <input
+          type="number"
+          inputmode="numeric"
+          min="0"
+          placeholder="—"
+          [value]="value.nicotineMax ?? ''"
+          (input)="updateNicotineMax($any($event.target).value)"
+        />
+      </label>
+    </div>
+  </section>
+
+  <section class="block">
+    <h3 class="sub">{{ 'price' | t }}</h3>
+    <div class="grid2">
+      <label class="mini">
+        <span>Mín</span>
+        <input
+          type="number"
+          inputmode="decimal"
+          min="0"
+          step="0.5"
+          placeholder="—"
+          [value]="priceInputMin()"
+          (input)="updatePriceMin($any($event.target).value)"
+        />
+      </label>
+      <label class="mini">
+        <span>Máx</span>
+        <input
+          type="number"
+          inputmode="decimal"
+          min="0"
+          step="0.5"
+          placeholder="—"
+          [value]="priceInputMax()"
+          (input)="updatePriceMax($any($event.target).value)"
+        />
+      </label>
+    </div>
+  </section>
+</div>
