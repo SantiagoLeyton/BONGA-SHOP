@@ -2,6 +2,7 @@ package com.bongashop.backend.productvariant.service;
 
 import com.bongashop.backend.inventory.entity.Inventory;
 import com.bongashop.backend.inventory.repository.InventoryRepository;
+import com.bongashop.backend.inventory.service.InventoryMovementService;
 import com.bongashop.backend.product.entity.Product;
 import com.bongashop.backend.product.service.ProductService;
 import com.bongashop.backend.productvariant.dto.ProductVariantRequest;
@@ -9,7 +10,10 @@ import com.bongashop.backend.productvariant.dto.ProductVariantResponse;
 import com.bongashop.backend.productvariant.entity.ProductVariant;
 import com.bongashop.backend.productvariant.mapper.ProductVariantMapper;
 import com.bongashop.backend.productvariant.repository.ProductVariantRepository;
+import com.bongashop.backend.shared.enums.InventoryMovementType;
 import com.bongashop.backend.shared.exception.ResourceNotFoundException;
+import com.bongashop.backend.user.entity.User;
+import com.bongashop.backend.user.service.UserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,17 +25,23 @@ public class ProductVariantService {
     private final ProductVariantRepository productVariantRepository;
     private final ProductService productService;
     private final InventoryRepository inventoryRepository;
+    private final InventoryMovementService movementService;
+    private final UserService userService;
     private final ProductVariantMapper productVariantMapper;
 
     public ProductVariantService(
             ProductVariantRepository productVariantRepository,
             ProductService productService,
             InventoryRepository inventoryRepository,
+            InventoryMovementService movementService,
+            UserService userService,
             ProductVariantMapper productVariantMapper
     ) {
         this.productVariantRepository = productVariantRepository;
         this.productService = productService;
         this.inventoryRepository = inventoryRepository;
+        this.movementService = movementService;
+        this.userService = userService;
         this.productVariantMapper = productVariantMapper;
     }
 
@@ -52,7 +62,7 @@ public class ProductVariantService {
     }
 
     @Transactional
-    public ProductVariantResponse create(Long productId, ProductVariantRequest request) {
+    public ProductVariantResponse create(Long productId, ProductVariantRequest request, Long userId) {
         Product product = productService.getProductEntity(productId);
         ProductVariant variant = new ProductVariant();
         variant.setProduct(product);
@@ -67,6 +77,8 @@ public class ProductVariantService {
         inventory.setStock(0);
         inventoryRepository.save(inventory);
         savedVariant.setInventory(inventory);
+        User user = userId == null ? null : userService.getById(userId);
+        movementService.recordMovement(savedVariant, InventoryMovementType.ENTRY, 0, 0, user, "Inventario inicial");
         return productVariantMapper.toResponse(savedVariant);
     }
 

@@ -16,9 +16,9 @@ import { CartUiService } from '../../../core/services/cart-ui.service';
 import { ModalService } from '../../../core/services/modal.service';
 import {
   AppSettingsService,
-  type AppCurrency,
   type AppLang,
 } from '../../../core/services/app-settings.service';
+import { CurrencyService, type AppCurrency } from '../../../core/services/currency.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { WishlistService } from '../../../core/services/wishlist.service';
 import { TranslatePipe } from '../../pipes/translate.pipe';
@@ -43,6 +43,7 @@ export class NavbarComponent {
   private readonly cart = inject(CartService);
   private readonly cartUi = inject(CartUiService);
   private readonly settings = inject(AppSettingsService);
+  private readonly currencyService = inject(CurrencyService);
   private readonly toasts = inject(ToastService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
@@ -57,7 +58,7 @@ export class NavbarComponent {
   readonly wishlistCount = computed(() => this.wishlist.count());
   readonly cartCount = computed(() => this.cart.count());
   readonly lang = this.settings.lang;
-  readonly currency = this.settings.currency;
+  readonly currency = this.currencyService.currency;
 
   /**
    * Iniciales del usuario (para el avatar del chip de cuenta).
@@ -120,7 +121,7 @@ export class NavbarComponent {
   }
 
   setCurrency(next: AppCurrency): void {
-    this.settings.setCurrency(next);
+    this.currencyService.setCurrency(next);
   }
 
   toggleMenu(): void {

@@ -7,6 +7,7 @@ import { CartUiService } from '../../../core/services/cart-ui.service';
 import { ProductService } from '../../../core/services/product.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { AppCurrencyPipe } from '../../pipes/app-currency.pipe';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 type ViewLine = {
   key: string;
@@ -22,7 +23,7 @@ type ViewLine = {
 @Component({
   selector: 'app-cart-drawer',
   standalone: true,
-  imports: [RouterLink, AppCurrencyPipe],
+  imports: [RouterLink, AppCurrencyPipe, TranslatePipe],
   templateUrl: './cart-drawer.component.html',
   styleUrl: './cart-drawer.component.scss',
 })

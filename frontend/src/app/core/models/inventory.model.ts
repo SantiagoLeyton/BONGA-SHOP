@@ -14,3 +14,28 @@ export interface InventoryRecord extends InventorySnapshot {
   active: boolean;
   lowStock: boolean;
 }
+
+export type InventoryMovementType = 'SALE' | 'RESTOCK' | 'ADJUSTMENT' | 'ENTRY';
+
+export interface InventoryMovement {
+  id: string;
+  createdAt: string;
+  productId: string;
+  productName: string;
+  variantId: string;
+  variantName: string;
+  type: InventoryMovementType;
+  quantityChange: number;
+  stockBefore: number;
+  stockAfter: number;
+  userName: string;
+  reason: string;
+}
+
+export interface InventoryMovementPage {
+  content: InventoryMovement[];
+  page: number;
+  size: number;
+  totalElements: number;
+  totalPages: number;
+}

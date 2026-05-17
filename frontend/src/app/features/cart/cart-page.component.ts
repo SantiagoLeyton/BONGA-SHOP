@@ -6,6 +6,7 @@ import { CartService } from '../../core/services/cart.service';
 import { ProductService } from '../../core/services/product.service';
 import { ToastService } from '../../core/services/toast.service';
 import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 type CartView = {
   key: string;
@@ -21,7 +22,7 @@ type CartView = {
 @Component({
   selector: 'app-cart-page',
   standalone: true,
-  imports: [RouterLink, AppCurrencyPipe],
+  imports: [RouterLink, AppCurrencyPipe, TranslatePipe],
   templateUrl: './cart-page.component.html',
   styleUrl: './cart-page.component.scss',
 })

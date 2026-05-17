@@ -5,13 +5,13 @@
   <header class="page-head container" appRevealScroll>
     <div class="page-head__copy">
       <p class="page-head__eyebrow">Marketplace</p>
-      <h1 class="title">Catálogo</h1>
-      <p class="muted page-head__lede">Explora sabores, marcas y variantes disponibles para comprar hoy.</p>
+      <h1 class="title">{{ 'catalogTitle' | t }}</h1>
+      <p class="muted page-head__lede">{{ 'catalogLede' | t }}</p>
     </div>
   </header>
 
   <div class="container layout">
-    <aside class="aside" aria-label="Filtros" appRevealScroll [appRevealDelay]="0.05">
+    <aside class="aside" [attr.aria-label]="'filters' | t" appRevealScroll [appRevealDelay]="0.05">
       <app-filter-panel
         [brands]="brands()"
         [flavors]="flavors()"
@@ -20,33 +20,33 @@
       />
     </aside>
 
-    <section class="catalog" aria-label="Resultados">
+    <section class="catalog" [attr.aria-label]="'results' | t">
       <div class="toolbar" appRevealScroll [appRevealDelay]="0.06">
         <div class="toolbar-left">
           <p class="count" role="status">
             <span class="count__value">{{ filtered().length }}</span>
             <span class="count__rest">
-              <span class="count__label">resultados</span>
-              <span class="count__hint">para explorar</span>
+              <span class="count__label">{{ 'results' | t }}</span>
+              <span class="count__hint">{{ 'exploreHint' | t }}</span>
             </span>
           </p>
 
           @if (activeChips().length) {
-            <div class="chips" aria-label="Filtros activos">
+            <div class="chips" [attr.aria-label]="'activeFilters' | t">
               @for (chip of activeChips(); track chip.key) {
                 <button type="button" class="chip" (click)="removeChip(chip.type, chip.value)" [title]="'Quitar: ' + chip.label">
                   <span class="chip-label">{{ chip.label }}</span>
                   <span class="chip-x" aria-hidden="true">×</span>
                 </button>
               }
-              <button type="button" class="btn btn-text btn-sm chips-clear" (click)="clearAll()">Limpiar todo</button>
+              <button type="button" class="btn btn-text btn-sm chips-clear" (click)="clearAll()">{{ 'clearAll' | t }}</button>
             </div>
           }
         </div>
 
-        <div class="toolbar-right" aria-label="Buscar en catálogo">
+        <div class="toolbar-right" [attr.aria-label]="'search' | t">
           <label class="search">
-            <span class="sr-only">Buscar</span>
+            <span class="sr-only">{{ 'search' | t }}</span>
             <span class="search__icon" aria-hidden="true">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <circle cx="11" cy="11" r="7" />
@@ -56,7 +56,7 @@
             <input
               type="search"
               class="search-input"
-              placeholder="Buscar por nombre, marca o sabor…"
+              [placeholder]="'searchPlaceholder' | t"
               [value]="query()"
               (input)="setQuery($any($event.target).value)"
             />
@@ -81,9 +81,9 @@
             </div>
           } @empty {
             <div class="empty">
-              <h2 class="empty__title">No encontramos productos con esos filtros</h2>
-              <p class="muted empty__text">Prueba otra marca, sabor o limpia la búsqueda para volver a explorar todo el catálogo.</p>
-              <button type="button" class="btn btn-secondary empty__btn" (click)="clearAll()">Mostrar todo</button>
+              <h2 class="empty__title">{{ 'emptyCatalogTitle' | t }}</h2>
+              <p class="muted empty__text">{{ 'emptyCatalogText' | t }}</p>
+              <button type="button" class="btn btn-secondary empty__btn" (click)="clearAll()">{{ 'showAll' | t }}</button>
             </div>
           }
         }

@@ -5,6 +5,7 @@ import com.bongashop.backend.cart.service.CartService;
 import com.bongashop.backend.cartitem.entity.CartItem;
 import com.bongashop.backend.inventory.entity.Inventory;
 import com.bongashop.backend.inventory.repository.InventoryRepository;
+import com.bongashop.backend.inventory.service.InventoryMovementService;
 import com.bongashop.backend.order.dto.OrderRequest;
 import com.bongashop.backend.order.dto.ShippingDataRequest;
 import com.bongashop.backend.order.entity.Order;
@@ -13,6 +14,7 @@ import com.bongashop.backend.order.repository.OrderRepository;
 import com.bongashop.backend.product.entity.Product;
 import com.bongashop.backend.productvariant.entity.ProductVariant;
 import com.bongashop.backend.shared.enums.OrderStatus;
+import com.bongashop.backend.shared.enums.InventoryMovementType;
 import com.bongashop.backend.shared.exception.InsufficientStockException;
 import com.bongashop.backend.user.entity.User;
 import com.bongashop.backend.user.service.UserService;
@@ -30,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,6 +46,8 @@ class OrderServiceTest {
     private UserService userService;
     @Mock
     private CartService cartService;
+    @Mock
+    private InventoryMovementService movementService;
 
     private OrderMapper orderMapper;
 
@@ -52,7 +57,7 @@ class OrderServiceTest {
     @BeforeEach
     void setUp() {
         orderMapper = new OrderMapper();
-        orderService = new OrderService(orderRepository, inventoryRepository, userService, cartService, orderMapper);
+        orderService = new OrderService(orderRepository, inventoryRepository, userService, cartService, orderMapper, movementService);
     }
 
     @Test
@@ -113,6 +118,15 @@ class OrderServiceTest {
         assertThat(response.status()).isEqualTo(OrderStatus.CREATED.name());
         assertThat(response.total()).isEqualByComparingTo("50");
         assertThat(inventory.getStock()).isEqualTo(8);
+        verify(inventoryRepository).save(inventory);
+        verify(movementService).recordMovement(
+                variant,
+                InventoryMovementType.SALE,
+                10,
+                8,
+                user,
+                "Compra"
+        );
     }
 
     @Test

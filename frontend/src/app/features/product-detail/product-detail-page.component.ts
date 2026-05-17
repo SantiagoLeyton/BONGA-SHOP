@@ -18,6 +18,7 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
 import { VaporFrameScrubComponent } from '../../shared/components/vapor-frame-scrub/vapor-frame-scrub.component';
 import { RevealScrollDirective } from '../../shared/directives/reveal-scroll.directive';
 import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-product-detail-page',
@@ -29,6 +30,7 @@ import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
     RevealScrollDirective,
     VaporFrameScrubComponent,
     ProductCardComponent,
+    TranslatePipe,
   ],
   templateUrl: './product-detail-page.component.html',
   styleUrl: './product-detail-page.component.scss',

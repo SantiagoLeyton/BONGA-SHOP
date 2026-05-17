@@ -4,18 +4,18 @@
 
   <div class="head">
     <div>
-      <p class="kicker">Mi cuenta</p>
-      <h1 class="title">Mis pedidos</h1>
-      <p class="sub">Consulta tu historial y revisa el estado de cada compra en un solo lugar.</p>
+      <p class="kicker">{{ 'myAccount' | t }}</p>
+      <h1 class="title">{{ 'myOrders' | t }}</h1>
+      <p class="sub">{{ 'ordersSub' | t }}</p>
     </div>
     <div class="actions">
-      <a class="btn btn-ghost" routerLink="/products">Seguir comprando</a>
-      <a class="btn btn-secondary" routerLink="/cart">Ver carrito</a>
+      <a class="btn btn-ghost" routerLink="/products">{{ 'keepShopping' | t }}</a>
+      <a class="btn btn-secondary" routerLink="/cart">{{ 'viewCart' | t }}</a>
     </div>
   </div>
 
   @if (loading()) {
-    <section class="list" aria-label="Cargando pedidos">
+    <section class="list" [attr.aria-label]="'loadingOrders' | t">
       @for (item of [1, 2, 3]; track item) {
         <article class="card card--loading" aria-hidden="true">
           <div class="card__head">
@@ -40,13 +40,13 @@
           <path d="M16 12l16 8" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
         </svg>
       </div>
-      <h2>Aún no tienes pedidos</h2>
-      <p class="muted">Cuando completes tu primera compra, aquí verás el estado, los productos y el total de cada orden.</p>
-      <a class="btn btn-primary" routerLink="/products">Explorar productos</a>
+      <h2>{{ 'emptyOrdersTitle' | t }}</h2>
+      <p class="muted">{{ 'ordersSub' | t }}</p>
+      <a class="btn btn-primary" routerLink="/products">{{ 'exploreProducts' | t }}</a>
     </section>
   } @else {
     <p class="list-caption" role="status">
-      {{ list().length }} {{ list().length === 1 ? 'pedido registrado' : 'pedidos registrados' }}
+      {{ list().length }} {{ list().length === 1 ? ('registeredOrder' | t) : ('registeredOrders' | t) }}
     </p>
     <section class="list" aria-label="Órdenes">
       @for (order of list(); track order.id) {
@@ -63,7 +63,7 @@
             (click)="toggleExpanded(order.id)"
           >
             <div class="card__lead">
-              <p class="card__id">Pedido <span class="card__id-num">#{{ order.id }}</span></p>
+              <p class="card__id">{{ 'order' | t }} <span class="card__id-num">#{{ order.id }}</span></p>
               <p class="card__date">{{ order.createdAt | date : 'medium' }}</p>
             </div>
 
@@ -75,7 +75,7 @@
             </div>
 
             <div class="card__total">
-              <span class="card__total-label">Total</span>
+              <span class="card__total-label">{{ 'total' | t }}</span>
               <span class="card__total-value">{{ orderTotal(order) | appCurrency }}</span>
             </div>
 
@@ -91,7 +91,7 @@
               <svg viewBox="0 0 16 16" width="12" height="12" fill="none" aria-hidden="true">
                 <path d="M2 4h12M2 8h12M2 12h8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
               </svg>
-              {{ order.linesCount }} {{ order.linesCount === 1 ? 'producto' : 'productos' }}
+              {{ order.linesCount }} {{ order.linesCount === 1 ? ('product' | t) : ('productsPlural' | t) }}
             </span>
             <span class="card__addr">
               <svg viewBox="0 0 16 16" width="12" height="12" fill="none" aria-hidden="true">
@@ -109,7 +109,7 @@
             [attr.inert]="isExpanded(order.id) ? null : ''"
           >
             <div class="card__details-inner">
-              <p class="card__details-title">Productos</p>
+              <p class="card__details-title">{{ 'products' | t }}</p>
               <ul class="lines">
                 @for (line of order.lines; track trackLine($index, line)) {
                   <li class="line">
@@ -134,22 +134,22 @@
               <div class="card__footer">
                 <dl class="card__facts">
                   <div>
-                    <dt>Enviar a</dt>
+                    <dt>{{ 'sendTo' | t }}</dt>
                     <dd>{{ order.address.name }}</dd>
                   </div>
                   <div>
-                    <dt>Dirección</dt>
+                    <dt>{{ 'address' | t }}</dt>
                     <dd>{{ order.address.city }} · {{ order.address.address1 }}</dd>
                   </div>
                   @if (order.address.notes) {
                     <div>
-                      <dt>Notas</dt>
+                      <dt>{{ 'notesDelivery' | t }}</dt>
                       <dd>{{ order.address.notes }}</dd>
                     </div>
                   }
                 </dl>
                 <div class="card__total-final">
-                  <span class="card__total-label">Total pagado</span>
+                  <span class="card__total-label">{{ 'paidTotal' | t }}</span>
                   <span class="card__total-value card__total-value--big">{{ orderTotal(order) | appCurrency }}</span>
                 </div>
               </div>

@@ -1,0 +1,304 @@
+:host {
+  position: fixed;
+  right: 1.2rem;
+  bottom: 1.2rem;
+  z-index: 80;
+}
+
+.vape-ai-fab {
+  position: relative;
+  width: 4.1rem;
+  height: 4.1rem;
+  border: 1px solid rgba(94, 234, 212, 0.36);
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 34% 22%, rgba(255, 255, 255, 0.26), transparent 23%),
+    linear-gradient(145deg, rgba(8, 47, 73, 0.94), rgba(13, 148, 136, 0.82));
+  color: #ecfeff;
+  cursor: pointer;
+  box-shadow: 0 16px 55px rgba(45, 212, 191, 0.24), 0 8px 28px rgba(2, 6, 23, 0.46);
+  overflow: hidden;
+}
+
+.vape-ai-fab--active {
+  transform: translateY(-2px);
+}
+
+.vape-ai-fab__mist {
+  position: absolute;
+  inset: -34%;
+  background:
+    radial-gradient(circle at 30% 40%, rgba(255, 255, 255, 0.2), transparent 18%),
+    radial-gradient(circle at 62% 54%, rgba(167, 139, 250, 0.24), transparent 20%),
+    radial-gradient(circle at 48% 68%, rgba(94, 234, 212, 0.2), transparent 22%);
+  filter: blur(8px);
+  animation: vapeMist 5s ease-in-out infinite alternate;
+}
+
+.vape-ai-fab__core {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.vape-ai-panel {
+  position: absolute;
+  right: 0;
+  bottom: 5rem;
+  width: min(390px, calc(100vw - 2rem));
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(3, 7, 18, 0.96)),
+    radial-gradient(circle at 80% 0%, rgba(94, 234, 212, 0.16), transparent 36%);
+  box-shadow: 0 26px 90px rgba(2, 6, 23, 0.66);
+  overflow: hidden;
+  backdrop-filter: blur(18px);
+}
+
+.vape-ai-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1rem 0.8rem;
+}
+
+.vape-ai-panel__head p,
+.vape-ai-kicker,
+.vape-ai-product__brand,
+.vape-ai-note,
+.vape-ai-error {
+  margin: 0;
+  font-size: 0.75rem;
+}
+
+.vape-ai-panel__head p,
+.vape-ai-kicker {
+  color: rgba(94, 234, 212, 0.86);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.vape-ai-panel__head h2,
+.vape-ai-step h3,
+.vape-ai-intro h3,
+.vape-ai-result h3,
+.vape-ai-product h4 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+.vape-ai-panel__head h2 {
+  margin-top: 0.2rem;
+  font-size: 1.15rem;
+}
+
+.vape-ai-icon-btn {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(15, 23, 42, 0.72);
+  color: #e5edf8;
+  cursor: pointer;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.vape-ai-progress {
+  height: 3px;
+  background: rgba(148, 163, 184, 0.12);
+}
+
+.vape-ai-progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #5eead4, #a78bfa);
+  transition: width 220ms ease;
+}
+
+.vape-ai-panel__body {
+  padding: 1rem;
+}
+
+.vape-ai-intro,
+.vape-ai-step,
+.vape-ai-result {
+  display: grid;
+  gap: 0.95rem;
+}
+
+.vape-ai-intro {
+  min-height: 260px;
+  align-content: center;
+}
+
+.vape-ai-intro p,
+.vape-ai-message,
+.vape-ai-product p {
+  margin: 0;
+  color: rgba(226, 232, 240, 0.76);
+  line-height: 1.5;
+}
+
+.vape-ai-orbit {
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(94, 234, 212, 0.34);
+  background:
+    radial-gradient(circle at 45% 42%, rgba(94, 234, 212, 0.28), transparent 25%),
+    radial-gradient(circle at 58% 60%, rgba(167, 139, 250, 0.26), transparent 28%);
+  box-shadow: inset 0 0 30px rgba(94, 234, 212, 0.12), 0 0 44px rgba(94, 234, 212, 0.1);
+}
+
+.vape-ai-options {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.vape-ai-options--grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.vape-ai-choice,
+.vape-ai-primary,
+.vape-ai-secondary {
+  min-height: 2.7rem;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.17);
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.vape-ai-choice {
+  background: rgba(15, 23, 42, 0.72);
+  color: #e2e8f0;
+}
+
+.vape-ai-choice--selected {
+  border-color: rgba(94, 234, 212, 0.62);
+  background: rgba(20, 184, 166, 0.16);
+  color: #f8fafc;
+}
+
+.vape-ai-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1rem;
+  background: linear-gradient(135deg, #5eead4, #8b5cf6);
+  color: #04111f;
+  text-decoration: none;
+}
+
+.vape-ai-secondary {
+  padding: 0 1rem;
+  background: rgba(148, 163, 184, 0.08);
+  color: #e2e8f0;
+}
+
+.vape-ai-choice:hover,
+.vape-ai-primary:hover,
+.vape-ai-secondary:hover {
+  transform: translateY(-1px);
+}
+
+.vape-ai-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.9rem;
+}
+
+.vape-ai-actions > * {
+  flex: 1;
+}
+
+.vape-ai-error {
+  color: rgba(251, 113, 133, 0.98);
+}
+
+.vape-ai-note {
+  color: rgba(251, 191, 36, 0.9);
+}
+
+.vape-ai-products {
+  display: grid;
+  gap: 0.7rem;
+}
+
+.vape-ai-product {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.8rem;
+  align-items: center;
+  padding: 0.8rem;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.56);
+}
+
+.vape-ai-product__brand {
+  color: rgba(94, 234, 212, 0.82);
+  font-weight: 800;
+}
+
+.vape-ai-product h4 {
+  margin-top: 0.15rem;
+  font-size: 0.98rem;
+}
+
+.vape-ai-product__meta {
+  display: grid;
+  justify-items: end;
+  gap: 0.2rem;
+  white-space: nowrap;
+}
+
+.vape-ai-product__meta span {
+  font-weight: 900;
+}
+
+.vape-ai-product__meta small {
+  color: rgba(148, 163, 184, 0.9);
+}
+
+@keyframes vapeMist {
+  from {
+    transform: translate3d(-4%, 3%, 0) rotate(0deg);
+  }
+  to {
+    transform: translate3d(5%, -3%, 0) rotate(16deg);
+  }
+}
+
+@media (max-width: 560px) {
+  :host {
+    right: 0.8rem;
+    bottom: 0.8rem;
+  }
+
+  .vape-ai-panel {
+    right: -0.2rem;
+    bottom: 4.7rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vape-ai-fab__mist,
+  .vape-ai-progress span,
+  .vape-ai-choice,
+  .vape-ai-primary,
+  .vape-ai-secondary {
+    animation: none;
+    transition: none;
+  }
+}

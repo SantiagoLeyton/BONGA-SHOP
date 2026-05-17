@@ -33,11 +33,11 @@
       <span class="pill muted">{{ nicotineRange() }}</span>
     </div>
     <div class="row">
-      <p class="price">Desde <strong>{{ minPrice() | appCurrency }}</strong></p>
+      <p class="price">{{ 'from' | t }} <strong>{{ minPrice() | appCurrency }}</strong></p>
       <div class="row-actions">
         @if (showQuickView && variant !== 'spotlight') {
           <button type="button" class="btn btn-secondary btn-sm" (click)="openQuickView($event)">
-            Vista rápida
+            {{ 'quickViewButton' | t }}
           </button>
         }
         <a
@@ -47,7 +47,7 @@
           [class.btn-spotlight-cta]="variant === 'spotlight'"
           [routerLink]="['/products', product.slug]"
         >
-          {{ variant === 'spotlight' ? 'Ver producto' : 'Ver detalle' }}
+          {{ variant === 'spotlight' ? ('viewProduct' | t) : ('viewDetail' | t) }}
         </a>
       </div>
     </div>

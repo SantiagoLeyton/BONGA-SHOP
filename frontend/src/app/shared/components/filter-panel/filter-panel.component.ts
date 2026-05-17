@@ -1,10 +1,12 @@
 import { Component, EventEmitter, HostListener, Input, Output, signal } from '@angular/core';
 import type { Brand } from '../../../core/models/brand.model';
 import type { ProductFilterState, ProductSort } from '../../utils/product-filter.util';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 
 @Component({
   selector: 'app-filter-panel',
   standalone: true,
+  imports: [TranslatePipe],
   templateUrl: './filter-panel.component.html',
   styleUrl: './filter-panel.component.scss',
 })

@@ -1,18 +1,18 @@
 @if (isOpen()) {
   <div class="root">
-    <button type="button" class="backdrop" (click)="close()" aria-label="Cerrar carrito"></button>
-    <aside class="panel" role="dialog" aria-modal="true" aria-label="Carrito">
+    <button type="button" class="backdrop" (click)="close()" [attr.aria-label]="'close' | t"></button>
+    <aside class="panel" role="dialog" aria-modal="true" [attr.aria-label]="'cart' | t">
       <header class="head">
         <div>
-          <p class="kicker">Carrito</p>
-          <p class="count">{{ count() }} {{ count() === 1 ? 'item guardado' : 'items guardados' }}</p>
+          <p class="kicker">{{ 'cart' | t }}</p>
+          <p class="count">{{ count() }} {{ count() === 1 ? ('savedItem' | t) : ('savedItems' | t) }}</p>
         </div>
-        <button type="button" class="icon" (click)="close()" aria-label="Cerrar">×</button>
+        <button type="button" class="icon" (click)="close()" [attr.aria-label]="'close' | t">×</button>
       </header>
 
       <div class="body">
         @if (!loading()) {
-          <div class="loading-grid" aria-label="Cargando carrito">
+          <div class="loading-grid" [attr.aria-label]="'loadingCart' | t">
             @for (item of [1, 2]; track item) {
               <article class="line line--loading">
                 <div class="thumb thumb--loading"></div>
@@ -26,12 +26,12 @@
           </div>
         } @else if (!viewLines().length) {
           <div class="empty empty-state">
-            <h3>Tu carrito esta vacio</h3>
-            <p class="muted">Agrega productos desde el catalogo y retoma la compra cuando quieras.</p>
-            <a class="btn btn-primary" routerLink="/products" (click)="close()">Explorar productos</a>
+            <h3>{{ 'emptyCartTitle' | t }}</h3>
+            <p class="muted">{{ 'emptyCartText' | t }}</p>
+            <a class="btn btn-primary" routerLink="/products" (click)="close()">{{ 'exploreProducts' | t }}</a>
           </div>
         } @else {
-          <ul class="lines" aria-label="Items del carrito">
+          <ul class="lines" [attr.aria-label]="'cartItems' | t">
             @for (line of viewLines(); track line.key) {
               <li class="line">
                 <img class="thumb" [src]="line.product.imageUrl" [alt]="line.product.name" loading="lazy" />
@@ -39,7 +39,7 @@
                   <p class="name">{{ line.product.name }}</p>
                   <p class="meta">{{ line.flavor }} · {{ line.nicotineMg }} mg</p>
                   <label class="sel">
-                    <span class="sr-only">Variante</span>
+                    <span class="sr-only">{{ 'variant' | t }}</span>
                     <select [value]="line.variantId" [disabled]="isBusy(line)" (change)="changeVariant(line, $any($event.target).value)">
                       @for (variant of line.product.variants; track variant.id) {
                         <option [value]="variant.id">{{ variant.flavor }} · {{ variant.nicotineMg }} mg</option>
@@ -55,7 +55,7 @@
                 <div class="price">
                   <p class="p">{{ line.lineTotal | appCurrency }}</p>
                   <div class="acts">
-                    <button type="button" class="rm" (click)="remove(line)" [disabled]="isBusy(line)">Quitar</button>
+                    <button type="button" class="rm" (click)="remove(line)" [disabled]="isBusy(line)">{{ 'remove' | t }}</button>
                   </div>
                 </div>
               </li>
@@ -66,10 +66,10 @@
 
       <footer class="foot">
         <div class="sum">
-          <span>Subtotal</span>
+          <span>{{ 'subtotal' | t }}</span>
           <strong>{{ subtotal() | appCurrency }}</strong>
         </div>
-        <p class="foot-copy">Tu carrito queda guardado en tu cuenta para continuar despues sin perder la seleccion.</p>
+        <p class="foot-copy">{{ 'cartSavedText' | t }}</p>
         <div class="actions">
           <button
             type="button"
@@ -78,10 +78,10 @@
             [disabled]="!viewLines().length || clearing() || !loading()"
             (click)="clear()"
           >
-            {{ clearing() ? 'Vaciando...' : 'Vaciar' }}
+            {{ clearing() ? ('clearing' | t) : ('clear' | t) }}
           </button>
           <a class="btn btn-primary" routerLink="/cart" (click)="close()" [class.is-disabled]="!viewLines().length">
-            Ver carrito
+            {{ 'viewCart' | t }}
           </a>
         </div>
       </footer>

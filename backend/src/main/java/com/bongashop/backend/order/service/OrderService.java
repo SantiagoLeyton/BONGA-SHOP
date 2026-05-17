@@ -6,6 +6,7 @@ import com.bongashop.backend.cartitem.entity.CartItem;
 import com.bongashop.backend.config.security.CustomUserDetails;
 import com.bongashop.backend.inventory.entity.Inventory;
 import com.bongashop.backend.inventory.repository.InventoryRepository;
+import com.bongashop.backend.inventory.service.InventoryMovementService;
 import com.bongashop.backend.order.dto.OrderDetailResponse;
 import com.bongashop.backend.order.dto.OrderItemRequest;
 import com.bongashop.backend.order.dto.OrderRequest;
@@ -17,6 +18,7 @@ import com.bongashop.backend.order.repository.OrderRepository;
 import com.bongashop.backend.orderdetail.entity.OrderDetail;
 import com.bongashop.backend.productvariant.entity.ProductVariant;
 import com.bongashop.backend.shared.dto.PageResponse;
+import com.bongashop.backend.shared.enums.InventoryMovementType;
 import com.bongashop.backend.shared.enums.OrderStatus;
 import com.bongashop.backend.shared.exception.BusinessException;
 import com.bongashop.backend.shared.exception.ForbiddenOperationException;
@@ -43,19 +45,22 @@ public class OrderService {
     private final UserService userService;
     private final CartService cartService;
     private final OrderMapper orderMapper;
+    private final InventoryMovementService movementService;
 
     public OrderService(
             OrderRepository orderRepository,
             InventoryRepository inventoryRepository,
             UserService userService,
             CartService cartService,
-            OrderMapper orderMapper
+            OrderMapper orderMapper,
+            InventoryMovementService movementService
     ) {
         this.orderRepository = orderRepository;
         this.inventoryRepository = inventoryRepository;
         this.userService = userService;
         this.cartService = cartService;
         this.orderMapper = orderMapper;
+        this.movementService = movementService;
     }
 
     @Transactional
@@ -86,7 +91,18 @@ public class OrderService {
                 throw new InsufficientStockException("Insufficient stock for variant " + cartItem.getVariant().getId());
             }
 
-            inventory.setStock(inventory.getStock() - cartItem.getQuantity());
+            int stockBefore = inventory.getStock();
+            int stockAfter = stockBefore - cartItem.getQuantity();
+            inventory.setStock(stockAfter);
+            inventoryRepository.save(inventory);
+            movementService.recordMovement(
+                    variant,
+                    InventoryMovementType.SALE,
+                    stockBefore,
+                    stockAfter,
+                    order.getUser(),
+                    "Compra"
+            );
             OrderDetail detail = new OrderDetail();
             detail.setOrder(order);
             detail.setVariant(variant);

@@ -9,11 +9,12 @@ import { ProductService } from '../../core/services/product.service';
 import { ModalService } from '../../core/services/modal.service';
 import { prefersReducedMotion, registerGsap } from '../../shared/animation/register-gsap';
 import { RevealScrollDirective } from '../../shared/directives/reveal-scroll.directive';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-home-page',
   standalone: true,
-  imports: [RouterLink, RevealScrollDirective],
+  imports: [RouterLink, RevealScrollDirective, TranslatePipe],
   templateUrl: './home-page.component.html',
   styleUrl: './home-page.component.scss',
 })

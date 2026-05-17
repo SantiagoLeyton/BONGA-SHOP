@@ -43,9 +43,10 @@ public class ProductVariantController {
     @ResponseStatus(HttpStatus.CREATED)
     public ProductVariantResponse createVariant(
             @PathVariable Long productId,
-            @Valid @RequestBody ProductVariantRequest request
+            @Valid @RequestBody ProductVariantRequest request,
+            @AuthenticationPrincipal CustomUserDetails userDetails
     ) {
-        return productVariantService.create(productId, request);
+        return productVariantService.create(productId, request, userDetails == null ? null : userDetails.getUserId());
     }
 
     @PutMapping("/variants/{id}")

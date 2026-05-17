@@ -2,7 +2,7 @@
   <aside class="admin-sidebar" aria-label="Navegación del panel">
     <header class="admin-sidebar__head">
       <p class="admin-sidebar__eyebrow">BONGA SHOP</p>
-      <h1 class="admin-sidebar__title">Panel admin</h1>
+      <h1 class="admin-sidebar__title">{{ 'adminPanel' | t }}</h1>
     </header>
 
     <nav class="admin-nav" aria-label="Secciones">
@@ -74,8 +74,8 @@
                 }
               </span>
               <span class="admin-nav__body">
-                <span class="admin-nav__label">{{ item.label }}</span>
-                <span class="admin-nav__caption">{{ item.caption }}</span>
+                <span class="admin-nav__label">{{ item.labelKey | t }}</span>
+                <span class="admin-nav__caption">{{ item.captionKey | t }}</span>
               </span>
               @if (item.id !== 'overview') {
                 <span class="admin-nav__badge">{{ countFor(item.id) }}</span>
@@ -89,10 +89,23 @@
     <div class="admin-sidebar__sep" aria-hidden="true"></div>
 
     <div class="admin-sidebar__alert" [class.is-warn]="lowStockCount() > 0">
-      <p class="admin-sidebar__alert-label">Stock crítico</p>
+      <p class="admin-sidebar__alert-label">{{ 'criticalStock' | t }}</p>
       <p class="admin-sidebar__alert-value">{{ lowStockCount() }}</p>
-      <p class="admin-sidebar__alert-hint">variantes requieren atención</p>
+      <p class="admin-sidebar__alert-hint">{{ 'variantsNeedAttention' | t }}</p>
     </div>
+
+    <button type="button" class="admin-sidebar__ai" (click)="openRecommendations()">
+      <span class="admin-sidebar__ai-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M12 3l1.7 5.2L19 10l-5.3 1.8L12 17l-1.7-5.2L5 10l5.3-1.8L12 3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+          <path d="M18.5 14l.8 2.4 2.2.8-2.2.8-.8 2.4-.8-2.4-2.2-.8 2.2-.8.8-2.4z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="admin-sidebar__ai-body">
+        <strong>Acciones recomendadas</strong>
+        <small>Analisis operativo</small>
+      </span>
+    </button>
 
     <a class="admin-sidebar__back" routerLink="/">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -104,7 +117,7 @@
           stroke-linejoin="round"
         />
       </svg>
-      Volver a la tienda
+      {{ 'backStore' | t }}
     </a>
   </aside>
 
@@ -112,3 +125,76 @@
     <router-outlet />
   </main>
 </div>
+
+<button
+  type="button"
+  class="admin-ai-scrim"
+  [class.is-open]="recommendationsOpen()"
+  (click)="closeRecommendations()"
+  tabindex="-1"
+  aria-hidden="true"
+></button>
+
+<aside
+  class="admin-ai-panel"
+  [class.is-open]="recommendationsOpen()"
+  [attr.aria-hidden]="!recommendationsOpen()"
+  [attr.inert]="recommendationsOpen() ? null : true"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Acciones recomendadas"
+>
+  <header class="admin-ai-panel__head">
+    <div>
+      <p class="admin-ai-panel__eyebrow">Inteligencia operativa</p>
+      <h2>Acciones recomendadas</h2>
+      <p>Recomendaciones calculadas con ventas, inventario y movimientos reales.</p>
+    </div>
+    <button type="button" class="admin-ai-panel__close" (click)="closeRecommendations()" aria-label="Cerrar">
+      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </header>
+
+  <div class="admin-ai-panel__actions">
+    <button type="button" class="admin-ai-refresh" (click)="refreshRecommendations()" [disabled]="recommendationsLoading()">
+      {{ recommendationsLoading() ? 'Analizando...' : 'Recalcular' }}
+    </button>
+  </div>
+
+  <div class="admin-ai-panel__body">
+    @if (recommendationsLoading()) {
+      <div class="admin-ai-loading">
+        <span></span><span></span><span></span>
+      </div>
+    } @else if (recommendations().length) {
+      @for (item of recommendations(); track item.title; let i = $index) {
+        <article class="admin-ai-card" [class.is-open]="expandedRecommendation() === i">
+          <button
+            type="button"
+            class="admin-ai-card__button"
+            (click)="toggleRecommendation(i)"
+            [attr.aria-expanded]="expandedRecommendation() === i"
+          >
+            <span [class]="priorityClass(item.priority)">{{ priorityLabel(item.priority) }}</span>
+            <strong>{{ item.title }}</strong>
+            <span class="admin-ai-card__chevron" aria-hidden="true">
+              <svg viewBox="0 0 16 16" fill="none">
+                <path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </span>
+          </button>
+          <div class="admin-ai-card__detail">
+            <p>{{ item.description }}</p>
+          </div>
+        </article>
+      }
+    } @else {
+      <section class="admin-ai-empty">
+        <h3>Sin acciones urgentes</h3>
+        <p>El sistema no encontro senales suficientes con los datos actuales. Se recalculara cuando existan mas ventas o movimientos.</p>
+      </section>
+    }
+  </div>
+</aside>

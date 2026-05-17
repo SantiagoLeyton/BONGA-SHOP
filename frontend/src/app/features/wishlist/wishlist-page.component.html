@@ -6,7 +6,7 @@
     <div>
       <p class="kicker">Tu selección</p>
       <h1 class="title">
-        Favoritos
+        {{ 'wishlist' | t }}
         @if (wishlistLoaded() && count() > 0) {
           <span class="title__count" [attr.aria-label]="count() + ' productos guardados'">({{ count() }})</span>
         }
@@ -14,7 +14,7 @@
       <p class="sub">Guarda los productos que te llaman, compáralos y vuelve a ellos cuando quieras.</p>
     </div>
     <div class="actions">
-      <a class="btn btn-ghost" routerLink="/products">Explorar productos</a>
+      <a class="btn btn-ghost" routerLink="/products">{{ 'exploreProducts' | t }}</a>
       <button
         type="button"
         class="btn btn-secondary"
@@ -23,7 +23,7 @@
         (click)="clear()"
         [disabled]="!items().length || clearing() || !wishlistLoaded()"
       >
-        {{ clearing() ? 'Limpiando...' : 'Vaciar favoritos' }}
+        {{ clearing() ? ('clearing' | t) : ('clearWishlist' | t) }}
       </button>
     </div>
   </div>
@@ -143,14 +143,14 @@
                 (click)="addToCart(product)"
               >
                 @if (isAdding(product.id)) {
-                  Agregando...
+                  {{ 'adding' | t }}
                 } @else {
                   <svg viewBox="0 0 16 16" width="13" height="13" fill="none" aria-hidden="true">
                     <path d="M2 3h2l1.5 8.5a1 1 0 001 .8h5.9a1 1 0 001-.8L15 6H5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
                     <circle cx="6.5" cy="14" r="1" fill="currentColor"/>
                     <circle cx="12.5" cy="14" r="1" fill="currentColor"/>
                   </svg>
-                  Agregar
+                  {{ 'add' | t }}
                 }
               </button>
               <button
@@ -159,7 +159,7 @@
                 (click)="remove(product)"
                 [disabled]="isRemoving(product.id)"
               >
-                Quitar
+                {{ 'remove' | t }}
               </button>
             </div>
           </div>
@@ -183,7 +183,7 @@
       <p class="empty__eyebrow">Aún no tienes favoritos</p>
       <h2>Tu lista personal está vacía</h2>
       <p class="muted">Marca los productos que te interesen con el corazón y aparecerán aquí para compararlos y decidir con calma.</p>
-      <a class="btn btn-primary" routerLink="/products">Explorar productos</a>
+      <a class="btn btn-primary" routerLink="/products">{{ 'exploreProducts' | t }}</a>
     </section>
   }
 </div>
@@ -287,14 +287,14 @@
                   [disabled]="isAdding(p.id)"
                   (click)="addToCartFromCompare(p)"
                 >
-                  {{ isAdding(p.id) ? 'Agregando...' : 'Agregar al carrito' }}
+                  {{ isAdding(p.id) ? ('adding' | t) : ('addToCart' | t) }}
                 </button>
                 <button
                   type="button"
                   class="btn btn-ghost btn-sm"
                   (click)="goToDetail(p)"
                 >
-                  Ver detalle
+                  {{ 'viewDetail' | t }}
                 </button>
               </div>
             </article>

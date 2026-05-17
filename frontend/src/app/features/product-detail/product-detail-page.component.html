@@ -1,11 +1,11 @@
 @if (loading()) {
   <div class="container detail">
     <nav class="crumbs" aria-label="Migas de pan">
-      <a routerLink="/">Inicio</a>
+      <a routerLink="/">{{ 'home' | t }}</a>
       <span aria-hidden="true">/</span>
-      <a routerLink="/products">Productos</a>
+      <a routerLink="/products">{{ 'products' | t }}</a>
       <span aria-hidden="true">/</span>
-      <span class="current">Cargando...</span>
+      <span class="current">{{ 'loading' | t }}</span>
     </nav>
 
     <div class="grid">
@@ -15,8 +15,8 @@
 
       <div class="copy" appRevealScroll [appRevealDelay]="0.1">
         <p class="brand">-</p>
-        <h1 class="title">Cargando producto...</h1>
-        <p class="desc">Estamos preparando la ficha completa para que puedas elegir mejor.</p>
+        <h1 class="title">{{ 'loadingProduct' | t }}</h1>
+        <p class="desc">{{ 'productLoadingText' | t }}</p>
       </div>
     </div>
   </div>
@@ -24,9 +24,9 @@
   @if (product(); as product) {
     <div class="container detail">
       <nav class="crumbs" aria-label="Migas de pan">
-        <a routerLink="/">Inicio</a>
+        <a routerLink="/">{{ 'home' | t }}</a>
         <span aria-hidden="true">/</span>
-        <a routerLink="/products">Productos</a>
+        <a routerLink="/products">{{ 'products' | t }}</a>
         <span aria-hidden="true">/</span>
         <span class="current">{{ product.name }}</span>
       </nav>
@@ -77,7 +77,7 @@
             <div class="buy">
               <div class="price-row">
                 <div>
-                  <p class="eyebrow">Variante seleccionada</p>
+                  <p class="eyebrow">{{ 'selectedVariant' | t }}</p>
                   <p class="price">{{ variant.price | appCurrency }}</p>
                 </div>
                 <p
@@ -96,12 +96,12 @@
                   [disabled]="variant.stock === 0"
                 >
                   @if (variant.stock === 0) {
-                    No disponible
+                    {{ 'unavailable' | t }}
                   } @else {
-                    Agregar al carrito
+                    {{ 'addToCart' | t }}
                   }
                 </button>
-                <p class="hint">Tu carrito conserva la variante elegida para que retomes la compra cuando quieras.</p>
+                <p class="hint">{{ 'cartVariantHint' | t }}</p>
               </div>
             </div>
           }
@@ -109,39 +109,39 @@
           <section class="tabs" aria-label="Informacion">
             <div class="tab-head" role="tablist" aria-label="Secciones de producto">
               <button type="button" class="tab" [class.tab--on]="tab() === 'details'" (click)="tab.set('details')">
-                Detalles
+                {{ 'details' | t }}
               </button>
               <button type="button" class="tab" [class.tab--on]="tab() === 'specs'" (click)="tab.set('specs')">
-                Variante
+                {{ 'variant' | t }}
               </button>
               <button type="button" class="tab" [class.tab--on]="tab() === 'shipping'" (click)="tab.set('shipping')">
-                Compra
+                {{ 'purchase' | t }}
               </button>
             </div>
 
             <div class="tab-body">
               @if (tab() === 'details') {
                 <ul class="list">
-                  <li><strong>Marca:</strong> {{ product.brand.name }}</li>
-                  <li><strong>Opciones disponibles:</strong> {{ product.variants.length }} variantes</li>
-                  <li><strong>Precio base:</strong> desde {{ product.variants[0].price | appCurrency }}</li>
+                  <li><strong>{{ 'brand' | t }}:</strong> {{ product.brand.name }}</li>
+                  <li><strong>{{ 'availability' | t }}:</strong> {{ product.variants.length }} {{ 'variants' | t }}</li>
+                  <li><strong>{{ 'basePrice' | t }}:</strong> {{ 'from' | t }} {{ product.variants[0].price | appCurrency }}</li>
                 </ul>
               } @else if (tab() === 'specs') {
                 @if (selectedVariant(); as selected) {
                   <div class="specs">
-                    <div class="spec"><span>Sabor</span><strong>{{ selected.flavor }}</strong></div>
-                    <div class="spec"><span>Nicotina</span><strong>{{ selected.nicotineMg }} mg</strong></div>
-                    <div class="spec"><span>Stock</span><strong>{{ selected.stock }}</strong></div>
-                    <div class="spec"><span>Referencia</span><strong>#{{ selected.id }}</strong></div>
+                    <div class="spec"><span>{{ 'flavor' | t }}</span><strong>{{ selected.flavor }}</strong></div>
+                    <div class="spec"><span>{{ 'nicotine' | t }}</span><strong>{{ selected.nicotineMg }} mg</strong></div>
+                    <div class="spec"><span>{{ 'stock' | t }}</span><strong>{{ selected.stock }}</strong></div>
+                    <div class="spec"><span>{{ 'reference' | t }}</span><strong>#{{ selected.id }}</strong></div>
                   </div>
                 } @else {
-                  <p class="muted">Selecciona una variante para ver su detalle.</p>
+                  <p class="muted">{{ 'selectVariantHint' | t }}</p>
                 }
               } @else {
                 <ul class="list">
-                  <li><strong>Checkout:</strong> confirmas la compra con tu carrito persistente y direccion de entrega.</li>
-                  <li><strong>Stock:</strong> el sistema valida inventario real antes de generar la orden.</li>
-                  <li><strong>Seguimiento:</strong> puedes revisar el historial y estado de tus pedidos desde tu cuenta.</li>
+                  <li><strong>Checkout:</strong> {{ 'checkoutProductText' | t }}</li>
+                  <li><strong>{{ 'stock' | t }}:</strong> {{ 'stockValidationText' | t }}</li>
+                  <li><strong>{{ 'orderTracking' | t }}:</strong> {{ 'orderHistoryText' | t }}</li>
                 </ul>
               }
             </div>
@@ -152,8 +152,8 @@
       @if (related().length) {
         <section class="related" appRevealScroll [appRevealDelay]="0.05">
           <div class="related-head">
-            <h2>Tambien te puede gustar</h2>
-            <a class="btn btn-text btn-sm" routerLink="/products">Ver todo</a>
+            <h2>{{ 'related' | t }}</h2>
+            <a class="btn btn-text btn-sm" routerLink="/products">{{ 'viewAll' | t }}</a>
           </div>
           <div class="related-grid">
             @for (relatedProduct of related(); track relatedProduct.id) {
@@ -165,9 +165,9 @@
     </div>
   } @else {
     <div class="container empty">
-      <h1>Producto no encontrado</h1>
-      <p class="muted">Revisa la URL o vuelve al catalogo para seguir explorando.</p>
-      <a class="btn btn-secondary" routerLink="/products">Volver a productos</a>
+      <h1>{{ 'productNotFound' | t }}</h1>
+      <p class="muted">{{ 'productNotFoundText' | t }}</p>
+      <a class="btn btn-secondary" routerLink="/products">{{ 'backProducts' | t }}</a>
     </div>
   }
 }

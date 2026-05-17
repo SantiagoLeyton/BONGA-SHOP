@@ -8,14 +8,16 @@ import { CartService } from '../../core/services/cart.service';
 import { OrderService } from '../../core/services/order.service';
 import { ProductService } from '../../core/services/product.service';
 import { ToastService } from '../../core/services/toast.service';
+import { TranslationService } from '../../core/services/translation.service';
 import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 type StepId = 'address' | 'review' | 'confirm' | 'done';
 
 @Component({
   selector: 'app-checkout-page',
   standalone: true,
-  imports: [RouterLink, ReactiveFormsModule, AppCurrencyPipe],
+  imports: [RouterLink, ReactiveFormsModule, AppCurrencyPipe, TranslatePipe],
   templateUrl: './checkout-page.component.html',
   styleUrl: './checkout-page.component.scss',
 })
@@ -27,6 +29,7 @@ export class CheckoutPageComponent {
   private readonly orders = inject(OrderService);
   private readonly products = inject(ProductService);
   private readonly accountProfile = inject(AccountProfileService);
+  private readonly translations = inject(TranslationService);
 
   readonly step = signal<StepId>('address');
   readonly productList = toSignal(this.products.getProducts(), { initialValue: [] });
@@ -155,8 +158,8 @@ export class CheckoutPageComponent {
   phoneErrorMessage(): string | null {
     const control = this.addressForm.controls.phone;
     if (!control.invalid || !(control.touched || control.dirty)) return null;
-    if (control.hasError('required')) return 'Ingresa un número de teléfono para coordinar la entrega.';
-    if (control.hasError('pattern')) return 'Solo dígitos (10 a 15), con "+" opcional al inicio. Ej. +57 3001234567.';
-    return 'Ingresa un teléfono válido.';
+    if (control.hasError('required')) return this.translations.instant('phoneRequired');
+    if (control.hasError('pattern')) return this.translations.instant('phoneInvalid');
+    return this.translations.instant('validPhone');
   }
 }

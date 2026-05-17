@@ -1,11 +1,11 @@
 <div class="filters">
   <div class="filters-head">
-    <h2 class="h">Filtros</h2>
-    <button type="button" class="btn btn-text btn-sm" (click)="reset()">Limpiar</button>
+    <h2 class="h">{{ 'filters' | t }}</h2>
+    <button type="button" class="btn btn-text btn-sm" (click)="reset()">{{ 'clearAll' | t }}</button>
   </div>
 
   <section class="block">
-    <h3 class="sub">Orden</h3>
+    <h3 class="sub">{{ 'sort' | t }}</h3>
     <div class="sort" data-sort-root>
       <button
         type="button"
@@ -38,7 +38,7 @@
   </section>
 
   <section class="block">
-    <h3 class="sub">Marca</h3>
+    <h3 class="sub">{{ 'brand' | t }}</h3>
     <ul class="checks">
       @for (b of brands; track b.id) {
         <li>
@@ -56,7 +56,7 @@
   </section>
 
   <section class="block">
-    <h3 class="sub">Sabor</h3>
+    <h3 class="sub">{{ 'flavor' | t }}</h3>
     <ul class="checks">
       @for (f of flavors; track f) {
         <li>
@@ -74,7 +74,7 @@
   </section>
 
   <section class="block">
-    <h3 class="sub">Nicotina (mg)</h3>
+    <h3 class="sub">{{ 'nicotine' | t }}</h3>
     <div class="grid2">
       <label class="mini">
         <span>Mín</span>
@@ -102,7 +102,7 @@
   </section>
 
   <section class="block">
-    <h3 class="sub">Precio (COP)</h3>
+    <h3 class="sub">{{ 'price' | t }}</h3>
     <div class="grid2">
       <label class="mini">
         <span>Mín</span>

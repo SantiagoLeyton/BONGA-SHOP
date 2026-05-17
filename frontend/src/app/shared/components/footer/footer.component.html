@@ -13,112 +13,114 @@
           <em>SHOP</em>
         </span>
       </a>
-      <p class="footer__tagline">Marketplace premium de vapes desechables.</p>
+      <p class="footer__tagline">{{ 'marketplaceTagline' | t }}</p>
       <p class="footer__copy">
-        Curamos marcas, sabores y experiencias. Checkout rápido, favoritos reales y seguimiento claro de cada pedido.
+        {{ 'footerCopy' | t }}
       </p>
 
       <div class="footer__ctas">
-        <a class="footer__btn footer__btn--primary" routerLink="/products">
-          <span>Explorar catálogo</span>
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
-            <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </a>
+        @if (showCatalogCta()) {
+          <a class="footer__btn footer__btn--primary" routerLink="/products">
+            <span>{{ 'exploreCatalog' | t }}</span>
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        }
         @if (!isAuthed()) {
           <button type="button" class="footer__btn footer__btn--ghost" (click)="openRegister()">
-            Crear cuenta
+            {{ 'createAccount' | t }}
           </button>
         } @else {
-          <a class="footer__btn footer__btn--ghost" routerLink="/account">Mi cuenta</a>
+          <a class="footer__btn footer__btn--ghost" routerLink="/account">{{ 'myAccount' | t }}</a>
         }
       </div>
 
       <ul class="footer__perks" aria-label="Ventajas">
-        <li><span class="footer__dot" aria-hidden="true"></span>Stock real contra inventario</li>
-        <li><span class="footer__dot" aria-hidden="true"></span>Conexión protegida</li>
-        <li><span class="footer__dot" aria-hidden="true"></span>Seguimiento de pedidos</li>
+        <li><span class="footer__dot" aria-hidden="true"></span>{{ 'realStock' | t }}</li>
+        <li><span class="footer__dot" aria-hidden="true"></span>{{ 'protectedConnection' | t }}</li>
+        <li><span class="footer__dot" aria-hidden="true"></span>{{ 'orderTracking' | t }}</li>
       </ul>
     </section>
 
     <nav class="footer__col" aria-label="Explorar">
-      <p class="footer__eyebrow">Explorar</p>
+      <p class="footer__eyebrow">{{ 'explore' | t }}</p>
       <ul class="footer__list">
-        <li><a routerLink="/">Inicio</a></li>
-        <li><a routerLink="/products">Productos</a></li>
+        <li><a routerLink="/">{{ 'home' | t }}</a></li>
+        <li><a routerLink="/products">{{ 'products' | t }}</a></li>
         @if (isAuthed()) {
-          <li><a routerLink="/wishlist">Favoritos</a></li>
-          <li><a routerLink="/orders">Mis pedidos</a></li>
+          <li><a routerLink="/wishlist">{{ 'wishlist' | t }}</a></li>
+          <li><a routerLink="/orders">{{ 'myOrders' | t }}</a></li>
         }
         @if (isAdmin()) {
-          <li><a class="footer__list-admin" routerLink="/admin">Panel admin</a></li>
+          <li><a class="footer__list-admin" routerLink="/admin">{{ 'adminPanel' | t }}</a></li>
         }
       </ul>
     </nav>
 
     <nav class="footer__col" aria-label="Tu cuenta">
-      <p class="footer__eyebrow">Tu cuenta</p>
+      <p class="footer__eyebrow">{{ 'yourAccount' | t }}</p>
       <ul class="footer__list">
         @if (isAuthed()) {
-          <li><a routerLink="/account">Mi cuenta</a></li>
-          <li><a routerLink="/cart">Carrito</a></li>
+          <li><a routerLink="/account">{{ 'myAccount' | t }}</a></li>
+          <li><a routerLink="/cart">{{ 'cart' | t }}</a></li>
           <li><a routerLink="/checkout">Checkout</a></li>
         } @else {
           <li>
             <button type="button" class="footer__list-btn" (click)="openRegister()">
-              Crear cuenta
+              {{ 'createAccount' | t }}
             </button>
           </li>
-          <li><a routerLink="/products">Ver catálogo</a></li>
+          <li><a routerLink="/products">{{ 'exploreCatalog' | t }}</a></li>
         }
       </ul>
     </nav>
 
-    <div class="footer__col" aria-label="Información">
-      <p class="footer__eyebrow">Información</p>
+    <div class="footer__col" aria-label="Informacion">
+      <p class="footer__eyebrow">{{ 'info' | t }}</p>
       <ul class="footer__list">
         <li>
           <button type="button" class="footer__list-btn" (click)="openInfo()">
-            Sobre el proyecto
+            {{ 'aboutProject' | t }}
           </button>
         </li>
         <li>
           <button type="button" class="footer__list-btn" (click)="openInfo()">
-            Equipo y créditos
+            {{ 'teamCredits' | t }}
           </button>
         </li>
         <li>
-          <a href="mailto:hola@bonga.shop">Contáctanos</a>
+          <a href="mailto:hola@bonga.shop">{{ 'contactUs' | t }}</a>
         </li>
       </ul>
       <p class="footer__note">
-        Producto mayor de edad. Verifica tu país y normativas locales.
+        {{ 'adultProductNote' | t }}
       </p>
     </div>
   </div>
 
   <div class="container footer__bottom">
     <p class="footer__legal">
-      <span>© {{ year }} <strong>BONGA SHOP</strong></span>
+      <span>(c) {{ year }} <strong>BONGA SHOP</strong></span>
       <span class="footer__sep" aria-hidden="true"></span>
-      <span>Todos los derechos reservados.</span>
+      <span>{{ 'rightsReserved' | t }}</span>
     </p>
 
     <div class="footer__meta">
       <button type="button" class="footer__linkish" (click)="openInfo()">
-        Proyecto académico / profesional
+        {{ 'projectBuild' | t }}
       </button>
       <span class="footer__sep" aria-hidden="true"></span>
-      <span class="footer__version">v1.0 · build {{ year }}</span>
+      <span class="footer__version">v1.0 - build {{ year }}</span>
     </div>
 
     <button
       type="button"
       class="footer__top-btn"
       (click)="scrollToTop()"
-      aria-label="Volver al inicio de la página"
+      aria-label="Volver al inicio de la pagina"
     >
-      <span>Volver arriba</span>
+      <span>{{ 'backToTop' | t }}</span>
       <svg viewBox="0 0 24 24" width="14" height="14" fill="none" aria-hidden="true">
         <path d="M6 14l6-6 6 6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>

@@ -1,0 +1,148 @@
+@if (isAuthed()) {
+  <button
+    type="button"
+    class="vape-ai-fab"
+    aria-label="Abrir asistente inteligente"
+    [class.vape-ai-fab--active]="open()"
+    (click)="toggleOpen()"
+  >
+    <span class="vape-ai-fab__mist" aria-hidden="true"></span>
+    <span class="vape-ai-fab__core">AI</span>
+  </button>
+
+  @if (open()) {
+    <aside class="vape-ai-panel" aria-label="Asistente inteligente de vapes">
+      <header class="vape-ai-panel__head">
+        <div>
+          <p>Asistente BONGA</p>
+          <h2>Encuentra tu vape ideal</h2>
+        </div>
+        <button type="button" class="vape-ai-icon-btn" aria-label="Cerrar asistente" (click)="close()">×</button>
+      </header>
+
+      <div class="vape-ai-progress" aria-hidden="true">
+        <span [style.width.%]="progress()"></span>
+      </div>
+
+      <div class="vape-ai-panel__body">
+        @if (!result()) {
+          @if (step() === 0) {
+            <section class="vape-ai-intro">
+              <span class="vape-ai-orbit" aria-hidden="true"></span>
+              <h3>¿No sabes qué vape es ideal para ti?</h3>
+              <p>Déjame ayudarte a encontrar una opción real de BONGA según sabor, intensidad y experiencia.</p>
+              <button type="button" class="vape-ai-primary" (click)="start()">Empezar guía</button>
+            </section>
+          }
+
+          @if (step() === 1) {
+            <section class="vape-ai-step">
+              <p class="vape-ai-kicker">Pregunta 1 de 3</p>
+              <h3>¿Qué sabores prefieres?</h3>
+              <div class="vape-ai-options vape-ai-options--grid">
+                @for (option of flavorOptions; track option) {
+                  <button
+                    type="button"
+                    class="vape-ai-choice"
+                    [class.vape-ai-choice--selected]="isFlavorSelected(option)"
+                    (click)="toggleFlavor(option)"
+                  >
+                    {{ option }}
+                  </button>
+                }
+              </div>
+            </section>
+          }
+
+          @if (step() === 2) {
+            <section class="vape-ai-step">
+              <p class="vape-ai-kicker">Pregunta 2 de 3</p>
+              <h3>¿Qué intensidad buscas?</h3>
+              <div class="vape-ai-options">
+                @for (option of intensityOptions; track option) {
+                  <button
+                    type="button"
+                    class="vape-ai-choice"
+                    [class.vape-ai-choice--selected]="selectedIntensity() === option"
+                    (click)="chooseIntensity(option)"
+                  >
+                    {{ option }}
+                  </button>
+                }
+              </div>
+            </section>
+          }
+
+          @if (step() === 3) {
+            <section class="vape-ai-step">
+              <p class="vape-ai-kicker">Pregunta 3 de 3</p>
+              <h3>¿Qué experiencia prefieres?</h3>
+              <div class="vape-ai-options vape-ai-options--grid">
+                @for (option of experienceOptions; track option) {
+                  <button
+                    type="button"
+                    class="vape-ai-choice"
+                    [class.vape-ai-choice--selected]="selectedExperience() === option"
+                    (click)="chooseExperience(option)"
+                  >
+                    {{ option }}
+                  </button>
+                }
+              </div>
+            </section>
+          }
+
+          @if (error()) {
+            <p class="vape-ai-error">{{ error() }}</p>
+          }
+
+          @if (step() > 0) {
+            <footer class="vape-ai-actions">
+              <button type="button" class="vape-ai-secondary" (click)="back()" [disabled]="loading()">Atrás</button>
+              @if (step() < 3) {
+                <button type="button" class="vape-ai-primary" (click)="next()">Continuar</button>
+              } @else {
+                <button type="button" class="vape-ai-primary" (click)="submit()" [disabled]="loading()">
+                  {{ loading() ? 'Analizando...' : 'Ver recomendación' }}
+                </button>
+              }
+            </footer>
+          }
+        } @else {
+          <section class="vape-ai-result">
+            <p class="vape-ai-kicker">{{ result()?.aiAvailable ? 'Gemma 2B activo' : 'Modo inteligente local' }}</p>
+            <h3>Tu recomendación</h3>
+            <p class="vape-ai-message">{{ result()?.message }}</p>
+
+            <div class="vape-ai-products">
+              @for (item of result()?.recommendations ?? []; track item.variantId) {
+                <article class="vape-ai-product">
+                  <div>
+                    <p class="vape-ai-product__brand">{{ item.brandName }}</p>
+                    <h4>{{ item.productName }}</h4>
+                    <p>{{ item.flavor }} · {{ item.nicotineLevel }}</p>
+                  </div>
+                  <div class="vape-ai-product__meta">
+                    <span>{{ item.price | currency: 'COP' : 'symbol-narrow' : '1.0-0' }}</span>
+                    <small>{{ item.stock }} disp.</small>
+                  </div>
+                </article>
+              }
+            </div>
+
+            @if (!result()?.aiAvailable) {
+              <p class="vape-ai-note">El asistente inteligente no está disponible temporalmente.</p>
+            }
+
+            <footer class="vape-ai-actions">
+              <button type="button" class="vape-ai-secondary" (click)="reset()">Nueva guía</button>
+              @if ((result()?.recommendations?.length ?? 0) > 0) {
+                <a class="vape-ai-primary" [routerLink]="productLink()">Ver productos</a>
+              }
+            </footer>
+          </section>
+        }
+      </div>
+    </aside>
+  }
+}

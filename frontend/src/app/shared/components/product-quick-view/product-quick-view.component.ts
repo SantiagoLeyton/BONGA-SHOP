@@ -6,13 +6,14 @@ import { CartUiService } from '../../../core/services/cart-ui.service';
 import { ModalService } from '../../../core/services/modal.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { AppCurrencyPipe } from '../../pipes/app-currency.pipe';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ModalShellComponent } from '../modal-shell/modal-shell.component';
 import { ProductBadgeComponent } from '../product-badge/product-badge.component';
 
 @Component({
   selector: 'app-product-quick-view',
   standalone: true,
-  imports: [ModalShellComponent, AppCurrencyPipe, ProductBadgeComponent],
+  imports: [ModalShellComponent, AppCurrencyPipe, ProductBadgeComponent, TranslatePipe],
   templateUrl: './product-quick-view.component.html',
   styleUrl: './product-quick-view.component.scss',
 })

@@ -36,7 +36,7 @@
       @if (isAdmin()) {
         <a class="nav__link nav__link--admin" routerLink="/admin" routerLinkActive="is-active">
           <span>{{ 'admin' | t }}</span>
-          <span class="nav__admin-mark" aria-hidden="true">Panel</span>
+          <span class="nav__admin-mark" aria-hidden="true">{{ 'adminPanel' | t }}</span>
         </a>
       }
     </nav>
@@ -56,11 +56,11 @@
         <button
           type="button"
           class="nav__pref"
-          disabled
+          (click)="setCurrency(currency() === 'COP' ? 'USD' : 'COP')"
           [attr.aria-label]="'Cambiar moneda'"
-          [attr.title]="'Moneda fija: COP'"
+          [attr.title]="'Moneda: ' + currency()"
         >
-          COP
+          {{ currency() }}
         </button>
       </div>
 
@@ -98,7 +98,7 @@
         >
           <span class="nav__avatar" aria-hidden="true">{{ userInitials() }}</span>
           <span class="nav__account-meta">
-            <span class="nav__account-label">Hola</span>
+            <span class="nav__account-label">{{ 'hello' | t }}</span>
             <strong class="nav__account-name">{{ u.name }}</strong>
           </span>
         </a>
@@ -197,13 +197,13 @@
   <div class="nav__drawer-glow nav__drawer-glow--b" aria-hidden="true"></div>
 
   <header class="nav__drawer-head">
-    <p class="nav__drawer-eyebrow">Navegación</p>
+    <p class="nav__drawer-eyebrow">{{ 'navigation' | t }}</p>
     @if (user(); as u) {
       <p class="nav__drawer-hello">
         Hola, <strong>{{ u.name }}</strong>
       </p>
     } @else {
-      <p class="nav__drawer-hello">Bienvenido a <strong>BONGA</strong></p>
+      <p class="nav__drawer-hello">{{ 'welcomeTo' | t }} <strong>BONGA</strong></p>
     }
     <button
       type="button"
@@ -292,7 +292,7 @@
             <path d="M4 20a8 8 0 0 1 16 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
           </svg>
         </span>
-        <span class="nav__drawer-label">Mi cuenta</span>
+        <span class="nav__drawer-label">{{ 'myAccount' | t }}</span>
       </a>
     }
 
@@ -310,7 +310,7 @@
           </svg>
         </span>
         <span class="nav__drawer-label">{{ 'admin' | t }}</span>
-        <span class="nav__drawer-badge" aria-hidden="true">Panel</span>
+        <span class="nav__drawer-badge" aria-hidden="true">{{ 'adminPanel' | t }}</span>
       </a>
     }
   </nav>
@@ -321,23 +321,23 @@
       class="nav__drawer-chip"
       (click)="setLang(lang() === 'es' ? 'en' : 'es')"
     >
-      <span class="nav__drawer-chip-label">Idioma</span>
-      <strong>{{ lang() === 'es' ? 'Español' : 'English' }}</strong>
+      <span class="nav__drawer-chip-label">{{ 'language' | t }}</span>
+      <strong>{{ lang() === 'es' ? 'ES' : 'EN' }}</strong>
     </button>
     <button
       type="button"
       class="nav__drawer-chip"
-      disabled
+      (click)="setCurrency(currency() === 'COP' ? 'USD' : 'COP')"
     >
-      <span class="nav__drawer-chip-label">Moneda</span>
-      <strong>COP</strong>
+      <span class="nav__drawer-chip-label">{{ 'currency' | t }}</span>
+      <strong>{{ currency() }}</strong>
     </button>
   </div>
 
   <footer class="nav__drawer-foot">
     @if (user()) {
       <button type="button" class="nav__cta nav__cta--ghost is-block" (click)="logout()">
-        Cerrar sesión
+        {{ 'logout' | t }}
       </button>
     } @else {
       <button type="button" class="nav__cta nav__cta--ghost is-block" (click)="openLogin()">

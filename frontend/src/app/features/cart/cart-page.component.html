@@ -1,12 +1,12 @@
 <div class="container cart">
   <div class="head">
     <div>
-      <p class="kicker">Tu compra</p>
-      <h1 class="title">Carrito</h1>
-      <p class="sub">Tus productos guardados viven en tu cuenta y se mantienen listos para checkout.</p>
+      <p class="kicker">{{ 'cartKicker' | t }}</p>
+      <h1 class="title">{{ 'cart' | t }}</h1>
+      <p class="sub">{{ 'cartSub' | t }}</p>
     </div>
     <div class="actions">
-      <a class="btn btn-ghost" routerLink="/products">Seguir comprando</a>
+      <a class="btn btn-ghost" routerLink="/products">{{ 'keepShopping' | t }}</a>
       <button
         type="button"
         class="btn btn-secondary"
@@ -15,13 +15,13 @@
         (click)="clear()"
         [disabled]="!lines().length || clearing() || isLoading()"
       >
-        {{ clearing() ? 'Vaciando...' : 'Vaciar carrito' }}
+        {{ clearing() ? ('clearing' | t) : ('clearCart' | t) }}
       </button>
     </div>
   </div>
 
   @if (isLoading()) {
-    <section class="loading-grid" aria-label="Cargando carrito">
+    <section class="loading-grid" [attr.aria-label]="'loadingCart' | t">
       @for (item of [1, 2, 3]; track item) {
         <article class="item item--loading">
           <div class="thumb thumb--loading"></div>
@@ -39,9 +39,9 @@
     </section>
   } @else if (!lines().length) {
     <section class="empty empty-state">
-      <h2>Tu carrito esta vacio</h2>
-      <p class="muted">Explora el catalogo, elige una variante y guardala aqui para comprar despues.</p>
-      <a class="btn btn-primary" routerLink="/products">Explorar productos</a>
+      <h2>{{ 'emptyCartTitle' | t }}</h2>
+      <p class="muted">{{ 'emptyCartText' | t }}</p>
+      <a class="btn btn-primary" routerLink="/products">{{ 'exploreProducts' | t }}</a>
     </section>
   } @else {
     <div class="grid">
@@ -70,13 +70,13 @@
                 <button type="button" class="qbtn" (click)="inc(line)" [disabled]="isBusy(line)">+</button>
               </div>
               @if (isBusy(line)) {
-                <p class="field-note">Actualizando esta linea...</p>
+              <p class="field-note">{{ 'updatingLine' | t }}</p>
               }
             </div>
             <div class="side">
               <p class="p">{{ line.lineTotal | appCurrency }}</p>
               <div class="acts">
-                <button type="button" class="rm" (click)="remove(line)" [disabled]="isBusy(line)">Quitar</button>
+                <button type="button" class="rm" (click)="remove(line)" [disabled]="isBusy(line)">{{ 'remove' | t }}</button>
               </div>
             </div>
           </article>
@@ -84,14 +84,14 @@
       </section>
 
       <aside class="summary" aria-label="Resumen">
-        <h2 class="sum-title">Resumen del pedido</h2>
-        <div class="row"><span>Subtotal</span><strong>{{ subtotal() | appCurrency }}</strong></div>
-        <div class="row"><span>Envio</span><strong>Se define en checkout</strong></div>
+        <h2 class="sum-title">{{ 'orderSummary' | t }}</h2>
+        <div class="row"><span>{{ 'subtotal' | t }}</span><strong>{{ subtotal() | appCurrency }}</strong></div>
+        <div class="row"><span>{{ 'shipping' | t }}</span><strong>{{ 'shippingCheckout' | t }}</strong></div>
         <div class="row total">
-          <span>Total estimado</span><strong>{{ total() | appCurrency }}</strong>
+          <span>{{ 'estimatedTotal' | t }}</span><strong>{{ total() | appCurrency }}</strong>
         </div>
 
-        <a class="btn btn-primary btn-lg" routerLink="/checkout">Continuar al checkout</a>
+        <a class="btn btn-primary btn-lg" routerLink="/checkout">{{ 'checkoutContinue' | t }}</a>
         <p class="hint">Antes de confirmar, revisaras tu direccion, el total final y el stock validado en tiempo real.</p>
       </aside>
     </div>

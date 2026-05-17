@@ -4,12 +4,13 @@ import type { Product } from '../../../core/models/product.model';
 import { ToastService } from '../../../core/services/toast.service';
 import { WishlistService } from '../../../core/services/wishlist.service';
 import { AppCurrencyPipe } from '../../pipes/app-currency.pipe';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ProductBadgeComponent } from '../product-badge/product-badge.component';
 
 @Component({
   selector: 'app-product-card',
   standalone: true,
-  imports: [RouterLink, ProductBadgeComponent, AppCurrencyPipe],
+  imports: [RouterLink, ProductBadgeComponent, AppCurrencyPipe, TranslatePipe],
   templateUrl: './product-card.component.html',
   styleUrl: './product-card.component.scss',
 })

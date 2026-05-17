@@ -26,37 +26,37 @@
 
     <!-- LEFT -->
     <div class="hero-left">
-      <span class="hero-badge">BONGA SHOP — VAPES DESECHABLES</span>
+      <span class="hero-badge">{{ 'homeBadge' | t }}</span>
 
       <h1 class="hero-title">
-        Más sabor.<br>
-        Más estilo. <span>Sin límites.</span>
+        {{ 'homeTitle1' | t }}<br>
+        {{ 'homeTitle2' | t }} <span>{{ 'homeTitle3' | t }}</span>
       </h1>
 
       <p class="hero-desc">
-        Vapes desechables, envío directo. Tú eliges el sabor.
+        {{ 'homeDesc' | t }}
       </p>
 
       <p class="hero-fine">
-        +18 · <button type="button" class="hero-fine__link" (click)="openLegalInfo()">Aviso legal</button> · Consume con responsabilidad
+        +18 · <button type="button" class="hero-fine__link" (click)="openLegalInfo()">{{ 'legalNotice' | t }}</button> · {{ 'responsibleUse' | t }}
       </p>
     </div>
 
     <!-- CENTER TOP: stats en glass pill -->
     <div class="hero-stats" aria-label="Datos del catálogo">
-      <div><strong #statProducts>0</strong> <span>Productos</span></div>
-      <div><strong #statVariants>0</strong> <span>Combinaciones</span></div>
+      <div><strong #statProducts>0</strong> <span>{{ 'productsStat' | t }}</span></div>
+      <div><strong #statVariants>0</strong> <span>{{ 'combinations' | t }}</span></div>
       <div><strong>24/7</strong> <span>Online</span></div>
     </div>
 
     <!-- RIGHT: botones -->
     <div class="hero-actions">
-      <a class="btn primary" routerLink="/products">Ver colección</a>
-      <button type="button" class="btn secondary" (click)="openBuyingInfo()">Cómo comprar</button>
+      <a class="btn primary" routerLink="/products">{{ 'viewCollection' | t }}</a>
+      <button type="button" class="btn secondary" (click)="openBuyingInfo()">{{ 'howToBuy' | t }}</button>
       @if (isAdmin()) {
-        <a class="btn ghost" routerLink="/admin">Panel admin</a>
+        <a class="btn ghost" routerLink="/admin">{{ 'adminPanel' | t }}</a>
       } @else if (user()) {
-        <a class="btn ghost" routerLink="/orders">Mis pedidos</a>
+        <a class="btn ghost" routerLink="/orders">{{ 'myOrders' | t }}</a>
       }
     </div>
 
@@ -76,11 +76,11 @@
   <div class="container trust-strip__inner">
     <span>+18</span>
     <span class="trust-strip__sep" aria-hidden="true">·</span>
-    <span>Envíos nacionales</span>
+    <span>{{ 'nationalShipping' | t }}</span>
     <span class="trust-strip__sep" aria-hidden="true">·</span>
-    <span>Compra segura</span>
+    <span>{{ 'securePurchase' | t }}</span>
     <span class="trust-strip__sep" aria-hidden="true">·</span>
-    <span>Sabores premium</span>
+    <span>{{ 'premiumFlavors' | t }}</span>
   </div>
 </div>
 
@@ -88,9 +88,9 @@
   <div class="section--featured__bridge" aria-hidden="true"></div>
   <div class="container section--featured__wrap">
     <header class="featured-head" appRevealScroll>
-      <h2 class="featured-head__title">Destacados</h2>
+      <h2 class="featured-head__title">{{ 'featured' | t }}</h2>
       <p class="featured-head__sub">
-        Una vitrina visual de lo más buscado: sabores premium, selección limitada y lanzamientos que marcan tendencia.
+        {{ 'featuredSub' | t }}
       </p>
     </header>
 
@@ -140,7 +140,7 @@
               <p class="featured-showcase__tag">{{ featuredTag(p) }}</p>
               <h3 class="featured-showcase__name">{{ p.name }}</h3>
               <p class="featured-showcase__meta">{{ p.brand.name }} · {{ featuredFlavor(p) }}</p>
-              <a class="featured-showcase__cta" [routerLink]="['/products', p.slug]">Explorar</a>
+              <a class="featured-showcase__cta" [routerLink]="['/products', p.slug]">{{ 'explore' | t }}</a>
             </div>
           </article>
         }
@@ -161,7 +161,7 @@
     </div>
 
     <p class="featured-more" appRevealScroll>
-      <a class="featured-more__link" routerLink="/products">Explorar todo el catálogo</a>
+      <a class="featured-more__link" routerLink="/products">{{ 'exploreFullCatalog' | t }}</a>
     </p>
   </div>
 </section>
@@ -169,15 +169,15 @@
 <section class="section section--brand">
   <div class="container split" appRevealScroll>
     <div>
-      <h2>Actitud de ciudad</h2>
+      <h2>{{ 'cityAttitude' | t }}</h2>
       <p class="muted">
-        Oscuro, limpio y con detalles que brillan. Pensado para quien quiere comprar rápido y verse bien haciéndolo.
+        {{ 'cityCopy' | t }}
       </p>
     </div>
     <ul class="ticks">
-      <li>Variedad de sabores y nicotina en un solo lugar</li>
-      <li>Detalle de producto con toda la info que importa</li>
-      <li>Checkout y pedidos enlazados a la API</li>
+      <li>{{ 'homeTick1' | t }}</li>
+      <li>{{ 'homeTick2' | t }}</li>
+      <li>{{ 'homeTick3' | t }}</li>
     </ul>
   </div>
 </section>

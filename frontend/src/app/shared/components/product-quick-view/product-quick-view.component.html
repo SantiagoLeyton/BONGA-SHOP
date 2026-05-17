@@ -1,4 +1,4 @@
-<app-modal-shell [isOpen]="isOpen" title="Vista rápida" (closed)="close()">
+<app-modal-shell [isOpen]="isOpen" [title]="'quickView' | t" (closed)="close()">
   @if (product; as p) {
     <div class="qv">
       <div class="media">
@@ -16,8 +16,8 @@
         <p class="desc">{{ p.description }}</p>
 
         <div class="meta">
-          <span class="pill">Desde {{ minPrice() | appCurrency }}</span>
-          <span class="pill muted">{{ p.variants.length }} variantes</span>
+          <span class="pill">{{ 'from' | t }} {{ minPrice() | appCurrency }}</span>
+          <span class="pill muted">{{ p.variants.length }} {{ 'variants' | t }}</span>
         </div>
 
         <div class="actions">
@@ -29,13 +29,13 @@
             [disabled]="adding()"
             (click)="addToCart()"
           >
-            {{ adding() ? 'Añadiendo...' : 'Añadir al carrito' }}
+            {{ adding() ? ('addingToCart' | t) : ('addToCart' | t) }}
           </button>
-          <button type="button" class="btn btn-secondary" (click)="close()">Cerrar</button>
+          <button type="button" class="btn btn-secondary" (click)="close()">{{ 'close' | t }}</button>
         </div>
       </div>
     </div>
   } @else {
-    <p class="muted">Sin datos.</p>
+    <p class="muted">{{ 'noData' | t }}</p>
   }
 </app-modal-shell>

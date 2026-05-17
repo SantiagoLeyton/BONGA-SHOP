@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecificationExecutor<Order> {
@@ -23,4 +24,6 @@ public interface OrderRepository extends JpaRepository<Order, Long>, JpaSpecific
             countQuery = "select count(o) from Order o where o.user.id = :userId"
     )
     Page<Order> findPageByUserId(@Param("userId") Long userId, Pageable pageable);
+
+    long countByPlacedAtGreaterThanEqual(LocalDateTime since);
 }

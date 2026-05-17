@@ -9,6 +9,7 @@ import { WishlistService } from '../../core/services/wishlist.service';
 import { ProductBadgeComponent } from '../../shared/components/product-badge/product-badge.component';
 import { ProductQuickViewComponent } from '../../shared/components/product-quick-view/product-quick-view.component';
 import { AppCurrencyPipe } from '../../shared/pipes/app-currency.pipe';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 type SortKey = 'recent' | 'price-asc' | 'price-desc' | 'name';
 
@@ -17,7 +18,7 @@ const MAX_COMPARE = 3;
 @Component({
   selector: 'app-wishlist-page',
   standalone: true,
-  imports: [RouterLink, AppCurrencyPipe, ProductBadgeComponent, ProductQuickViewComponent],
+  imports: [RouterLink, AppCurrencyPipe, TranslatePipe, ProductBadgeComponent, ProductQuickViewComponent],
   templateUrl: './wishlist-page.component.html',
   styleUrl: './wishlist-page.component.scss',
 })

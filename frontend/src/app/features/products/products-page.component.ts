@@ -7,6 +7,7 @@ import { ProductCardComponent } from '../../shared/components/product-card/produ
 import { ProductQuickViewComponent } from '../../shared/components/product-quick-view/product-quick-view.component';
 import { ProductCardSkeletonComponent } from '../../shared/components/skeleton/product-card-skeleton.component';
 import { RevealScrollDirective } from '../../shared/directives/reveal-scroll.directive';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import {
   applyProductFilters,
   defaultFilterState,
@@ -24,6 +25,7 @@ import type { Product } from '../../core/models/product.model';
     ProductQuickViewComponent,
     ProductCardSkeletonComponent,
     RevealScrollDirective,
+    TranslatePipe,
   ],
   templateUrl: './products-page.component.html',
   styleUrl: './products-page.component.scss',

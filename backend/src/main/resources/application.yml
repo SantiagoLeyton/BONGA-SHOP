@@ -51,6 +51,10 @@ app:
     allowed-origins: ${APP_CORS_ALLOWED_ORIGINS:http://localhost:4200,http://127.0.0.1:4200}
   inventory:
     low-stock-threshold: ${LOW_STOCK_THRESHOLD:5}
+  ai:
+    ollama:
+      base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
+      model: ${OLLAMA_MODEL:gemma:2b}
   bootstrap:
     admin-enabled: ${APP_ADMIN_ENABLED:true}
     admin-name: ${APP_ADMIN_NAME:Bonga Admin}
