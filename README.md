@@ -53,7 +53,7 @@ El proyecto está construido como un **monolito modular**: una sola aplicación 
 
 ## 🧱 Arquitectura del sistema
 
-```mermaid
+```
 flowchart LR
     U[Usuario / Administrador] --> A[Angular 19<br/>localhost:4200]
     A -->|HTTP + JWT| B[Spring Boot 3.3.5<br/>API /api/v1]
